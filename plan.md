@@ -45,6 +45,9 @@ graph TD
 *   *Exemple :* L'insertion d'un trajet (`rides`) exige que `auth.uid() = driver_id`.
 *   Le gating du contact du chauffeur et de la messagerie est appliqué au niveau applicatif et base de données via le statut du paiement associé au couple (voyageur, trajet).
 
+### Table Supplémentaire (Session 14)
+8.  **`sms_logs`** : Journal de tous les SMS Mobile Money reçus (corps du SMS, référence extraite, montant, expéditeur, correspondance trouvée, nombre de réservations validées, horodatage).
+
 ---
 
 ## 🗂️ 3. Organisation du Code
@@ -59,10 +62,16 @@ miaradia-app/
 │   ├── ride/             # Écran détaillé d'un trajet avec widget de réservation
 │   └── _layout.tsx       # Configuration des thèmes et des WebSockets
 ├── components/           # Composants UI réutilisables (Modales, sélecteurs, étoiles)
+│   ├── CustomAlert.tsx   # Modale d'alerte premium animée (S14)
+│   └── PaymentModal.tsx  # Modale de sélection Mobile Money
 ├── constants/            # Données géographiques de Madagascar (Provinces, Régions, Communes)
 │   └── locations/
 ├── hooks/                # Hooks React réutilisables (sessions, requêtes)
 ├── lib/                  # Utilitaires (client Supabase, formateur de prix, OSM, suggestions d'itinéraires)
+├── utils/                # alert.ts (intercepteur CustomAlert)
+├── supabase/             # Edge Functions Supabase
+│   └── functions/
+│       └── sms-webhook/  # Validation automatique SMS Mobile Money (S14)
 └── scripts/              # Scripts utilitaires de parsing de données
 ```
 
@@ -76,10 +85,31 @@ miaradia-app/
 *   Chat temps réel et notation des conducteurs.
 *   Politique d'inscription stricte (Vrai Visage, Rôle).
 
-### Phase 2 : Automatisation & Instantanéité (Prochaine Étape)
-*   **Intégration Agrégateur Mobile Money :** Remplacer le traitement manuel admin des dépôts en Kiosque par une API de paiement (ex. Bizao ou APIs directes) pour valider les transactions et débloquer les contacts instantanément.
-*   **Notifications Push (Expo Notifications) :** Alerter les utilisateurs hors-app des nouveaux messages de chat et de la confirmation des réservations.
+### Phase 2 : Automatisation & Instantanéité *(PARTIELLEMENT RÉALISÉE ✅)*
+*   **Validation SMS Mobile Money *(RÉALISÉ - S14)* :** Supabase Edge Function `sms-webhook` qui reçoit les SMS de confirmation MVola/Orange/Airtel via l'app SMS Gateway sur le téléphone admin, extrait la référence, compare avec les réservations en attente et déverrouille automatiquement le contact chauffeur.
+*   **Déploiement Web Vercel *(RÉALISÉ - S14)* :** Application en production sur https://miaradia-app.vercel.app avec CI/CD automatique (GitHub → Vercel).
+*   **Alertes Premium *(RÉALISÉ - S14)* :** Composant `CustomAlert` modal animé déployé sur toute l'application.
+*   **Notifications Push (Expo Notifications) *(EN ATTENTE)* :** Alerter les utilisateurs hors-app des nouveaux messages de chat et de la confirmation des réservations.
+*   **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Obtenir un compte business Telma pour une validation encore plus fiable que la solution SMS Gateway.
 
 ### Phase 3 : Fiabilité & Mode Offline
 *   **Cache Local SQLite/AsyncStorage :** Mettre en cache local les détails du billet réservé et le contact du chauffeur pour y avoir accès sur la route nationale en zone d'ombre (sans réseau).
 *   **Vérification CIN (KYC) :** Formulaire de téléversement et processus d'approbation d'identité pour certifier officiellement les conducteurs.
+
+### Phase 4 : Croissance & Communauté
+*   **Application Android native (APK)** : Génération du fichier `.apk` via EAS Build pour distribution directe ou sur le Play Store.
+*   **Programme de Fidélité** : Récompenses pour les passagers fréquents (crédits gratuits).
+*   **Abonnements Passager/Chauffeur** : Plans hebdomadaires et mensuels pour accès illimité.
+
+---
+
+## 🌐 5. Infrastructure de Déploiement *(SESSION 14)*
+
+| Service | Usage | URL |
+|---|---|---|
+| **Vercel** | Hébergement Web + CI/CD | https://miaradia-app.vercel.app |
+| **GitHub** | Code source + versioning | https://github.com/Aintsoa-ai/miaradia-app |
+| **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
+| **SMS Gateway** | App Android sur téléphone admin | Gratuit |
+
+*Dernière mise à jour : **3 Juin 2026** - Session 14*

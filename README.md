@@ -67,16 +67,18 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Préférences et Équipements *(NOUVEAU)* :** Ajout de multiples options à cocher (Climatisation, Sièges Inclinables, Prises, etc.) qui s'enregistrent en base et pré-remplissent automatiquement chaque nouvelle annonce.
 - **Gestion des Annonces *(NOUVEAU)* :** Sur la page de détail de *son propre trajet*, le chauffeur dispose d'un panneau pour ajuster les places en temps réel (boutons `+` et `-`) ou supprimer totalement l'annonce.
 
-### 8. Système de Paiement Mobile Money
+### 8. Système de Paiement Mobile Money *(AMÉLIORÉ - SESSION 14)*
 - **Gating de Contact :** Le numéro du conducteur est masqué jusqu'au paiement.
 - **Multi-Opérateurs :** MVola, Orange Money, Airtel Money, Kiosque.
 - **Frais dynamiques :** 10% du prix du trajet (min 1 000, max 5 000 Ar).
 - **Validation Admin :** Les dépôts kiosque sont validés manuellement par l'administrateur.
-- [x] **Paiement Mobile Money** : Gating du contact chauffeur via frais de réservation.
+- **Validation Automatique SMS *(NOUVEAU - S14)* :** Système de validation automatique des paiements Mobile Money via détection et parsing des SMS entrants (MVola/Orange/Airtel). L'app SMS Gateway sur le téléphone de l'admin intercepte les SMS de confirmation, les envoie à la Supabase Edge Function `sms-webhook`, qui compare la référence avec les réservations en attente et déverrouille automatiquement le contact du chauffeur. Zéro intervention manuelle.
+- **Table `sms_logs` *(NOUVEAU - S14)* :** Audit complet de tous les SMS Mobile Money reçus (référence, montant, expéditeur, correspondance trouvée, réservations validées).
 
-### 9. Tableau de Bord Administrateur
+### 9. Tableau de Bord Administrateur *(AMÉLIORÉ - SESSION 14)*
 - **Validation Kiosque :** Validation des dépôts manuels.
 - **Statistiques Utilisateurs *(NOUVEAU)* :** Affichage en temps réel du nombre de chauffeurs inscrits, de clients, et calcul dynamique du nombre de chauffeurs en ligne.
+- **Passerelle SMS Admin *(NOUVEAU - S14)* :** L'administrateur installe l'app SMS Gateway sur son téléphone personnel. Chaque SMS Mobile Money reçu est automatiquement transmis à Supabase pour validation sans aucune action manuelle.
 
 ### 10. Système de Réputation & Avis *(NOUVEAU - V2.0)*
 - **Notation 5 Étoiles :** Les passagers peuvent noter les chauffeurs après chaque trajet terminé.
@@ -143,6 +145,20 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
   - **Recherche & Navigation :** Transition parfaite vers l'écran des résultats avec filtres interactifs et onglets.
   - **Bouton Retour (Back) :** Retour fluide à la page d'accueil avec conservation des choix.
 - **Tests de Validation Desktop 💻 :** Validation complète via tests d'automatisation dans le navigateur de bureau, garantissant zéro erreur de compilation et une fluidité totale de navigation.
+- **Alertes Professionnelles `CustomAlert` *(NOUVEAU - S14)* :** Remplacement universel de `Alert.alert` natif par un composant `CustomAlert` modal animé (glassmorphisme, icônes conditionnelles succès/erreur/avertissement) intégré globalement dans `app/_layout.tsx`. Un utilitaire `utils/alert.ts` intercepte tous les appels d'alertes. Validé sur Mobile et Desktop.
+
+---
+
+## 🌐 Déploiement & Infrastructure *(NOUVEAU - SESSION 14)*
+
+| Plateforme | URL | Statut |
+|---|---|---|
+| **Web (Vercel)** | https://miaradia-app.vercel.app | ✅ En production |
+| **Code source** | https://github.com/Aintsoa-ai/miaradia-app | ✅ Public |
+| **Backend** | https://yqttaeukmnstyxbabkqz.supabase.co | ✅ Actif |
+| **Edge Function SMS** | `.../functions/v1/sms-webhook` | ✅ Déployée |
+
+**CI/CD :** Chaque `git push` sur la branche `master` déclenche automatiquement un nouveau déploiement sur Vercel.
 
 ---
 
@@ -158,6 +174,22 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 | `lib/locationFormatter.ts` | Formate la sélection au format `RN.Ville-Quartier` |
 | `lib/itinerarySuggestions.ts` | Suggère les escales logiques selon l'axe routier (RN) |
 
+### Composants Clés (`components/`)
+| Fichier | Rôle |
+|---|---|
+| `components/CustomAlert.tsx` | Modale d'alerte premium animée (remplace Alert.alert) |
+| `components/PaymentModal.tsx` | Modale de sélection de paiement Mobile Money |
+
+### Utilitaires (`utils/`)
+| Fichier | Rôle |
+|---|---|
+| `utils/alert.ts` | Intercepteur global pour CustomAlert |
+
+### Supabase Edge Functions (`supabase/functions/`)
+| Fonction | URL | Rôle |
+|---|---|---|
+| `sms-webhook` | `.../functions/v1/sms-webhook` | Reçoit les SMS MVola/Orange/Airtel, compare les références et valide automatiquement les paiements |
+
 ---
 
-*Dernière mise à jour : **20 Mai 2026** — Correction des sélecteurs de date et d'heure pour ordinateur (Web) et mobile (Native).*
+*Dernière mise à jour : **3 Juin 2026** — Session 14 : Déploiement Vercel, GitHub CI/CD, Alertes Premium CustomAlert, Passerelle SMS Mobile Money automatique.*

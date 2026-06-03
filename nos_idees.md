@@ -16,7 +16,8 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 ## 💰 Monétisation & Prix
 - [ ] **Tarification au km automatique** : Proposer un prix suggéré au chauffeur dès qu'il entre son trajet, basé sur les prix moyens du marché malgache.
 - [ ] **Paiement In-App complet** : Passer d'un gating de contact à une réservation avec séquestre (l'argent est gardé par l'app jusqu'à l'arrivée).
-- [ ] **Intégration d'Agrégateur Mobile Money Automatique (MVola, Orange Money, Airtel Money) *(PROCHAINE ÉTAPE CRITIQUE)* :** Remplacer la validation manuelle des dépôts Kiosques par une solution de paiement instantanée en ligne (via agrégateur type Bizao ou Webpay) pour débloquer automatiquement et immédiatement le contact chauffeur et la messagerie dès la transaction réussie.
+- [x] **Validation Automatique SMS Mobile Money *(RÉALISÉ - S14)* :** Système de détection automatique des SMS MVola/Orange/Airtel Money via l'app SMS Gateway + Supabase Edge Function `sms-webhook`. Parsing des SMS, comparaison des références, déverrouillage automatique du contact chauffeur et décrémentation des places. Zéro intervention manuelle. Table `sms_logs` pour audit complet.
+- [ ] **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Remplacer la solution SMS Gateway par l'API officielle Telma MVola pour une validation encore plus fiable et instantanée (nécessite un compte business Telma).
 - [ ] **Abonnement Premium Chauffeur** : Permettre aux chauffeurs pro de payer un abonnement mensuel pour ne plus avoir de frais sur les réservations.
 - [ ] **Offres d'Abonnement Passager (Accès Illimité Contacts) *(NOUVEAU)* :** Permettre aux voyageurs fréquents d'acheter un pass d'accès par Mobile Money au lieu de payer à chaque trajet :
   - **Hebdomadaire (15 000 Ar) :** Accès illimité pour voir les numéros de téléphone des chauffeurs et échanger en illimité durant 7 jours.
@@ -62,6 +63,9 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Appels In-App (VoIP)** : Intégrer un bouton d'appel direct via l'app (type Messenger) après déblocage du contact.
 - [ ] **Dashboard Admin Mobile** : Une application simplifiée pour l'admin pour valider les paiements en déplacement.
 - [ ] **Optimisation Realtime** : Centraliser la gestion des WebSockets Supabase (via un Context global) pour éviter les souscriptions multiples et améliorer les performances.
+- [x] **Alertes Premium CustomAlert *(RÉALISÉ - S14)* :** Remplacement universel de tous les `Alert.alert` natifs par un composant `CustomAlert` modal animé professionnel. Intégré globalement dans `_layout.tsx`, disponible sur toute l'application. Icônes conditionnelles (succès/erreur/avertissement), animation fluide, style glassmorphisme. Validé Mobile et Desktop.
+- [x] **Déploiement Vercel + GitHub CI/CD *(RÉALISÉ - S14)* :** Application en ligne sur https://miaradia-app.vercel.app avec mise à jour automatique à chaque `git push`. Code source sur https://github.com/Aintsoa-ai/miaradia-app.
+- [x] **Passerelle SMS Automatique *(RÉALISÉ - S14)* :** Edge Function `sms-webhook` déployée sur Supabase. Parse les SMS MVola/Orange/Airtel, valide les paiements et déverrouille les contacts sans intervention humaine. Gratuit, zéro abonnement.
 
 ---
-*Dernière mise à jour : 20 Mai 2026*
+*Dernière mise à jour : 3 Juin 2026 - Session 14*
