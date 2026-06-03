@@ -279,8 +279,29 @@ export default function AdminDashboard() {
           ))
         )}
 
+        {/* PASSERELLE SMS AUTOMATIQUE */}
+        <TouchableOpacity
+          onPress={() => router.push('/admin/sms-gateway')}
+          style={{
+            backgroundColor: '#054752', borderRadius: 20, padding: 20,
+            flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 12,
+            shadowColor: '#054752', shadowOpacity: 0.3, shadowRadius: 12, elevation: 6
+          }}
+        >
+          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
+            <Ionicons name="phone-portrait" size={22} color="white" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: 'white', fontWeight: '900', fontSize: 15 }}>📱 Passerelle SMS Automatique</Text>
+            <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: '600', marginTop: 2 }}>
+              Validation automatique MVola/Orange/Airtel — Zéro intervention
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
+        </TouchableOpacity>
+
         {/* SECTION DÉMO */}
-        <View className="mt-10 border-t border-gray-200 pt-10 mb-20">
+        <View className="mt-6 border-t border-gray-200 pt-8 mb-20">
           <Text className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-4 text-center">Espace Développeur</Text>
           <TouchableOpacity 
             onPress={generateDemoData}
