@@ -12,6 +12,8 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Axe Fluvial** : Ajouter la possibilité de publier des trajets en bateau (ex: Canal des Pangalanes ou traversées vers Sainte-Marie / Nosy Be).
 - [ ] **Points de Repère (Points of Interest)** : Permettre aux conducteurs d'ajouter des points de repère connus (ex: "Arrêt devant Station Galana") au lieu de simples noms de communes.
 - [ ] **Météo des Routes** : Alerte sur l'état des pistes en saison des pluies (ex: "Piste RN5 difficile actuellement").
+- [ ] **Trajets Courtes Distances / Intra-District (Taxi Communautaire) *(NOUVEAU)* :** Proposer une option pour les trajets quotidiens (Maison-Travail-Maison). Un conducteur publie son trajet matin/soir, et les gens de son quartier peuvent rentrer avec lui.
+- [ ] **Sortie de Famille / Privatisation *(NOUVEAU)* :** Ajouter une catégorie où les voyageurs cherchent spécifiquement à privatiser une voiture pour une sortie de famille (frais de publication spécifique, ex: 1 000 Ar).
 
 ## 💰 Monétisation & Prix
 - [ ] **Tarification au km automatique** : Proposer un prix suggéré au chauffeur dès qu'il entre son trajet, basé sur les prix moyens du marché malgache.
@@ -19,10 +21,10 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Validation Automatique SMS Mobile Money *(RÉALISÉ - S14)* :** Système de détection automatique des SMS MVola/Orange/Airtel Money via l'app SMS Gateway + Supabase Edge Function `sms-webhook`. Parsing des SMS, comparaison des références, déverrouillage automatique du contact chauffeur et décrémentation des places. Zéro intervention manuelle. Table `sms_logs` pour audit complet.
 - [ ] **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Remplacer la solution SMS Gateway par l'API officielle Telma MVola pour une validation encore plus fiable et instantanée (nécessite un compte business Telma).
 - [ ] **Abonnement Premium Chauffeur** : Permettre aux chauffeurs pro de payer un abonnement mensuel pour ne plus avoir de frais sur les réservations.
-- [ ] **Offres d'Abonnement Passager (Accès Illimité Contacts) *(NOUVEAU)* :** Permettre aux voyageurs fréquents d'acheter un pass d'accès par Mobile Money au lieu de payer à chaque trajet :
-  - **Hebdomadaire (15 000 Ar) :** Accès illimité pour voir les numéros de téléphone des chauffeurs et échanger en illimité durant 7 jours.
-  - **Mensuel (50 000 Ar) :** Accès illimité pour voir les numéros de téléphone et échanger en illimité durant 30 jours.
-- [ ] **Programme de Fidélité Voyageur (Bonus d'Activité) *(NOUVEAU)* :** Récompenser les passagers fidèles pour stimuler l'activité. Si un voyageur effectue une réservation et contacte plus de 8 chauffeurs différents en moins d'une semaine, l'application lui offre **1 crédit de contact gratuit en bonus** (frais de réservation offerts sur le trajet suivant de son choix).
+- [ ] **Offres d'Abonnement Passager (Accès Illimité Contacts) *(NOUVEAU)* :** Proposer des abonnements pour les voyageurs réguliers au lieu de payer à chaque trajet :
+  - **Hebdomadaire :** Affiche tous les numéros de conducteurs pendant une semaine entière.
+  - **Mensuel :** Affiche tous les numéros de conducteurs pendant un mois entier.
+- [ ] **Programme de Fidélité Voyageur (Bonus d'Activité) :** Récompenser les passagers fidèles pour stimuler l'activité. Si un voyageur effectue une réservation et contacte plus de 8 chauffeurs différents en moins d'une semaine, l'application lui offre **1 crédit de contact gratuit en bonus** (frais de réservation offerts sur le trajet suivant de son choix).
 
 ## 🤝 Communauté & Confiance
 - [ ] **Vérification d'Identité (KYC)** : Permettre aux utilisateurs d'uploader leur CIN pour obtenir un badge "Profil Vérifié par CIN".
@@ -60,6 +62,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Sélecteurs de Dates Universels Hybrides & Ergonomie (S13) 💻📱** : Remplacement du libellé par défaut "Aujourd'hui" par "Départ" sur ordinateur et mobile. Résolution de l'incompatibilité de DateTimePickerModal sur ordinateur (Web) par l'utilisation d'overlays HTML transparents (`input type="date"` et `input type="datetime-local"`) dotés d'un index d'empilement élevé (`zIndex: 99999`) et déclenchés par geste de confiance (`.showPicker()`) au clic de conteneurs standard `<div>` sans altérer le comportement mobile natif.
 - [x] **Moteur de Recherche Madagascar Intelligent & Tolérant aux Écarts (S13) 💻📱** : Résolution définitive du bug de non-correspondance de recherche ("sur ordinateur et sur téléphone ça n'arrive pas à trouver de trajet") provoqué par la différence entre les noms de quartiers/districts ultra-détaillés de l'autocomplétion (ex: "Antananarivo-Renivohitra (District)") et les noms simplifiés stockés en base (ex: "Antananarivo"). Implémentation d'un algorithme de décomposition intelligent (`extractCleanSearchTerms`) qui sépare les composants complexes, nettoie les parenthèses/suffixes (District, Région, ville, chiffres romains) et génère des requêtes multi-termes `OR` extrêmement tolérantes sur Supabase, garantissant 100% de trajets trouvés sur ordinateur et téléphone.
 - [ ] **Notifications Push** : Alerter le passager quand son trajet va bientôt partir ou quand un nouveau message arrive.
+- [ ] **Alerte SMS au Chauffeur *(NOUVEAU)* :** Dès qu'un passager paie par Mobile Money et obtient le numéro du conducteur, envoyer automatiquement un SMS au conducteur pour le prévenir : *"Un passager vient de réserver, il va vous appeler dans les prochaines minutes."*
 - [ ] **Appels In-App (VoIP)** : Intégrer un bouton d'appel direct via l'app (type Messenger) après déblocage du contact.
 - [ ] **Dashboard Admin Mobile** : Une application simplifiée pour l'admin pour valider les paiements en déplacement.
 - [ ] **Optimisation Realtime** : Centraliser la gestion des WebSockets Supabase (via un Context global) pour éviter les souscriptions multiples et améliorer les performances.
