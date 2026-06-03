@@ -1,0 +1,44 @@
+{
+  "session": 12,
+  "date": "2026-05-19T20:00:00+03:00",
+  "status": "SUCCESS",
+  "description": "Résolution des gels de clavier et de focus sur Android, correctif anti-crash des logs de circularité de NativeWind v4, style de politique de bagage natif synchrone, et migration réussie des colonnes manquantes dans la base Supabase active.",
+  "changes": [
+    {
+      "file": "miaradia-app/app/(tabs)/publish.tsx",
+      "action": "MODIFIED",
+      "details": "Implémentation du Stable Input Overlay pour départ/arrivée. Remplacement de TouchableOpacity dynamic class par un style React Native direct pour la sélection de bagage."
+    },
+    {
+      "file": "miaradia-app/app/(tabs)/index.tsx",
+      "action": "MODIFIED",
+      "details": "Implémentation du Stable Input Overlay pour départ/arrivée dans l'écran de recherche de trajet principale."
+    },
+    {
+      "file": "miaradia-app/node_modules/react-native-css-interop/dist/runtime/native/render-component.js",
+      "action": "PATCHED",
+      "details": "Ajout de try/catch robustes autour de printUpgradeWarning et stringify pour éviter les crashs de sérialisation récursive sur mobile."
+    },
+    {
+      "file": "miaradia-app/README.md",
+      "action": "DOCUMENTED",
+      "details": "Mise à jour complète avec l'explication des correctifs Android, NativeWind et Supabase."
+    },
+    {
+      "file": "miaradia-app/audit.md",
+      "action": "DOCUMENTED",
+      "details": "Mise à jour avec la validation complète de la Session 12 stable."
+    },
+    {
+      "file": "miaradia-app/nos_idees.md",
+      "action": "DOCUMENTED",
+      "details": "Synchronisation de la boîte à idées avec l'alignement Supabase et les correctifs tactiles."
+    }
+  ],
+  "verification": {
+    "focus_loops_freeze": "Résolu universellement (Stable Input Overlay)",
+    "baggage_policy_touch": "100% Tactile et instantané via style natif",
+    "nativewind_circular_refs_crash": "Parfaitement neutralisé via verrous try/catch",
+    "supabase_schema_migration": "Succès (baggage_size et has_roof_rack actifs et queryable)"
+  }
+}

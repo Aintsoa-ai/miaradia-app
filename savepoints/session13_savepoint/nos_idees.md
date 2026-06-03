@@ -1,0 +1,67 @@
+# 💡 Boîte à Idées - Miara-Dia 🚙🇲🇬
+
+Ce document recense les idées d'amélioration et les futures fonctionnalités pour rendre l'application encore plus puissante et adaptée au contexte malgache.
+
+> [!IMPORTANT]
+> **Règle d'Or de l'Intégration :** Toute nouvelle idée de fonctionnalité validée et implémentée doit impérativement être déclinée de manière optimale sur **version téléphone** et **version ordinateur**. 
+
+---
+
+## 🗺️ Géographie & Itinéraires
+- [ ] **Détection d'embouteillages (Tana)** : Intégrer une alerte ou une estimation de temps supplémentaire pour les axes saturés (ex: Anosizato, 67ha).
+- [ ] **Axe Fluvial** : Ajouter la possibilité de publier des trajets en bateau (ex: Canal des Pangalanes ou traversées vers Sainte-Marie / Nosy Be).
+- [ ] **Points de Repère (Points of Interest)** : Permettre aux conducteurs d'ajouter des points de repère connus (ex: "Arrêt devant Station Galana") au lieu de simples noms de communes.
+- [ ] **Météo des Routes** : Alerte sur l'état des pistes en saison des pluies (ex: "Piste RN5 difficile actuellement").
+
+## 💰 Monétisation & Prix
+- [ ] **Tarification au km automatique** : Proposer un prix suggéré au chauffeur dès qu'il entre son trajet, basé sur les prix moyens du marché malgache.
+- [ ] **Paiement In-App complet** : Passer d'un gating de contact à une réservation avec séquestre (l'argent est gardé par l'app jusqu'à l'arrivée).
+- [ ] **Intégration d'Agrégateur Mobile Money Automatique (MVola, Orange Money, Airtel Money) *(PROCHAINE ÉTAPE CRITIQUE)* :** Remplacer la validation manuelle des dépôts Kiosques par une solution de paiement instantanée en ligne (via agrégateur type Bizao ou Webpay) pour débloquer automatiquement et immédiatement le contact chauffeur et la messagerie dès la transaction réussie.
+- [ ] **Abonnement Premium Chauffeur** : Permettre aux chauffeurs pro de payer un abonnement mensuel pour ne plus avoir de frais sur les réservations.
+- [ ] **Offres d'Abonnement Passager (Accès Illimité Contacts) *(NOUVEAU)* :** Permettre aux voyageurs fréquents d'acheter un pass d'accès par Mobile Money au lieu de payer à chaque trajet :
+  - **Hebdomadaire (15 000 Ar) :** Accès illimité pour voir les numéros de téléphone des chauffeurs et échanger en illimité durant 7 jours.
+  - **Mensuel (50 000 Ar) :** Accès illimité pour voir les numéros de téléphone et échanger en illimité durant 30 jours.
+- [ ] **Programme de Fidélité Voyageur (Bonus d'Activité) *(NOUVEAU)* :** Récompenser les passagers fidèles pour stimuler l'activité. Si un voyageur effectue une réservation et contacte plus de 8 chauffeurs différents en moins d'une semaine, l'application lui offre **1 crédit de contact gratuit en bonus** (frais de réservation offerts sur le trajet suivant de son choix).
+
+## 🤝 Communauté & Confiance
+- [ ] **Vérification d'Identité (KYC)** : Permettre aux utilisateurs d'uploader leur CIN pour obtenir un badge "Profil Vérifié par CIN".
+- [ ] **Groupes de Voyage** : Créer des groupes spécifiques (ex: "Voyageurs réguliers Tana-Antsirabe") pour fidéliser la clientèle.
+- [ ] **Avis Audio** : Permettre de laisser un petit message vocal en guise d'avis (très utilisé à Madagascar).
+
+## 📱 Expérience Utilisateur (UX)
+- [ ] **Mode Hors-Ligne** : Permettre de consulter ses billets et les numéros de contact même sans connexion (utile sur les RN en zone d'ombre).
+- [ ] **Partage de Position Temps Réel** : Permettre au passager de partager son trajet avec ses proches pour plus de sécurité.
+- [ ] **Support Multi-langue** : Malagasy complet (Vahinaly / Ofisialy) en plus du Français.
+- [x] **Design SaaS Ultra Pro** : Formulaires en Split-Screen, ombres douces et carrousel d'images automatisé.
+- [ ] **Micro-animations** : Ajouter des transitions fluides (Lottie) lors des chargements ou des validations de paiement.
+
+## 🏗️ Technique & Admin
+- [x] **Système d'Avis & Réputation** : Permettre aux passagers de noter les chauffeurs.
+- [x] **Sécurité des Profils** : Politique de photo réelle et choix du rôle.
+- [x] **Interface Desktop "Ultra Pro"** : Navigation responsive, header professionnel et mise en page SaaS à 100% (Accueil, Recherche, Login, Chat, Profil, Mes Voyages).
+- [x] **Copie conforme BlaBlaCar sur ordinateur** : Structure dual-pane double colonne sur l'ensemble des parcours (Recherche, Détails, Publication, Voyages, Profils).
+- [x] **Polissage de l'Expérience Utilisateur** : Suppression complète et absolue des rectangles de focus navigateur (`outlineStyle: 'none'`) et mise en place d'un affichage des destinations en deux lignes majuscules compactes.
+- [x] **Boutons "x" d'Effacement Rapide** : Ajout de boutons de croix interactives pour vider instantanément les inputs de lieux.
+- [x] **Correctif d'Alignement Vertical** : Utilisation de conteneurs ScrollView sur ordinateur pour éviter que les éléments importants (logos, boutons) soient poussés hors de l'écran.
+- [x] **Validation Téléphone Complète 📱** : Tous les boutons mobiles (swap, autocomplétion, recherche, retour, onglets) validés fonctionnels et ergonomiques sous émulation mobile.
+- [x] **Précision GPS & Toby Ratsimandrava 📍** : Mappage intelligent du Toby Ratsimandrava / Ambohijanahary Andrefana sur la bonne zone (Ouest Ambohijanahary) en traduisant les synonymes de direction (`Andrefana` -> `Ouest`), avec correctif de nettoyage sur "Renivohitra" (S10) pour bannir les fausses correspondances vers "Ivohitra (Antsirabe I)", support des graphies abrégées ("ambohijary"), et mappage automatique des noms français/coloniaux (`Tamatave` -> `Toamasina`, `Majunga` -> `Mahajanga`, `Tananarivo/Tananarive/Tana` -> `Antananarivo`, etc.).
+- [x] **Correctif Faille API Chat 💬** : Verrouillage asynchrone dans `app/chat/[id].tsx` et rectification de la transmission du nom de profil dans `app/ride/[id].tsx` pour éradiquer les erreurs `400 Bad Request` Supabase sur les conversations internes.
+- [x] **Résolution Faille RLS Générateur Démo 🛠️** : Déplacement de la logique à l'intérieur du composant `AdminDashboard` de [app/admin/index.tsx](file:///d:/PROJET_COMMANDE_CLIENT/BLABLA%20CAR%20GASY/miaradia-app/app/admin/index.tsx) pour lier dynamiquement les trajets générés au `driver_id` de l'administrateur connecté, résolvant l'erreur RLS Supabase `42501` tout en maintenant des noms fictifs denormalisés distincts pour les tests.
+- [x] **Agrandissement Hit-Targets Recherche (Desktop) 💻** : Intégration de la propriété `h-full` sur les entrées textuelles de la barre d'autocomplétion horizontale sur ordinateur, résolvant le problème de ciblage de clic.
+- [x] **Enrichissement des Repères Généraux 🗺️** : Ajout des principaux carrefours et zones d'affluence générale (Analakely, Soarano, 67ha, Ankatso, Ankorondrano, Anosibe, Ratsimandrava) pour fiabiliser la géolocalisation de tous les usagers de l'application.
+- [x] **Refonte Ergonomique de la Recherche (S11) 🎯** : Retrait volontaire et définitif de la fonctionnalité "Votre position actuelle" (Reverse-Geocoding GPS) sur ordinateur et téléphone pour contrer l'imprécision inhérente des services de géolocalisation à Madagascar au niveau des Fokontany. Priorisation de l'autocomplétion textuelle ultra-rapide.
+- [x] **Correction du Bug d'Affichage des Quartiers Composés (S11) 🏷️** : Résolution du parsing vicieux dans `renderRichLocation` qui tronquait aléaiorement les noms de quartiers comportant un tiret (ex: "Cité 67 ha Afovoany-Andrefana"). Le formatage par parenthèse est désormais priorisé.
+- [x] **Résolution du Gel Clavier & Focus Android (S12) 📱** : Déploiement universel du patron *Stable Input Overlay* sur la page de publication et de recherche pour éliminer définitivement les cycles de démontage et l'autoFocus récursif qui figeaient le processeur des téléphones.
+- [x] **Correctif Anti-Crash des Icônes & Sérialisations (S12) 🛡️** : Mise en place de blocs de détection `try/catch` sur le compilateur de NativeWind v4 pour neutraliser les crashs fatals liés aux références circulaires de navigation.
+- [x] **Correctif Tactile de Politique de Bagages (S12) 🧳** : Résolution de la perte de l'événement onPress de NativeWind sur le sélecteur de bagage grâce à une liaison de style React Native directe.
+- [x] **Alignement Instantané du Schéma Supabase (S12) 🗄️** : Intégration des colonnes `baggage_size` et `has_roof_rack` en production dans Supabase avec validation automatisée locale.
+- [x] **Résolution de Superposition Autocomplete Publication (S12) 💻** : Application de styles d'empilement CSS explicites (`position: relative` et `zIndex: 999`) pour permettre au dropdown de suggestions de lieux de flotter sur ordinateur par-dessus tout autre élément de la page.
+- [x] **Sélecteurs de Dates Universels Hybrides & Ergonomie (S13) 💻📱** : Remplacement du libellé par défaut "Aujourd'hui" par "Départ" sur ordinateur et mobile. Résolution de l'incompatibilité de DateTimePickerModal sur ordinateur (Web) par l'utilisation d'overlays HTML transparents (`input type="date"` et `input type="datetime-local"`) dotés d'un index d'empilement élevé (`zIndex: 99999`) et déclenchés par geste de confiance (`.showPicker()`) au clic de conteneurs standard `<div>` sans altérer le comportement mobile natif.
+- [x] **Moteur de Recherche Madagascar Intelligent & Tolérant aux Écarts (S13) 💻📱** : Résolution définitive du bug de non-correspondance de recherche ("sur ordinateur et sur téléphone ça n'arrive pas à trouver de trajet") provoqué par la différence entre les noms de quartiers/districts ultra-détaillés de l'autocomplétion (ex: "Antananarivo-Renivohitra (District)") et les noms simplifiés stockés en base (ex: "Antananarivo"). Implémentation d'un algorithme de décomposition intelligent (`extractCleanSearchTerms`) qui sépare les composants complexes, nettoie les parenthèses/suffixes (District, Région, ville, chiffres romains) et génère des requêtes multi-termes `OR` extrêmement tolérantes sur Supabase, garantissant 100% de trajets trouvés sur ordinateur et téléphone.
+- [ ] **Notifications Push** : Alerter le passager quand son trajet va bientôt partir ou quand un nouveau message arrive.
+- [ ] **Appels In-App (VoIP)** : Intégrer un bouton d'appel direct via l'app (type Messenger) après déblocage du contact.
+- [ ] **Dashboard Admin Mobile** : Une application simplifiée pour l'admin pour valider les paiements en déplacement.
+- [ ] **Optimisation Realtime** : Centraliser la gestion des WebSockets Supabase (via un Context global) pour éviter les souscriptions multiples et améliorer les performances.
+
+---
+*Dernière mise à jour : 20 Mai 2026*

@@ -1,0 +1,35 @@
+﻿╔══════════════════════════════════════════════════════════════════════╗
+║         POINT DE SAUVEGARDE — MIARA-DIA                            ║
+║         Date : 15/05/2026 22:50                              ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+═══ ÉTAT : STABLE ✅ (CORRECTIFS APPLIQUÉS) ════════════════════════════
+
+🆕 CORRECTIFS DE CETTE SESSION (FIX) :
+
+1. FOND DE CARTE GRATUIT OSM
+   ├─ Suppression de l'appel API Google Maps (payant/bloqué)
+   └─ Ajout d'une tuile vectorielle OSM CartoDB Voyager très esthétique.
+
+2. SAUVEGARDE DB DE LA DURÉE (publish.tsx)
+   ├─ Récupération de durationMin depuis l'API OSRM.
+   └─ Enregistrement dans Supabase de distance, duration, duration_min, et rrival_time.
+
+3. RENFORCEMENT DU FALLBACK (distancesMadagascar.ts)
+   ├─ Renvoie désormais durationMin: 0 au lieu de crasher sur "N/A".
+   └─ Ajout du trajet courant Tana ↔ Ambositra (259 km, 6h).
+
+4. CORRECTIFS MINEURS
+   ├─ Remplacement des faux UUID par des UUID conformes dans admin/index.tsx
+   ├─ Renommage de l'appel de fonction fetchPendingBookings -> fetchAdminData
+   └─ Refonte de la fonction de calcul dans la page de détails du trajet (app/ride/[id].tsx)
+      pour utiliser prioritairement les données de la base.
+
+═══ FICHIERS MODIFIÉS DEPUIS LE DERNIER POINT ════════════════════════
+
+app/admin/index.tsx             [MODIFIÉ - Fix UUID & nom fonction]
+app/resultats-recherche.tsx     [MODIFIÉ - Image map OSM]
+app/ride/[id].tsx               [MODIFIÉ - Utilisation DB native]
+app/(tabs)/publish.tsx          [MODIFIÉ - Insertion DB des calculs de trajet]
+lib/distancesMadagascar.ts      [MODIFIÉ - Tana/Ambositra + fallback sécurisé]
+README.md                       [MODIFIÉ - Mise à jour log]

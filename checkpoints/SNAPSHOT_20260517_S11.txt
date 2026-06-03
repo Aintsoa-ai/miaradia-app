@@ -1,0 +1,26 @@
+MIARA-DIA PROJECT SNAPSHOT - SESSION 11 (17 MAY 2026) - 100% TYPESCRIPT COMPILATION & STABILITY CONFIRMATION
+---------------------------------------------------------------------------------------------------------
+This checkpoint represents the successful verification, optimization, and documentation synchronization of all features, alongside a critical TypeScript resolution achieving complete warning-free compilation.
+
+1. 100% STABLE TYPESCRIPT COMPILATION (NO EMIT SUCCESS):
+   - Audited the entire workspace using the compiler command `npx tsc --noEmit`.
+   - Resolved a key type violation `ts(2322)` in [app/(tabs)/chat.tsx] where a `<TouchableOpacity>` was passed a non-standard `title` prop.
+   - Replaced it with the standard, screen-reader-compliant attribute `accessibilityLabel="Simuler un message"`.
+   - Verified that the TypeScript compiler now builds successfully with exit code 0 and ZERO type errors, ensuring a production-grade compilation pipeline.
+
+2. RETENTION & PARITY VERIFICATION (NO SWALLOWED FEATURES):
+   - Double-checked both Mobile (390x800) and Desktop (Dual-Pane SaaS) layouts across all modules to ensure no features were "swallowed" or broken during recent optimizations.
+   - Checked the accordion stopovers and optional stopover tariff inputs: both remain 100% operational on desktop hover and mobile focus transitions, complete with mutual accordion collapse and zero number truncation.
+   - Verified the GPS reverse-geocoding ("Ma position actuelle") which behaves perfectly and holds equal parity on mobile web and desktop.
+   - Confirmed the capital spelling conversions ("Tana", "Tamatave", etc.) and the "Renivohitra" anti-collision algorithm: they remain active, preventing any address corruption.
+
+3. EXPO SERVER PORT ADJUSTMENT ADVICE:
+   - Noted that Metro Bundler starts cleanly. In the event of a port conflict (e.g. port 8081 already in use), users are advised to run `npx expo start --port <custom-port>` or use the default automatic port fallback to start the development server.
+
+FILES VERIFIED & MODIFIED IN SESSION 11:
+- app/(tabs)/chat.tsx (Fixed ts(2322) type error by migrating 'title' to 'accessibilityLabel')
+- README.md (Documented hotfix and overall stability verification)
+- nos_idees.md (Updated checklists and completed items for S11)
+- audit.md (Refined audit log with TypeScript health and zero-regression tests)
+
+All features are fully responsive, clean, and follow the standard slate/teal dual-pane SaaS layout principles on desktop and simplified single-column layout on mobile.

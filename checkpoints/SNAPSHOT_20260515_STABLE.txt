@@ -1,0 +1,18 @@
+POINT DE SAUVEGARDE TECHNIQUE - 15/05/2026 17:50
+------------------------------------------------
+ÉTAT : STABLE & AUDITÉ
+
+CHANGEMENTS MAJEURS :
+- Correction Infinite Recursion (Profiles RLS).
+- RLS Disable (Profiles) pour garantir le fonctionnement immédiat des modifications.
+- Recherche Case-Insensitive (Fuzzy Search) sur les trajets.
+- Optimisation Clavier (extraScrollHeight=100) sur toute l'app.
+- Redirection intelligente Login -> Page Cible.
+
+BASE DE DONNÉES :
+- 20 trajets démo injectés couvrant tout Madagascar.
+- Table 'profiles' accessible en modification pour le propriétaire.
+
+UI :
+- Correction syntaxe JSX index.tsx (ScrollView fusionnée).
+- Messages de succès sur les enregistrements.

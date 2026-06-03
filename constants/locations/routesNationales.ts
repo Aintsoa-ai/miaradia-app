@@ -1,0 +1,22 @@
+export const ROUTES_NATIONALES: string[] = [
+  // Axes principaux
+  "RN1 (Antananarivo - Tsiroanomandidy)",
+  "RN2 (Antananarivo - Toamasina)",
+  "RN3 (Antananarivo - Anjozorobe)",
+  "RN4 (Antananarivo - Mahajanga)",
+  "RN5 (Toamasina - Maroantsetra)",
+  "RN6 (Antsohihy - Antsiranana)",
+  "RN7 (Antananarivo - Toliara)",
+  "RN9 (Toliara - Morombe)",
+  "RN10 (Toliara - Bekily)",
+  "RN11 (Fianarantsoa - Manakara)",
+  "RN12 (Vangaindrano - Farafangana)",
+  "RN13 (Ihosy - Taolagnaro)",
+  "RN25 (Ambohimahasoa - Mananjary)",
+  "RN27 (Ambositra - Fandriana)",
+  "RN34 (Antsirabe - Malaimbandy)",
+  "RN35 (Ivato - Morondava)",
+  "RN36 (Moramanga - Ambatondrazaka - RN44)",
+  "RN43 (Antsohihy - Mandritsara)",
+  "RN44 (Moramanga - Ambatondrazaka)",
+];

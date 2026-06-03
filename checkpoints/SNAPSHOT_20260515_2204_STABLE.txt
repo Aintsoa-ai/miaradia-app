@@ -1,0 +1,67 @@
+﻿╔══════════════════════════════════════════════════════════════════════╗
+║         POINT DE SAUVEGARDE — MIARA-DIA                            ║
+║         Date : 15/05/2026 22:04                              ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+═══ ÉTAT : STABLE ✅ ═══════════════════════════════════════════════════
+
+🆕 NOUVEAUTÉS DE CETTE SESSION :
+
+1. CALCUL DISTANCE & DURÉE AUTOMATIQUE
+   ├─ lib/distancesMadagascar.ts  → Dictionnaire RN1-RN13 (distances + durationMin)
+   ├─ lib/distanceService.ts      → API OpenStreetMap (Nominatim + OSRM), 100% gratuit
+   ├─ publish.tsx                 → Widget temps réel avec debounce 1.5s
+   └─ resultats-recherche.tsx     → Heure d'arrivée = Heure départ + durée
+
+2. FORMATAGE DES PRIX (lib/formatPrice.ts)
+   ├─ formatPrice() / formatPriceAr()
+   ├─ 80000 → "80 000 Ar"
+   └─ Appliqué sur : ride/[id].tsx, driver/[id].tsx, admin/index.tsx,
+                     rides.tsx, resultats-recherche.tsx, publish.tsx
+
+3. REDESIGN ÉCRAN RÉSULTATS (resultats-recherche.tsx)
+   ├─ Timeline verticale (départ → arrivée)
+   ├─ Barre de filtres (Tout / Voiture / Moto)
+   ├─ Bouton carte → ouvre Google Maps
+   └─ Carte conducteur propre et aérée
+
+4. DONNÉES DÉMO COMPLÈTES (admin/index.tsx)
+   └─ 10 trajets avec distance, duration, duration_min, arrival_time réels
+
+5. CORRECTION BUGS
+   ├─ TypeScript : .trim() sur string | string[] → résolu
+   └─ Avatar cache-busting → ?t=timestamp sur tous les écrans
+
+═══ FICHIERS MODIFIÉS ════════════════════════════════════════════════
+
+lib/formatPrice.ts              [NOUVEAU]
+lib/distancesMadagascar.ts      [NOUVEAU]
+lib/distanceService.ts          [NOUVEAU]
+app/resultats-recherche.tsx     [MODIFIÉ - réécriture complète]
+app/(tabs)/publish.tsx          [MODIFIÉ - widget distance]
+app/(tabs)/rides.tsx            [MODIFIÉ - formatPrice]
+app/ride/[id].tsx               [MODIFIÉ - formatPrice]
+app/driver/[id].tsx             [MODIFIÉ - formatPrice]
+app/admin/index.tsx             [MODIFIÉ - formatPrice + données démo]
+README.md                       [MODIFIÉ - mise à jour complète]
+
+═══ BACKEND SUPABASE ════════════════════════════════════════════════
+
+- RLS profiles      : DÉSACTIVÉ (évite récursion infinie)
+- Storage avatars   : PUBLIC (lecture ouverte, upload authentifié)
+- Tables actives    : rides, profiles, bookings, reviews
+
+═══ POINTS DE VIGILANCE ════════════════════════════════════════════
+
+⚠ Avant publication Store :
+  1. Supprimer bouton "Devenir Admin" dans profile.tsx
+  2. Supprimer bouton "Générer Trajets Démo" dans admin/index.tsx
+  3. Supprimer tous les console.log
+  4. Remettre des politiques RLS strictes sur profiles
+
+═══ PROCHAINES ÉTAPES SUGGÉRÉES ════════════════════════════════════
+
+  → Intégration système de notifications (push)
+  → Système de notation post-trajet
+  → Paiement Mobile Money réel (webhook MVola/Orange)
+  → Build APK production (eas build)

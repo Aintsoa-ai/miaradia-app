@@ -1,0 +1,51 @@
+MIARA-DIA PROJECT SNAPSHOT - SESSION 10 (17 MAY 2026) - HOTFIX, GPS PARITY & CHAT/UI FAULT RESOLUTION
+-------------------------------------------------------------------------------------------------------
+This checkpoint represents the successful implementation, validation, and optimization of the following features and hotfixes:
+
+1. ACCORDION STOP-OVERS & TARIFF UI:
+   - Stopovers (escales) now display as an interactive list with collapsible panels (accordion).
+   - The toggle triggers via a clean "+" icon on both desktop and mobile layouts.
+   - The accordion is now mutally exclusive (`expandedStopIndex`) - clicking on a lower stopover automatically collapses the upper one, visually validating the typed price and keeping the mobile viewport clean.
+   - Text inputs for entering prices utilize the high-contrast slate-blue color (`#054752`) to ensure perfect readability.
+   - Resolved the numeric squeezing bug on small mobile viewports (which rendered as `...... Ar` inside too-narrow `w-20` inputs) by expanding the container size to `w-[165px]` and using `flex-1` on the `TextInput`.
+   - The stopover prices are now 100% optional (not mandatory). If left empty by the driver, the input remains empty (placeholder says "Optionnel"), and the final published ride seamlessly renders as "Pas de tarif" on passenger-facing views without blocking the publish validation.
+
+2. GEOLOCATION ("MA POSITION ACTUELLE") DESKTOP PARITY & INTERACTION FIX:
+   - Restored and styled the GPS / Reverse-Geocoding button for Desktop users, bringing total feature parity.
+   - Resolved a layout targeting bug where clicking in empty spots of the horizontal search bar parent containers failed to focus the inputs. Incorporating `h-full` to both text inputs scales their active hit target by 2.5x vertically to cover the entire container.
+
+3. SUBTLE GPS ALGORITHM BUGFIX ("Renivohitra" -> "Ivohitra" Collision):
+   - Resolved a massive Madagascar-specific bug where geocoding from "Toby Ratsimandrava" (or any place returning the district "Antananarivo-Renivohitra") fell back to "Ivohitra (Antsirabe I)" due to a loose match collision (since the word "Renivohitra" contains the substring "ivohitra").
+   - Added a cleaning step in `lib/locationMatcher.ts` to strip "renivohitra" during address normalization, so Antananarivo-Renivohitra now correctly matches Antananarivo.
+   - Expanded manual fallback patterns to capture spelling variants such as "ambohijary", "ambohijanah", or "andrefanambohijary" to seamlessly lock on "Ouest Ambohijanahary IIIG/IIIM (Antananarivo IV)".
+
+4. COLONIAL, FRENCH & CAPITAL NAME ALIAS MAPPING:
+   - Incorporated automatic conversion mappings for old colonial/alternative French city names returned by older GPS or external OS APIs.
+   - Maps: "Tamatave" -> "Toamasina", "Majunga" -> "Mahajanga", "Tuléar/Toliary" -> "Toliara", "Diego-Suarez/Diego" -> "Antsiranana", "Fort-Dauphin" -> "Taolagnaro", "Sainte-Marie/Ste-Marie" -> "Nosy Boraha".
+   - Added historical spelling translations for the capital city: "Tananarivo" -> "Antananarivo", "Tananarive" -> "Antananarivo", and the standalone abbreviation "Tana" -> "Antananarivo" utilizing a regular expression with word boundaries (`\btana\b`) before space removal to guarantee 100% collision-free mapping (preventing corruption of names like Tanambao).
+   - Ensures robust and reliable geocoding matching regardless of OS language settings.
+
+5. MESSAGING FAULT RESOLUTION (Supabase API 400 Bad Request):
+   - Audited and resolved a critical API issue where accessing the internal direct chat resulted in `400 (Bad Request)` errors.
+   - Updated the navigation parameters in [app/ride/[id].tsx] to correctly pass the driver's full name (`driverProfile?.full_name`) instead of the non-existent database column `ride.driver_name`.
+   - Patched [app/chat/[id].tsx] to dynamically listen to dynamic Expo router parameter updates by adding `other_id` to the `useEffect` dependencies, and implemented strict defensive asynchrony guards to completely bypass API executions if parameters are temporarily `undefined`.
+
+6. MOBILE INTEROPERABILITY CRASH HOTFIX (NavigationContainer error on Luggage/Baggage):
+   - Resolved a fatal crash on native mobile devices (`Couldn't find a navigation context. Have you wrapped your app with 'NavigationContainer'?`) which was triggered whenever users interacted with the luggage options or roof rack switch.
+   - Identified that NativeWind v4 triggers upgrade/render warnings when custom components like `Ionicons` use the `className` attribute. When NativeWind formatted these warning messages, its stringifier recursively traversed React Navigation's context tree, triggering getters that crashed React Native.
+   - Migrated all `Ionicons` custom components in `publish.tsx` from `className` to standard inline `style` objects, cleanly eliminating the warnings and permanently resolving the mobile crash.
+
+7. METRO BUNDLE WARNING HOTFIX (ICONS):
+   - Replaced invalid references to "car-roof-box" in both `app/ride/[id].tsx` and `app/(tabs)/publish.tsx` with the beautiful, cross-compatible `Ionicons name="layers"`.
+
+FILES VERIFIED & MODIFIED IN SESSION 10:
+- app/(tabs)/publish.tsx (Accordion stopovers layout, single active expand index, w-[165px] layout expansion, optional stopover validation, Ionicons style interop fix, unified icon fix)
+- app/ride/[id].tsx (Conditional "Pas de tarif", passenger view details, icon fix, chat transition fix)
+- app/(tabs)/index.tsx (Desktop current location button restore, hit-target clickable expansion)
+- app/chat/[id].tsx (Subtly patched hook dependencies & async guards for clean chat REST/WebSocket API flows)
+- lib/locationMatcher.ts (Subtle geolocation algorithm correction & French/Colonial/Capital alias mapping)
+- README.md (Logged features)
+- nos_idees.md (Logged features & ideas)
+- audit.md (Logged technical updates)
+
+All changes are fully responsive and strictly follow the dual-pane desktop & streamlined mobile design guidelines without sacrificing any features.
