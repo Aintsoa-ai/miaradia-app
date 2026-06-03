@@ -16,6 +16,7 @@ export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [stats, setStats] = useState({ drivers: 0, clients: 0, online: 0 });
+  const [recentSmsLogs, setRecentSmsLogs] = useState<any[]>([]);
 
   useEffect(() => {
     checkAdmin();
@@ -84,6 +85,17 @@ export default function AdminDashboard() {
         // Fausse stat "en ligne" pour le moment, basée sur un pourcentage
         const onlineCount = Math.max(1, Math.floor(driversCount * 0.3)); 
         setStats({ drivers: driversCount, clients: clientsCount, online: onlineCount });
+      }
+
+      // 4. Fetch recent SMS logs for the mini-widget
+      const { data: smsLogs, error: smsError } = await supabase
+        .from('sms_logs')
+        .select('*')
+        .order('received_at', { ascending: false })
+        .limit(3);
+        
+      if (!smsError && smsLogs) {
+        setRecentSmsLogs(smsLogs);
       }
 
     } catch (error: any) {
@@ -278,6 +290,48 @@ export default function AdminDashboard() {
             </View>
           ))
         )}
+
+        {/* WIDGET : DERNIERS SMS REÇUS */}
+        <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 20, marginTop: 8, borderWidth: 1, borderColor: '#F3F4F6' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="chatbubble-ellipses" size={20} color="#054752" />
+              <Text style={{ fontSize: 14, fontWeight: '800', color: '#054752', textTransform: 'uppercase', letterSpacing: 1, marginLeft: 8 }}>
+                Derniers SMS
+              </Text>
+            </View>
+          </View>
+
+          {recentSmsLogs.length === 0 ? (
+            <Text style={{ color: '#9CA3AF', fontSize: 12, fontWeight: '600', textAlign: 'center', fontStyle: 'italic' }}>
+              Aucun SMS reçu récemment
+            </Text>
+          ) : (
+            recentSmsLogs.map((log) => (
+              <View key={log.id} style={{
+                flexDirection: 'row', alignItems: 'center', marginBottom: 12,
+                backgroundColor: log.matched ? '#ECFDF5' : '#F9FAFB',
+                padding: 12, borderRadius: 12,
+                borderLeftWidth: 4, borderLeftColor: log.matched ? '#10B981' : '#D1D5DB'
+              }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#1F2937' }}>
+                    {log.extracted_amount ? `${log.extracted_amount} Ar` : 'Montant inconnu'}
+                  </Text>
+                  <Text style={{ fontSize: 10, color: '#6B7280', marginTop: 2 }} numberOfLines={1}>
+                    Réf: {log.extracted_reference || 'Non lue'}
+                  </Text>
+                </View>
+                <View style={{ alignItems: 'flex-end' }}>
+                  <Text style={{ fontSize: 18 }}>{log.matched ? '✅' : '⚪'}</Text>
+                  <Text style={{ fontSize: 9, color: '#9CA3AF', marginTop: 2 }}>
+                    {new Date(log.received_at).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
+                  </Text>
+                </View>
+              </View>
+            ))
+          )}
+        </View>
 
         {/* PASSERELLE SMS AUTOMATIQUE */}
         <TouchableOpacity
