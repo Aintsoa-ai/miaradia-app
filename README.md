@@ -69,16 +69,16 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 
 ### 8. Système de Paiement Mobile Money *(AMÉLIORÉ - SESSION 14)*
 - **Gating de Contact :** Le numéro du conducteur est masqué jusqu'au paiement.
-- **Multi-Opérateurs :** MVola, Orange Money, Airtel Money, Kiosque.
+- **Multi-Opérateurs :** MVola, Orange Money, Airtel Money. (Kiosque manuel retiré pour plus de fluidité).
 - **Frais dynamiques :** 10% du prix du trajet (min 1 000, max 5 000 Ar).
-- **Validation Admin :** Les dépôts kiosque sont validés manuellement par l'administrateur.
 - **Validation Automatique SMS *(NOUVEAU - S14)* :** Système de validation automatique des paiements Mobile Money via détection et parsing des SMS entrants (MVola/Orange/Airtel). L'app SMS Gateway sur le téléphone de l'admin intercepte les SMS de confirmation, les envoie à la Supabase Edge Function `sms-webhook`, qui compare la référence avec les réservations en attente et déverrouille automatiquement le contact du chauffeur. Zéro intervention manuelle.
 - **Table `sms_logs` *(NOUVEAU - S14)* :** Audit complet de tous les SMS Mobile Money reçus (référence, montant, expéditeur, correspondance trouvée, réservations validées).
 
 ### 9. Tableau de Bord Administrateur *(AMÉLIORÉ - SESSION 14)*
-- **Validation Kiosque :** Validation des dépôts manuels.
+- **Validation Automatique :** Suppression de la validation manuelle chronophage.
 - **Statistiques Utilisateurs *(NOUVEAU)* :** Affichage en temps réel du nombre de chauffeurs inscrits, de clients, et calcul dynamique du nombre de chauffeurs en ligne.
-- **Passerelle SMS Admin *(NOUVEAU - S14)* :** L'administrateur installe l'app SMS Gateway sur son téléphone personnel. Chaque SMS Mobile Money reçu est automatiquement transmis à Supabase pour validation sans aucune action manuelle.
+- **Mini-Widget SMS *(NOUVEAU - S14)* :** Affichage en direct des 3 derniers SMS reçus et de leur statut de validation directement sur l'écran d'accueil admin.
+- **Passerelle SMS Admin *(NOUVEAU - S14)* :** L'administrateur installe l'APK Android (EAS Build) SMS Gateway sur son téléphone personnel. Chaque SMS Mobile Money reçu est automatiquement lu et valide les trajets sans aucune action manuelle.
 
 ### 10. Système de Réputation & Avis *(NOUVEAU - V2.0)*
 - **Notation 5 Étoiles :** Les passagers peuvent noter les chauffeurs après chaque trajet terminé.

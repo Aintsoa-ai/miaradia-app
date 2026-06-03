@@ -85,8 +85,8 @@ miaradia-app/
 *   Chat temps réel et notation des conducteurs.
 *   Politique d'inscription stricte (Vrai Visage, Rôle).
 
-### Phase 2 : Automatisation & Instantanéité *(PARTIELLEMENT RÉALISÉE ✅)*
-*   **Validation SMS Mobile Money *(RÉALISÉ - S14)* :** Supabase Edge Function `sms-webhook` qui reçoit les SMS de confirmation MVola/Orange/Airtel via l'app SMS Gateway sur le téléphone admin, extrait la référence, compare avec les réservations en attente et déverrouille automatiquement le contact chauffeur.
+### Phase 2 : Automatisation & Instantanéité *(RÉALISÉ ✅)*
+*   **Validation SMS Mobile Money *(RÉALISÉ - S14)* :** Création d'une "Passerelle SMS" Native Android. L'application lit les SMS MVola/Orange/Airtel entrants, compare avec les réservations en attente et déverrouille automatiquement le contact chauffeur. Suppression du "Cash Point".
 *   **Déploiement Web Vercel *(RÉALISÉ - S14)* :** Application en production sur https://miaradia-app.vercel.app avec CI/CD automatique (GitHub → Vercel).
 *   **Alertes Premium *(RÉALISÉ - S14)* :** Composant `CustomAlert` modal animé déployé sur toute l'application.
 *   **Notifications Push (Expo Notifications) *(EN ATTENTE)* :** Alerter les utilisateurs hors-app des nouveaux messages de chat et de la confirmation des réservations.
@@ -96,8 +96,8 @@ miaradia-app/
 *   **Cache Local SQLite/AsyncStorage :** Mettre en cache local les détails du billet réservé et le contact du chauffeur pour y avoir accès sur la route nationale en zone d'ombre (sans réseau).
 *   **Vérification CIN (KYC) :** Formulaire de téléversement et processus d'approbation d'identité pour certifier officiellement les conducteurs.
 
-### Phase 4 : Croissance & Communauté
-*   **Application Android native (APK)** : Génération du fichier `.apk` via EAS Build pour distribution directe ou sur le Play Store.
+### Phase 4 : Croissance & Distribution *(RÉALISÉ ✅)*
+*   **Application Android native (APK) *(RÉALISÉ - S14)* :** Configuration `eas.json` et génération du fichier `.apk` via EAS Build pour distribution directe. Intègre les permissions `RECEIVE_SMS` et `READ_SMS` vitales.
 *   **Programme de Fidélité** : Récompenses pour les passagers fréquents (crédits gratuits).
 *   **Abonnements Passager/Chauffeur** : Plans hebdomadaires et mensuels pour accès illimité.
 
