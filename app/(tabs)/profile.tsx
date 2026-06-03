@@ -287,6 +287,43 @@ export default function ProfileScreen() {
     router.replace('/');
   };
 
+  const containsHiddenPhone = (text: string) => {
+    if (!text) return false;
+    let mappedText = text.toLowerCase();
+    
+    // Dictionnaire de conversion Mots -> Chiffres (Français & Malgache)
+    // Astuce : "trente" -> "3", "quatre" -> "4" pour que "trente quatre" devienne "34"
+    const dict: {[key: string]: string} = {
+      'zéro': '0', 'zero': '0', 'aotra': '0',
+      'un': '1', 'iray': '1', 'iraika': '1',
+      'deux': '2', 'roa': '2',
+      'trois': '3', 'telo': '3',
+      'quatre': '4', 'efatra': '4',
+      'cinq': '5', 'dimy': '5',
+      'six': '6', 'enina': '6',
+      'sept': '7', 'fito': '7',
+      'huit': '8', 'valo': '8',
+      'neuf': '9', 'sivy': '9',
+      'dix': '10', 'folo': '10',
+      'onze': '11', 'douze': '12', 'treize': '13', 'quatorze': '14', 'quinze': '15',
+      'vingt': '2', 'trente': '3', 'quarante': '4', 'cinquante': '5', 
+      'telopolo': '3', 'roapolo': '2'
+    };
+    
+    Object.keys(dict).forEach(key => {
+      mappedText = mappedText.replace(new RegExp('\\b' + key + '\\b', 'g'), dict[key]);
+    });
+    
+    // On extrait uniquement les chiffres restants
+    const digitsOnly = mappedText.replace(/\D/g, '');
+    
+    // Si on trouve plus de 9 chiffres et que ça contient "03", c'est une tentative de fraude
+    if (digitsOnly.length >= 9 && digitsOnly.includes('03')) {
+      return true;
+    }
+    return false;
+  };
+
   const handleSaveProfile = async () => {
     try {
       setUploading(true);
@@ -301,9 +338,14 @@ export default function ProfileScreen() {
         return;
       }
 
-      const error = validatePhone(phone);
-      if (error) {
-        CustomAlert.alert("Numéro invalide", error);
+      const errorPhone = validatePhone(phone);
+      if (errorPhone) {
+        CustomAlert.alert("Numéro invalide", errorPhone);
+        return;
+      }
+
+      if (containsHiddenPhone(bio)) {
+        CustomAlert.alert("Action non autorisée", "Il est interdit de renseigner un numéro de téléphone dans la bio. Merci d'utiliser uniquement le champ 'Téléphone' prévu à cet effet.");
         return;
       }
 
