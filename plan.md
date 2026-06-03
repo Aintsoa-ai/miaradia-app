@@ -83,7 +83,7 @@ miaradia-app/
 *   Moteur de recherche tolérant multi-termes à Madagascar.
 *   Design dual-pane adaptatif Desktop & Mobile.
 *   Chat temps réel et notation des conducteurs.
-*   Politique d'inscription stricte (Vrai Visage, Rôle).
+*   Politique d'inscription stricte (Vrai Visage, Rôle) et **Algorithme Anti-Fraude linguistique (Bio)** pour bloquer le contournement de la passerelle de paiement (S14).
 
 ### Phase 2 : Automatisation & Instantanéité *(RÉALISÉ ✅)*
 *   **Validation SMS Mobile Money *(RÉALISÉ - S14)* :** Création d'une "Passerelle SMS" Native Android. L'application lit les SMS MVola/Orange/Airtel entrants, compare avec les réservations en attente et déverrouille automatiquement le contact chauffeur. Suppression du "Cash Point".

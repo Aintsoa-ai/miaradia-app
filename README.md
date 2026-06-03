@@ -92,6 +92,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Politique "Vrai Visage" & Qualité :** Photo de profil obligatoire dès l'inscription. Le visage doit être clair, net et identifiable.
 - **Règles de Netteté :** Interdiction des photos floues (sauf flou artistique d'arrière-plan portrait). Rejet des photos de voitures, paysages ou masques.
 - **Vérification d'Identité :** Base technique prête pour le KYC (Know Your Customer).
+- **Algorithme Anti-Fraude (Bio) *(NOUVEAU - S14)* :** L'application analyse la biographie du conducteur lors de la sauvegarde du profil. L'algorithme convertit les mots textuels en chiffres (Français et Malgache : "zero", "trente", "telo", "efatra") et bloque instantanément l'enregistrement s'il détecte une tentative de dissimuler un numéro de téléphone Mobile Money (préfixes 03x et séquence > 9 chiffres) pour contourner le système de monétisation.
 
 ### 12. Messagerie Interne Temps Réel *(NOUVEAU - V2.0)*
 - **Chat Instantané :** Communication directe entre passager et conducteur via Supabase Realtime.

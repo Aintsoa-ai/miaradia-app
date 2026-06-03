@@ -60,6 +60,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
   - **Hebdomadaire :** Affiche tous les numéros de conducteurs pendant une semaine entière.
   - **Mensuel :** Affiche tous les numéros de conducteurs pendant un mois entier.
 - [ ] **Programme de Fidélité Voyageur (Bonus d'Activité) :** Récompenser les passagers fidèles pour stimuler l'activité. Si un voyageur effectue une réservation et contacte plus de 8 chauffeurs différents en moins d'une semaine, l'application lui offre **1 crédit de contact gratuit en bonus** (frais de réservation offerts sur le trajet suivant de son choix).
+- [ ] **Booster une Publication *(NOUVEAU)* :** Option payante pour les chauffeurs permettant de mettre en avant (Boost) leur annonce de trajet en tête des résultats de recherche (comme sur Facebook) moyennant un tarif premium.
 
 ### 🤝 Communauté & Confiance
 - [ ] **Vérification d'Identité (KYC)** : Permettre aux utilisateurs d'uploader leur CIN pour obtenir un badge "Profil Vérifié par CIN".
