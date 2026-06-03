@@ -37,14 +37,6 @@ const METHODS = [
     logo: require('../assets/images/airtel_izy.png'),
     textColor: '#FFF',
     type: 'push'
-  },
-  {
-    id: 'Kiosque',
-    name: 'Cashpoint / Kiosque',
-    color: '#4B5563',
-    logo: require('../assets/images/cashpoints_logo.jpeg'),
-    textColor: '#FFF',
-    type: 'manual'
   }
 ];
 
