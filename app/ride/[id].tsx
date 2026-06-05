@@ -33,9 +33,13 @@ export default function RideDetailsScreen() {
   };
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
+    try {
+      if (typeof router.canGoBack === 'function' && router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace('/');
+      }
+    } catch (e) {
       router.replace('/');
     }
   };
@@ -113,7 +117,7 @@ export default function RideDetailsScreen() {
   }, [id]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: any;
     if (isPendingVerification && currentUserId && id) {
       // Polling toutes les 3 secondes pour vérifier si l'admin ou le SMS a validé
       interval = setInterval(() => {

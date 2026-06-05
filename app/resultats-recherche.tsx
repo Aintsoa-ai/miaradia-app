@@ -26,9 +26,13 @@ export default function SearchResultsScreen() {
   const [filterType, setFilterType] = useState<'Tout' | 'Voiture' | 'Minibus' | 'Moto'>('Tout');
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
+    try {
+      if (typeof router.canGoBack === 'function' && router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace('/');
+      }
+    } catch (e) {
       router.replace('/');
     }
   };
