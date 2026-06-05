@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ChatScreen() {
   const { id: ride_id, other_id, other_name } = useLocalSearchParams();
@@ -14,6 +15,7 @@ export default function ChatScreen() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     let channel: any;
@@ -189,10 +191,13 @@ export default function ChatScreen() {
 
       {/* INPUT */}
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
-        <View className="bg-white px-4 pt-3 pb-8 border-t border-gray-100 shadow-xl">
+        <View 
+          className="bg-white px-4 pt-3 border-t border-gray-100 shadow-xl"
+          style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+        >
           <View className="flex-row items-end">
             <TouchableOpacity className="w-10 h-10 items-center justify-center mb-1">
               <Ionicons name="add-circle-outline" size={28} color="#64748B" />

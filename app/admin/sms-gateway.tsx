@@ -6,8 +6,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { CustomAlert } from '../../utils/alert';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Import conditionnel pour Android uniquement
+let globalSubscription: any = null;
+let globalIsListening = false;
 let SmsListener: any = null;
 if (Platform.OS === 'android') {
   try {
@@ -96,7 +98,21 @@ export default function SmsGatewayScreen() {
 
   useEffect(() => {
     fetchData();
-    return () => stopListening();
+    
+    // Check if it was already listening globally
+    if (globalIsListening) {
+      setIsListening(true);
+    } else {
+      // Load saved preference
+      AsyncStorage.getItem('sms_listening_pref').then(pref => {
+        if (pref === 'true' && !globalIsListening) {
+          startListening();
+        }
+      });
+    }
+
+    // We do NOT stop listening on unmount anymore
+    // so it keeps running in the background while the app is open
   }, []);
 
   const fetchData = async () => {
@@ -236,14 +252,16 @@ export default function SmsGatewayScreen() {
     }
 
     try {
-      subscriptionRef.current = SmsListener.addListener((message: any) => {
+      globalSubscription = SmsListener.addListener((message: any) => {
         const body = message.body || message.messageBody || '';
         const sender = message.originatingAddress || '';
         console.log('📱 SMS reçu de:', sender, '→', body.substring(0, 50));
         processIncomingSms(body, sender);
       });
 
+      globalIsListening = true;
       setIsListening(true);
+      AsyncStorage.setItem('sms_listening_pref', 'true');
       CustomAlert.alert('🟢 Passerelle Active', 'Miara-Dia écoute maintenant vos SMS entrants. Gardez l\'app ouverte en arrière-plan.');
     } catch (error) {
       console.error('Erreur démarrage SMS listener:', error);
@@ -252,11 +270,13 @@ export default function SmsGatewayScreen() {
   };
 
   const stopListening = () => {
-    if (subscriptionRef.current) {
-      subscriptionRef.current.remove();
-      subscriptionRef.current = null;
+    if (globalSubscription) {
+      globalSubscription.remove();
+      globalSubscription = null;
     }
+    globalIsListening = false;
     setIsListening(false);
+    AsyncStorage.setItem('sms_listening_pref', 'false');
   };
 
   const toggleListening = () => {

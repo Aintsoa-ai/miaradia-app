@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Supabase Edge Function : sms-webhook
 // Reçoit les SMS MVola/Orange/Airtel depuis l'app SMS Gateway
 // Compare avec les réservations en attente et valide automatiquement

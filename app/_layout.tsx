@@ -49,7 +49,7 @@ export default function Layout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ride/[id]" options={{ presentation: 'card' }} />
       </Stack>
-      <CustomAlertComponent ref={CustomAlertRef} />
+      <CustomAlertComponent />
     </>
   );
 }
