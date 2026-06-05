@@ -13,7 +13,11 @@
 ### 3. Automatisation des Communications
 - Implémentation d'une injection de message automatique via la Supabase Edge Function `sms-webhook`. Dès que le webhook valide un paiement Mobile Money avec succès, il poste silencieusement un message dans la table `messages` à l'attention du conducteur pour lui certifier que le paiement a été validé et que le passager va l'appeler.
 
-### 4. Synchronisation Documentaire
+### 4. Correctifs de Fin de Session (Stabilité Finale)
+- **Modale de Paiement (Scroll) :** Ajout de la dépendance `ScrollView` manquante pour éviter le "White Screen of Death" et permettre de faire défiler les instructions de paiement sur les petits écrans.
+- **Modale de Succès (Transparence) :** Correction d'un bug de rendu `NativeWind` web sur le composant `Animated.View` de la modale de succès d'alerte, garantissant que le fond blanc reste 100% opaque et lisible.
+
+### 5. Synchronisation Documentaire
 - Tous les documents structurels (`README.md`, `audit.md`, `nos_idees.md`) ont été revus, mis à jour et validés.
 - Les fonctionnalités futures ("Sortie de famille", "Trajets réguliers", "Abonnements Mensuels", "Booster Publication") sont explicitement listées dans le backlog `nos_idees.md`.
 
