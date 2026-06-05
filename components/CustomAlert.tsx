@@ -69,45 +69,46 @@ export const CustomAlertComponent = () => {
     <Modal transparent visible={visible} animationType="none" onRequestClose={close}>
       <View className="flex-1 justify-center items-center px-6" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
         <Animated.View 
-          style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}
-          className="w-full max-w-sm bg-white rounded-[32px] overflow-hidden shadow-2xl z-10"
+          style={{ transform: [{ scale: scaleValue }], opacity: opacityValue, width: '100%', maxWidth: 384, zIndex: 10 }}
         >
-          {/* Header Icon */}
-          <View className="items-center mt-8 mb-4">
-            <View className={`w-20 h-20 rounded-[24px] items-center justify-center ${config.type === 'error' ? 'bg-red-50' : config.type === 'warning' ? 'bg-orange-50' : 'bg-blue-50'}`}>
-              <Ionicons 
-                name={config.type === 'error' ? 'close-circle' : config.type === 'warning' ? 'warning' : 'checkmark-circle'} 
-                size={40} 
-                color={config.type === 'error' ? '#EF4444' : config.type === 'warning' ? '#F97316' : '#3B82F6'} 
-              />
+          <View className="bg-white rounded-[32px] overflow-hidden shadow-2xl">
+            {/* Header Icon */}
+            <View className="items-center mt-8 mb-4">
+              <View className={`w-20 h-20 rounded-[24px] items-center justify-center ${config.type === 'error' ? 'bg-red-50' : config.type === 'warning' ? 'bg-orange-50' : 'bg-blue-50'}`}>
+                <Ionicons 
+                  name={config.type === 'error' ? 'close-circle' : config.type === 'warning' ? 'warning' : 'checkmark-circle'} 
+                  size={40} 
+                  color={config.type === 'error' ? '#EF4444' : config.type === 'warning' ? '#F97316' : '#3B82F6'} 
+                />
+              </View>
             </View>
-          </View>
-          
-          <View className="px-8 pb-8">
-            <Text className="text-2xl font-black text-slate-900 text-center mb-3 tracking-tight">{config.title}</Text>
-            {!!config.message && (
-              <Text className="text-[15px] text-slate-500 font-semibold text-center leading-relaxed">
-                {config.message}
-              </Text>
-            )}
-          </View>
-
-          <View className="flex-row border-t border-slate-100">
-            {config.buttons?.map((btn, idx) => (
-              <TouchableOpacity
-                key={idx}
-                onPress={() => {
-                  close();
-                  if (btn.onPress) setTimeout(btn.onPress, 150);
-                }}
-                className={`flex-1 py-5 items-center justify-center ${idx > 0 ? 'border-l border-slate-100' : ''}`}
-                activeOpacity={0.7}
-              >
-                <Text className={`font-black text-sm uppercase tracking-widest ${btn.style === 'cancel' ? 'text-slate-400' : btn.style === 'destructive' ? 'text-red-600' : 'text-blue-600'}`}>
-                  {btn.text}
+            
+            <View className="px-8 pb-8">
+              <Text className="text-2xl font-black text-slate-900 text-center mb-3 tracking-tight">{config.title}</Text>
+              {!!config.message && (
+                <Text className="text-[15px] text-slate-500 font-semibold text-center leading-relaxed">
+                  {config.message}
                 </Text>
-              </TouchableOpacity>
-            ))}
+              )}
+            </View>
+
+            <View className="flex-row border-t border-slate-100">
+              {config.buttons?.map((btn, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  onPress={() => {
+                    close();
+                    if (btn.onPress) setTimeout(btn.onPress, 150);
+                  }}
+                  className={`flex-1 py-5 items-center justify-center ${idx > 0 ? 'border-l border-slate-100' : ''}`}
+                  activeOpacity={0.7}
+                >
+                  <Text className={`font-black text-sm uppercase tracking-widest ${btn.style === 'cancel' ? 'text-slate-400' : btn.style === 'destructive' ? 'text-red-600' : 'text-blue-600'}`}>
+                    {btn.text}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </Animated.View>
       </View>
