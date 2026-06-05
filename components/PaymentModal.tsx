@@ -72,16 +72,18 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
           {METHODS.map((method) => (
             <TouchableOpacity
               key={method.id}
-              style={[styles.methodButton, { backgroundColor: method.color }]}
+              style={styles.methodButton}
               onPress={() => handleSelect(method)}
               disabled={loading}
             >
               {method.logo ? (
-                <Image source={method.logo} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
+                <View style={styles.logoContainer}>
+                  <Image source={method.logo} style={{ width: '100%', height: '100%', resizeMode: 'contain' }} />
+                </View>
               ) : (
-                <View style={{ width: '100%', height: '100%', backgroundColor: method.color, alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons name={method.type === 'manual' ? "home-outline" : "wallet-outline"} size={40} color={method.textColor} />
-                  <Text style={[styles.methodText, { color: method.textColor, marginTop: 8 }]} numberOfLines={1}>{method.name}</Text>
+                <View style={{ width: '100%', height: '100%', backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
+                  <Ionicons name={method.type === 'manual' ? "home-outline" : "wallet-outline"} size={32} color="#6B7280" />
+                  <Text style={[styles.methodText, { color: '#6B7280', marginTop: 4 }]} numberOfLines={1}>{method.name}</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -283,23 +285,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   methodButton: {
-    width: '30%',
-    aspectRatio: 1,
+    width: '31%',
+    height: 90,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
-    padding: 0,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
+    borderRadius: 16,
+    padding: 10,
     backgroundColor: '#FFF',
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  logoContainer: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   methodText: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: 12,
+    fontWeight: '700',
     textAlign: 'center',
   },
   cancelButton: {
