@@ -209,7 +209,9 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
             <Text style={styles.amountValue}>{amount.toLocaleString('fr-FR')} Ar</Text>
           </View>
 
-          {renderContent()}
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
+            {renderContent()}
+          </ScrollView>
 
           <TouchableOpacity style={styles.cancelButton} onPress={onClose} disabled={loading}>
             <Text style={styles.cancelText}>Annuler</Text>
@@ -235,7 +237,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     paddingHorizontal: 24,
     paddingBottom: 40,
-    maxHeight: height * 0.7,
+    maxHeight: height * 0.9,
   },
   header: {
     alignItems: 'center',
