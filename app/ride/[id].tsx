@@ -74,7 +74,8 @@ export default function RideDetailsScreen() {
         .select('*')
         .eq('ride_id', rideId)
         .eq('passenger_id', userId)
-        .eq('payment_status', 'completed')
+        .order('created_at', { ascending: false })
+        .limit(1)
         .single();
       
       if (data) {
@@ -183,29 +184,19 @@ export default function RideDetailsScreen() {
           amount_fee: fee,
           amount_total: Number(ride.price || 0) + fee,
           payment_method: method,
-          payment_status: isManual ? 'pending' : 'completed',
+          payment_status: 'pending',
           payment_reference: reference || null
         }]);
 
       if (bookingError) throw bookingError;
 
-      // MISE À JOUR DU NOMBRE DE PLACES RESTANTES
-      if (!isManual) {
-        const { error: updateError } = await supabase
-          .from('rides')
-          .update({ seats: Math.max(0, (ride.seats || 1) - 1) })
-          .eq('id', ride.id);
-        
-        if (updateError) console.error("Erreur mise à jour places:", updateError);
-      }
+      // La mise à jour des places se fera automatiquement lors de la validation SMS/Admin.
 
+      setIsPendingVerification(true);
       if (isManual) {
-        setIsPendingVerification(true);
         CustomAlert.alert("En attente", "Votre demande a été envoyée. L'administrateur déverrouillera le contact et mettra à jour les places dès réception du transfert.");
       } else {
-        setIsUnlocked(true);
-        setRide({ ...ride, seats: Math.max(0, (ride.seats || 1) - 1) }); // Update local state
-        CustomAlert.alert("Succès", "Paiement réussi ! Les coordonnées du chauffeur sont visibles et une place a été réservée.");
+        CustomAlert.alert("En attente de validation", "Votre paiement Mobile Money est en cours de vérification. Le numéro sera déverrouillé automatiquement dès réception de la confirmation.");
       }
       
       setIsPaymentModalVisible(false);
