@@ -1,6 +1,6 @@
 # 🛡️ Rapport d'Audit Complet - Miara-Dia 🚙🇲🇬
 
-Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la Session 15 (5 Juin 2026).
+Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la Session 16 (5 Juin 2026).
 
 > [!IMPORTANT]
 > **Critère d'Éligibilité des Audits :** Toute fonctionnalité auditée doit passer avec succès les tests d'ergonomie et de performance sur **version ordinateur (Desktop)** et **version téléphone (Mobile)**. 
@@ -10,6 +10,10 @@ Ce document récapitule l'état de santé technique et fonctionnel de l'applicat
 ## ✅ 1. État des Lieux : Fonctionnalités Opérationnelles
 L'application est considérée comme **STABLE** sur les piliers suivants :
 
+*   **Résolution Clavier & UI Android (S16) 📱 :** Intégration de `useSafeAreaInsets` et ajustement du `KeyboardAvoidingView` dans l'écran de messagerie pour garantir que le clavier logiciel et la barre de navigation native Android ne masquent plus jamais la zone de saisie du texte.
+*   **Sécurité Blindée du Flux de Paiement (S16) 🔒 :** Renforcement de la politique de déverrouillage de contact. L'interface mobile ne permet plus le déblocage immédiat du numéro sur validation locale ; le contact reste en statut `pending` jusqu'à ce que la confirmation réelle du paiement soit validée par la fonction serveur `sms-webhook`.
+*   **Parsing Mobile Money Madagascar Réel (S16) 🇲🇬 :** Correction radicale des expressions régulières de la passerelle SMS admin pour correspondre fidèlement à la réalité des SMS malgaches : prise en charge des séparateurs d'espaces (`1 100 Ar`) et des références sans deux-points (`Ref 1710288383`).
+*   **Création Automatique de Profil (S16) 👤 :** Résolution d'une erreur de clé étrangère (`bookings_passenger_id_fkey`) grâce à un nouveau Trigger SQL Supabase qui crée automatiquement et silencieusement une entrée dans la table `profiles` dès qu'un utilisateur complète son inscription Auth.
 *   **Polissage UI & Résolution des Overlaps (S15) 🎨 :**
     - **Navigation Native Android :** Remplacement des marges statiques par `useSafeAreaInsets` dans `_layout.tsx` pour empêcher le chevauchement de la barre d'onglets avec la barre de navigation système des téléphones récents (Edge-to-Edge).
     - **Interface Web Desktop (Carrousel) :** Résolution d'un artefact visuel (rectangle noir sur le bord droit) lors du défilement du carrousel de la page d'accueil. Application de positionnements `inset-0` avec dimensions absolues (`100%`) et suppression de l'attribut `objectPosition` défaillant, garantissant un rendu plein écran parfait.

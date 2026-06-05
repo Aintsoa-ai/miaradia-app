@@ -86,7 +86,7 @@ miaradia-app/
 *   Politique d'inscription stricte (Vrai Visage, Rôle) et **Algorithme Anti-Fraude linguistique (Bio)** pour bloquer le contournement de la passerelle de paiement (S14).
 
 ### Phase 2 : Automatisation & Instantanéité *(RÉALISÉ ✅)*
-*   **Validation SMS Mobile Money *(RÉALISÉ - S14)* :** Création d'une "Passerelle SMS" Native Android. L'application lit les SMS MVola/Orange/Airtel entrants, compare avec les réservations en attente et déverrouille automatiquement le contact chauffeur. Suppression du "Cash Point".
+*   **Validation SMS Mobile Money *(RÉALISÉ - S16)* :** Création d'une "Passerelle SMS" Native Android. L'application lit en arrière-plan les SMS MVola/Orange/Airtel entrants, compare avec les réservations en attente via une syntaxe RegExp ajustée au format malgache réel, et déverrouille automatiquement le contact chauffeur.
 *   **Déploiement Web Vercel *(RÉALISÉ - S14)* :** Application en production sur https://miaradia-app.vercel.app avec CI/CD automatique (GitHub → Vercel).
 *   **Alertes Premium *(RÉALISÉ - S14)* :** Composant `CustomAlert` modal animé déployé sur toute l'application.
 *   **Notifications Push (Expo Notifications) *(EN ATTENTE)* :** Alerter les utilisateurs hors-app des nouveaux messages de chat et de la confirmation des réservations.

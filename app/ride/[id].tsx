@@ -104,6 +104,19 @@ export default function RideDetailsScreen() {
     checkAuthAndBooking();
   }, [id]);
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isPendingVerification && currentUserId && id) {
+      // Polling toutes les 3 secondes pour vérifier si l'admin ou le SMS a validé
+      interval = setInterval(() => {
+        checkExistingBooking(id as string, currentUserId);
+      }, 3000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPendingVerification, currentUserId, id]);
+
   const handleUpdateSeats = async (newSeats: number) => {
     try {
       const { error } = await supabase

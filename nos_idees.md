@@ -38,6 +38,11 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Déploiement Vercel + GitHub CI/CD *(RÉALISÉ - S14)* :** Application en ligne sur https://miaradia-app.vercel.app avec mise à jour automatique à chaque `git push`. Code source sur https://github.com/Aintsoa-ai/miaradia-app.
 - [x] **Passerelle SMS Automatique *(RÉALISÉ - S14)* :** Edge Function `sms-webhook` déployée sur Supabase. Parse les SMS MVola/Orange/Airtel, valide les paiements et déverrouille les contacts sans intervention humaine. Gratuit, zéro abonnement.
 - [x] **Alerte Message Automatique au Chauffeur *(RÉALISÉ)* :** Dès qu'un passager paie par Mobile Money et obtient le numéro du conducteur, le système envoie automatiquement un message de chat In-App au conducteur pour le prévenir : *"✅ Paiement validé automatiquement via Mobile Money. Je vais vous appeler dans les minutes qui viennent pour confirmer les détails."*
+- [x] **Persistance Passerelle SMS en Arrière-Plan *(RÉALISÉ - S16)* :** L'écoute SMS de l'administrateur reste active même lors de la navigation dans l'application grâce à un état global persistant sauvegardé avec `AsyncStorage`.
+- [x] **Sécurisation Blindée des Paiements *(RÉALISÉ - S16)* :** Correction du flux de paiement. Le numéro du conducteur reste strictement verrouillé (statut `pending`) jusqu'à ce que la passerelle SMS valide officiellement la transaction en base de données.
+- [x] **Alignement Clavier Android Edge-to-Edge *(RÉALISÉ - S16)* :** Utilisation de `useSafeAreaInsets` et ajustement des décalages `KeyboardAvoidingView` pour garantir que la zone de texte de messagerie ne soit jamais masquée par la barre de navigation native d'Android ou le clavier virtuel.
+- [x] **Parseur SMS MVola Real-Format *(RÉALISÉ - S16)* :** Mise à jour radicale des regex de la passerelle SMS pour détecter avec précision le format réel des SMS MVola malgaches (montants avec espaces `1 100 Ar` et références sans deux-points `Ref 1710288383`).
+- [x] **Synchronisation automatique `auth.users` ↔ `profiles` *(RÉALISÉ - S16)* :** Mise en place d'un Trigger SQL sur Supabase assurant la création automatique et instantanée du profil public d'un nouvel utilisateur dès son inscription.
 
 ---
 

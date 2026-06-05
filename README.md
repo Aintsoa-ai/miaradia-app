@@ -71,9 +71,10 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Gating de Contact :** Le numéro du conducteur est masqué jusqu'au paiement.
 - **Multi-Opérateurs & UI Premium *(S15)* :** Modale de sélection élégante pour MVola, Orange Money, Airtel Money. (Kiosque manuel retiré pour plus de fluidité).
 - **Frais dynamiques :** 10% du prix du trajet (min 1 000, max 5 000 Ar).
-- **Validation Automatique SMS *(NOUVEAU - S14)* :** Système de validation automatique des paiements Mobile Money via détection et parsing des SMS entrants (MVola/Orange/Airtel). L'app SMS Gateway sur le téléphone de l'admin intercepte les SMS de confirmation, les envoie à la Supabase Edge Function `sms-webhook`, qui compare la référence avec les réservations en attente et déverrouille automatiquement le contact du chauffeur. Zéro intervention manuelle.
-- **Table `sms_logs` *(NOUVEAU - S14)* :** Audit complet de tous les SMS Mobile Money reçus (référence, montant, expéditeur, correspondance trouvée, réservations validées).
-- **Chat de Confirmation Automatique *(NOUVEAU - S15)* :** Immédiatement après la validation du paiement, le système insère de manière asynchrone un message automatique dans le chat de la réservation pour avertir le conducteur que le passager va l'appeler.
+- **Validation Automatique SMS *(NOUVEAU - S14/S16)* :** Système de validation automatique des paiements Mobile Money via détection et parsing des SMS entrants (MVola/Orange/Airtel). L'app SMS Gateway sur le téléphone de l'admin intercepte les SMS, avec des parseurs regex adaptés au **format réel malgache** (gestion des espaces dans les montants et formats de références multiples). L'état d'écoute est désormais persistant en arrière-plan via `AsyncStorage`.
+- **Table `sms_logs` *(NOUVEAU - S14)* :** Audit complet de tous les SMS Mobile Money reçus.
+- **Sécurisation Blindée *(NOUVEAU - S16)* :** Le numéro du chauffeur reste strictement verrouillé tant que la passerelle SMS n'a pas confirmé le paiement en base de données, empêchant tout contournement manuel.
+- **Chat de Confirmation Automatique *(NOUVEAU - S15)* :** Immédiatement après la validation du paiement, le système insère de manière asynchrone un message automatique dans le chat de la réservation.
 
 ### 9. Tableau de Bord Administrateur *(AMÉLIORÉ - SESSION 14)*
 - **Validation Automatique :** Suppression de la validation manuelle chronophage.
