@@ -1,6 +1,6 @@
 # 🛡️ Rapport d'Audit Complet - Miara-Dia 🚙🇲🇬
 
-Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la Session 14 (3 Juin 2026).
+Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la Session 15 (5 Juin 2026).
 
 > [!IMPORTANT]
 > **Critère d'Éligibilité des Audits :** Toute fonctionnalité auditée doit passer avec succès les tests d'ergonomie et de performance sur **version ordinateur (Desktop)** et **version téléphone (Mobile)**. 
@@ -10,6 +10,11 @@ Ce document récapitule l'état de santé technique et fonctionnel de l'applicat
 ## ✅ 1. État des Lieux : Fonctionnalités Opérationnelles
 L'application est considérée comme **STABLE** sur les piliers suivants :
 
+*   **Polissage UI & Résolution des Overlaps (S15) 🎨 :**
+    - **Navigation Native Android :** Remplacement des marges statiques par `useSafeAreaInsets` dans `_layout.tsx` pour empêcher le chevauchement de la barre d'onglets avec la barre de navigation système des téléphones récents (Edge-to-Edge).
+    - **Interface Web Desktop (Carrousel) :** Résolution d'un artefact visuel (rectangle noir sur le bord droit) lors du défilement du carrousel de la page d'accueil. Application de positionnements `inset-0` avec dimensions absolues (`100%`) et suppression de l'attribut `objectPosition` défaillant, garantissant un rendu plein écran parfait.
+    - **Modale de Paiement Mobile Money :** Refonte stylistique des logos opérateurs (MVola, Orange, Airtel). Remplacement des massifs boutons carrés contraints par un rendu élégant en rectangles blancs propres (padding, ombre douce, `resizeMode='contain'`) inspiré des standards SaaS professionnels.
+*   **Chat Automatisé de Confirmation (S15) 💬 :** Dès la validation du paiement via le webhook SMS, le système insère silencieusement et de manière asynchrone un message in-app du type "✅ Paiement validé automatiquement via Mobile Money...". Cela rassure instantanément le chauffeur et le passager avant même leur premier appel.
 *   **Moteur Géographique** : Couverture nationale 100% (RN1 à RN44 + Pistes de brousse).
 *   **Logique de Routage** : Détection des raccourcis, transversales et choix d'itinéraires multiples.
 *   **Publication Intelligente** : Suggestions d'escales "One-Click", calcul automatique de l'heure d'arrivée, et **Gestion Premium d'Escales & Tarifs (S9)**.

@@ -37,7 +37,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Alertes Premium CustomAlert *(RÉALISÉ - S14)* :** Remplacement universel de tous les `Alert.alert` natifs par un composant `CustomAlert` modal animé professionnel. Intégré globalement dans `_layout.tsx`, disponible sur toute l'application. Icônes conditionnelles (succès/erreur/avertissement), animation fluide, style glassmorphisme. Validé Mobile et Desktop.
 - [x] **Déploiement Vercel + GitHub CI/CD *(RÉALISÉ - S14)* :** Application en ligne sur https://miaradia-app.vercel.app avec mise à jour automatique à chaque `git push`. Code source sur https://github.com/Aintsoa-ai/miaradia-app.
 - [x] **Passerelle SMS Automatique *(RÉALISÉ - S14)* :** Edge Function `sms-webhook` déployée sur Supabase. Parse les SMS MVola/Orange/Airtel, valide les paiements et déverrouille les contacts sans intervention humaine. Gratuit, zéro abonnement.
-
+- [x] **Alerte Message Automatique au Chauffeur *(RÉALISÉ)* :** Dès qu'un passager paie par Mobile Money et obtient le numéro du conducteur, le système envoie automatiquement un message de chat In-App au conducteur pour le prévenir : *"✅ Paiement validé automatiquement via Mobile Money. Je vais vous appeler dans les minutes qui viennent pour confirmer les détails."*
 
 ---
 
@@ -75,11 +75,9 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ### 🏗️ Technique & Admin
 - [ ] **Notifications Push** : Alerter le passager quand son trajet va bientôt partir ou quand un nouveau message arrive.
-- [ ] **Alerte SMS au Chauffeur** : Dès qu'un passager paie par Mobile Money et obtient le numéro du conducteur, envoyer automatiquement un SMS au conducteur pour le prévenir : *"Un passager vient de réserver, il va vous appeler dans les prochaines minutes."*
 - [ ] **Appels In-App (VoIP)** : Intégrer un bouton d'appel direct via l'app (type Messenger) après déblocage du contact.
 - [ ] **Dashboard Admin Mobile** : Une application simplifiée pour l'admin pour valider les paiements en déplacement.
-- [ ] **Optimisation Realtime** : Centraliser la gestion des WebSockets Supabase (via un Context global) pour éviter les souscriptions multiples et améliorer les performances. avec mise à jour automatique à chaque `git push`. Code source sur https://github.com/Aintsoa-ai/miaradia-app.
-- [x] **Passerelle SMS Automatique *(RÉALISÉ - S14)* :** Edge Function `sms-webhook` déployée sur Supabase. Parse les SMS MVola/Orange/Airtel, valide les paiements et déverrouille les contacts sans intervention humaine. Gratuit, zéro abonnement.
+- [ ] **Optimisation Realtime** : Centraliser la gestion des WebSockets Supabase (via un Context global) pour éviter les souscriptions multiples et améliorer les performances.
 
 ---
-*Dernière mise à jour : 3 Juin 2026 - Session 14*
+*Dernière mise à jour : 5 Juin 2026 - Session 15*
