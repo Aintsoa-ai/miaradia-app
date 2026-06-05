@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../../lib/supabase';
 import { DesktopHeader } from '../../components/DesktopHeader';
 
 export default function TabLayout() {
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const isDesktop = width > 768;
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -59,9 +61,9 @@ export default function TabLayout() {
           tabBarInactiveTintColor: 'gray',
           tabBarStyle: {
             display: isDesktop ? 'none' : 'flex',
-            paddingBottom: Platform.OS === 'android' ? 25 : 20,
+            paddingBottom: Platform.OS === 'android' ? Math.max(insets.bottom + 5, 25) : 20,
             paddingTop: 5,
-            height: Platform.OS === 'android' ? 85 : 80,
+            height: Platform.OS === 'android' ? 60 + Math.max(insets.bottom + 5, 25) : 80,
           },
         }}
       >
