@@ -500,8 +500,8 @@ export default function SearchScreen() {
             Votre voyage à {"\n"}Madagascar, {"\n"}
             <Text className="text-blue-400">redéfini.</Text>
           </Text>
-          <Text className="text-xl text-slate-300 font-medium leading-relaxed max-w-lg mb-10">
-            Covoiturage, taxi-brousse premium et 4x4. L'expérience de voyage la plus fiable de l'île.
+          <Text className="text-xl text-slate-300 font-medium leading-relaxed max-w-xl mb-10">
+            Le 1er réseau de covoiturage et de transport premium à Madagascar. Voyagez à travers toute l'île avec des chauffeurs vérifiés, en toute sérénité et au meilleur prix.
           </Text>
           <View className="flex-row items-center gap-8">
              <View className="flex-row items-center bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700/50 backdrop-blur-md">
