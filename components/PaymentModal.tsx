@@ -130,6 +130,11 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
       );
     }
 
+    let adminNumber = '034 82 372 67';
+    if (selectedMethod?.id === 'Orange Money') {
+      adminNumber = '037 38 946 19';
+    }
+
     return (
       <View style={styles.manualContainer}>
         <TouchableOpacity onPress={() => setStep('select')} style={styles.backButton}>
@@ -141,14 +146,21 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
           <Text style={[styles.operatorBadgeText, { color: selectedMethod?.textColor || '#000' }]}>{selectedMethod?.name || 'Opérateur'}</Text>
         </View>
 
-        <Text style={styles.manualTitle}>Numéro de téléphone</Text>
-        <Text style={styles.simpleText}>Saisissez le numéro qui va effectuer le paiement :</Text>
+        <Text style={styles.manualTitle}>Instructions de Paiement</Text>
+        <View style={styles.instructionCard}>
+          <Text style={styles.manualInstruction}>
+            1. Transférez exactement <Text style={{fontWeight:'800'}}>{amount.toLocaleString('fr-FR')} Ar</Text> (en totalité avec les frais à votre charge) au numéro :{"\n"}
+            <Text style={styles.phoneNumber}>{adminNumber}</Text>{"\n"}
+            <Text style={{fontSize: 12, color: '#6B7280'}}>Nom : Aintsoa Mihajatiana</Text>{"\n\n"}
+            2. Saisissez <Text style={{fontWeight:'800'}}>VOTRE</Text> numéro de téléphone ci-dessous et validez.
+          </Text>
+        </View>
 
         <View style={styles.inputContainer}>
           <Ionicons name="call-outline" size={20} color="#9CA3AF" />
           <TextInput
             style={styles.input}
-            placeholder="034 XX XXX XX"
+            placeholder="Votre numéro (ex: 034 XX XXX XX)"
             value={phoneNumber}
             onChangeText={setPhoneNumber}
             keyboardType="phone-pad"
@@ -157,9 +169,9 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
         </View>
 
         <View style={styles.infoBox}>
-          <Ionicons name="information-circle-outline" size={20} color="#2563EB" />
+          <Ionicons name="flash-outline" size={20} color="#2563EB" />
           <Text style={styles.infoText}>
-            Vous allez recevoir une demande de confirmation sur votre mobile après avoir cliqué sur le bouton.
+            La validation sera automatique et instantanée dès réception de votre transfert.
           </Text>
         </View>
 
@@ -168,7 +180,7 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
           onPress={handleSubmit}
           disabled={phoneNumber.length < 10 || loading}
         >
-          {loading ? <ActivityIndicator color="white" /> : <Text style={styles.confirmButtonText}>Payer {amount.toLocaleString('fr-FR')} Ar</Text>}
+          {loading ? <ActivityIndicator color="white" /> : <Text style={styles.confirmButtonText}>J'ai envoyé {amount.toLocaleString('fr-FR')} Ar</Text>}
         </TouchableOpacity>
       </View>
     );
