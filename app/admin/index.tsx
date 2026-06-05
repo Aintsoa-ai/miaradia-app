@@ -21,7 +21,39 @@ export default function AdminDashboard() {
   useEffect(() => {
     checkAdmin();
     fetchAdminData();
+    
+    // Auto-refresh silencieux toutes les 5 secondes
+    const interval = setInterval(() => {
+      fetchAdminDataSilent();
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
+
+  const fetchAdminDataSilent = async () => {
+    try {
+      const { data: pending } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          rides (departure, arrival, date),
+          passenger:profiles!passenger_id(full_name)
+        `)
+        .eq('payment_status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (pending) setBookings(pending);
+
+      const { data: smsLogs } = await supabase
+        .from('sms_logs')
+        .select('*')
+        .order('received_at', { ascending: false })
+        .limit(3);
+        
+      if (smsLogs) setRecentSmsLogs(smsLogs);
+    } catch (error: any) {
+      console.error('Error fetching admin data silent:', error.message);
+    }
+  };
 
   const checkAdmin = async () => {
     const { data: { user } } = await supabase.auth.getUser();
