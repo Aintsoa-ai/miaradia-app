@@ -167,6 +167,18 @@ Deno.serve(async (req) => {
           .eq('id', booking.ride_id);
       }
 
+      // 3. Envoyer une Alerte Message automatique au chauffeur
+      if (booking.passenger_id && booking.rides?.driver_id) {
+        await supabase
+          .from('messages')
+          .insert([{
+            sender_id: booking.passenger_id,
+            receiver_id: booking.rides.driver_id,
+            ride_id: booking.ride_id,
+            content: "✅ Paiement validé automatiquement via Mobile Money. Je vais vous appeler dans les minutes qui viennent pour confirmer les détails."
+          }]);
+      }
+
       validated++;
       console.log(`✅ Réservation ${booking.id} validée automatiquement ! Passager: ${booking.passenger_id}`);
     }
