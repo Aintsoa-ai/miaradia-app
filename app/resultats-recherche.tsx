@@ -25,6 +25,14 @@ export default function SearchResultsScreen() {
   const [expandedRideId, setExpandedRideId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<'Tout' | 'Voiture' | 'Minibus' | 'Moto'>('Tout');
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/');
+    }
+  };
+
   // Filtres et Tri
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [sortBy, setSortBy] = useState<'earliest' | 'lowest_price' | 'closest_dep' | 'closest_arr' | 'shortest'>('earliest');
@@ -353,7 +361,7 @@ export default function SearchResultsScreen() {
       {!isDesktop && (
         <View className="bg-white px-6 pt-16 pb-6 shadow-sm z-10">
           <View className="flex-row items-center justify-between">
-            <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 bg-gray-100 rounded-full items-center justify-center">
+            <TouchableOpacity onPress={handleBack} className="w-10 h-10 bg-gray-100 rounded-full items-center justify-center">
               <Ionicons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
           <View className="items-center flex-1 mx-4">

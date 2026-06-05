@@ -32,6 +32,14 @@ export default function RideDetailsScreen() {
     return Math.min(5000, Math.max(1000, fee));
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/');
+    }
+  };
+
   useEffect(() => {
     fetchRideDetails();
   }, [id]);
@@ -278,7 +286,7 @@ export default function RideDetailsScreen() {
         <View className="bg-white border-b border-slate-200 py-4 px-12 z-10 shadow-sm">
           <View className="max-w-5xl mx-auto w-full flex-row items-center justify-between">
             <TouchableOpacity 
-              onPress={() => router.back()} 
+              onPress={handleBack} 
               className="flex-row items-center py-2 px-4 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors"
             >
               <Ionicons name="arrow-back" size={18} color="#054752" />
@@ -713,7 +721,7 @@ export default function RideDetailsScreen() {
       
       {/* Header */}
       <View className="flex-row items-center px-6 pb-4 pt-2 bg-white border-b border-gray-100 z-10">
-        <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 items-center justify-center mr-2 -ml-2">
+        <TouchableOpacity onPress={handleBack} className="w-10 h-10 items-center justify-center mr-2 -ml-2">
           <Ionicons name="arrow-back" size={28} color="#2563EB" />
         </TouchableOpacity>
         <Text className="text-xl font-bold text-gray-900 ml-2">{ride.date?.split(' à ')[0] || ride.date || 'Date inconnue'}</Text>

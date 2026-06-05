@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView, Switch,
-  Platform, Alert, ActivityIndicator, AppState, AppStateStatus
+  Platform, Alert, ActivityIndicator, AppState, AppStateStatus, PermissionsAndroid
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
@@ -270,22 +270,50 @@ export default function SmsGatewayScreen() {
       return;
     }
 
-    try {
-      globalSubscription = SmsListener.addListener((message: any) => {
-        const body = message.body || message.messageBody || '';
-        const sender = message.originatingAddress || '';
-        console.log('📱 SMS reçu de:', sender, '→', body.substring(0, 50));
-        processIncomingSms(body, sender);
-      });
+    const startListenerActual = () => {
+      try {
+        globalSubscription = SmsListener.addListener((message: any) => {
+          const body = message.body || message.messageBody || '';
+          const sender = message.originatingAddress || '';
+          console.log('📱 SMS reçu de:', sender, '→', body.substring(0, 50));
+          processIncomingSms(body, sender);
+        });
 
-      globalIsListening = true;
-      setIsListening(true);
-      AsyncStorage.setItem('sms_listening_pref', 'true');
-      CustomAlert.alert('🟢 Passerelle Active', 'Miara-Dia écoute maintenant vos SMS entrants. Gardez l\'app ouverte en arrière-plan.');
-    } catch (error) {
-      console.error('Erreur démarrage SMS listener:', error);
-      CustomAlert.alert('Erreur', 'Impossible de démarrer l\'écoute SMS. L\'app doit être compilée en APK natif.');
-    }
+        globalIsListening = true;
+        setIsListening(true);
+        AsyncStorage.setItem('sms_listening_pref', 'true');
+        CustomAlert.alert('🟢 Passerelle Active', 'Miara-Dia écoute maintenant vos SMS entrants. Gardez l\'app ouverte en arrière-plan.');
+      } catch (error) {
+        console.error('Erreur démarrage SMS listener:', error);
+        CustomAlert.alert('Erreur', 'Impossible de démarrer l\'écoute SMS. L\'app doit être compilée en APK natif.');
+      }
+    };
+
+    const requestSmsPermission = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
+          {
+            title: "Permission SMS",
+            message: "Miara-Dia a besoin de lire vos SMS pour valider automatiquement les paiements Mobile Money.",
+            buttonNeutral: "Plus tard",
+            buttonNegative: "Annuler",
+            buttonPositive: "Autoriser"
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          startListenerActual();
+        } else {
+          CustomAlert.alert("Permission refusée", "L'écoute automatique des SMS ne peut pas fonctionner sans cette permission.");
+          setIsListening(false);
+          AsyncStorage.setItem('sms_listening_pref', 'false');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    };
+
+    requestSmsPermission();
   };
 
   const stopListening = () => {
