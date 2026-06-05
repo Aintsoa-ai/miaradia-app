@@ -467,8 +467,8 @@ export default function SearchScreen() {
     <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
       {/* SECTION HERO DESKTOP */}
       <View className="bg-slate-900 h-[550px] w-full flex-row items-center px-24 overflow-hidden relative">
-        {/* CARROUSEL D'IMAGES EN FOND DROIT AVEC FONDU */}
-        <View className="absolute right-0 top-0 bottom-0 w-2/3 h-full">
+        {/* CARROUSEL D'IMAGES EN FOND AVEC FONDU */}
+        <View className="absolute right-0 top-0 bottom-0 w-full h-full">
           {CAROUSEL_DATA.map((item, index) => (
             <Image 
               key={item.id}
@@ -478,14 +478,16 @@ export default function SearchScreen() {
               style={{
                 opacity: activeIndex === index ? 1 : 0,
                 transition: 'opacity 1.5s ease-in-out',
+                ...(Platform.OS === 'web' ? { objectPosition: 'center' } : {})
               } as any}
             />
           ))}
           <LinearGradient
-            colors={['#0F172A', 'transparent']}
+            colors={['#0F172A', 'rgba(15, 23, 42, 0.8)', 'transparent']}
+            locations={[0, 0.4, 1]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, width: '50%' }}
+            style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, width: '100%' }}
           />
           <LinearGradient
             colors={['rgba(15, 23, 42, 0)', 'rgba(15, 23, 42, 0.4)']}
