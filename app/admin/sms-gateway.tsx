@@ -198,20 +198,39 @@ export default function SmsGatewayScreen() {
       }
 
       // Chercher les réservations correspondantes
-      const { data: bookings } = await supabase
+      // STRATÉGIE DE CORRESPONDANCE :
+      // 1. L'utilisateur entre son numéro de tel dans PaymentModal → sauvegardé comme payment_reference
+      // 2. Le SMS MVola contient : sender (numéro de l'expéditeur) + ref (numéro transaction MVola)
+      // On cherche par numéro d'expéditeur OU par référence MVola (les deux cas couverts)
+      
+      const senderPhone = extractedSender || sender || '';
+      const cleanSender = senderPhone.replace(/\s+/g, '').replace(/^\+261/, '0');
+      
+      console.log(`🔍 Recherche booking: ref="${reference}" sender="${cleanSender}" montant=${amount}`);
+
+      // Récupérer TOUTES les réservations en attente et filtrer manuellement
+      const { data: allPending } = await supabase
         .from('bookings')
         .select('*, rides(*)')
-        .eq('payment_status', 'pending')
-        .ilike('payment_reference', `%${reference}%`);
+        .eq('payment_status', 'pending');
+
+      // Chercher par numéro de l'expéditeur (cas MVola normal) OU par référence (cas fallback)
+      const bookings = (allPending || []).filter((b: any) => {
+        const ref = (b.payment_reference || '').replace(/\s+/g, '');
+        return ref.includes(cleanSender) || 
+               ref.includes(reference || '') ||
+               cleanSender.includes(ref) ||
+               (reference && ref.includes(reference));
+      });
 
       let validated = 0;
 
       if (bookings && bookings.length > 0) {
         for (const booking of bookings) {
-          // Vérification du montant (tolérance 200 Ar)
+          // Vérification du montant (tolérance 500 Ar pour couvrir les frais opérateur)
           if (amount && booking.amount_fee) {
             const diff = Math.abs(amount - booking.amount_fee);
-            if (diff > 200) continue;
+            if (diff > 500) continue;
           }
 
           // Valider le paiement
