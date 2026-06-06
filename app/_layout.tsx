@@ -3,9 +3,14 @@ import { Stack } from "expo-router";
 import { Platform } from "react-native";
 import { useEffect } from "react";
 import { CustomAlertComponent, CustomAlertRef } from "../components/CustomAlert";
+import { autoStartSmsListener } from "../lib/smsAutoStart";
 
 export default function Layout() {
   useEffect(() => {
+    // Démarrer le listener SMS automatiquement au lancement (Android uniquement)
+    // Fonctionne si la préférence 'sms_listening_pref' = 'true' est sauvegardée
+    autoStartSmsListener();
+
     // Protection anti-inspection uniquement sur le Web
     if (Platform.OS === "web") {
       const disableInspect = (e: KeyboardEvent) => {
