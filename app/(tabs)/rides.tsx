@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, RefreshControl, useWindowDimensions } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { formatPrice } from '../../lib/formatPrice';
 import ReviewModal from '../../components/ReviewModal';
@@ -72,9 +72,11 @@ export default function RidesScreen() {
     }
   }, [activeTab]);
 
-  useEffect(() => {
-    fetchMyRides();
-  }, [fetchMyRides]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchMyRides();
+    }, [fetchMyRides])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);

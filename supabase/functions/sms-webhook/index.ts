@@ -104,12 +104,12 @@ Deno.serve(async (req) => {
     // Connexion Supabase avec droits admin
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Chercher la réservation en attente avec cette référence
+    // Autoriser la recherche si le client a tapé la référence OU son numéro de téléphone
     const { data: bookings, error: searchError } = await supabase
       .from('bookings')
       .select('*, rides(*)')
       .eq('payment_status', 'pending')
-      .ilike('payment_reference', `%${reference}%`)
+      .or(`payment_reference.ilike.%${reference}%,payment_reference.ilike.%${sender}%`)
       .limit(5);
 
     if (searchError) throw searchError;

@@ -196,13 +196,12 @@ export default function SmsGatewayScreen() {
         return;
       }
 
-      // Chercher les réservations correspondantes (soit par ref, soit par sender)
-      const searchSender = extractedSender || sender || 'NO_SENDER';
+      // Chercher les réservations correspondantes
       const { data: bookings } = await supabase
         .from('bookings')
         .select('*, rides(*)')
         .eq('payment_status', 'pending')
-        .or(`payment_reference.ilike.%${reference}%,payment_reference.ilike.%${searchSender}%`);
+        .ilike('payment_reference', `%${reference}%`);
 
       let validated = 0;
 
@@ -248,7 +247,7 @@ export default function SmsGatewayScreen() {
       await fetchData();
 
     } catch (error: any) {
-      console.error('Erreur traitement SMS via Webhook:', error.message);
+      console.error('Erreur traitement SMS:', error);
     } finally {
       setProcessing(false);
     }
