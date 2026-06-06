@@ -1,2 +1,14 @@
-<manifest>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="expo.modules.smsgateway">
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application>
+        <service 
+            android:name=".SmsForegroundService" 
+            android:enabled="true" 
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+    </application>
 </manifest>

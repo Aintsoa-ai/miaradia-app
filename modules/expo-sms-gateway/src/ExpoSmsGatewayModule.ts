@@ -5,7 +5,7 @@ type ExpoSmsGatewayModuleEvents = {
 };
 
 declare class ExpoSmsGatewayModule extends NativeModule<ExpoSmsGatewayModuleEvents> {
-  startListening(): boolean;
+  startListening(supabaseUrl: string, supabaseKey: string): boolean;
   stopListening(): boolean;
   isListening(): boolean;
 }

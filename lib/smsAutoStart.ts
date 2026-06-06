@@ -180,7 +180,9 @@ export async function autoStartSmsListener(): Promise<void> {
     }
 
     // Démarrer l'écoute via le module natif
-    ExpoSmsGatewayModule.startListening();
+    const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
+    const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+    ExpoSmsGatewayModule.startListening(supabaseUrl, supabaseKey);
     
     // Ecouter les événements
     globalSmsSubscription = ExpoSmsGatewayModule.addListener('onSmsReceived', (event: any) => {

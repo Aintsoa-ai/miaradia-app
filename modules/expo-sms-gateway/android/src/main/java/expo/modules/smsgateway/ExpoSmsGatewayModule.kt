@@ -1,55 +1,31 @@
 package expo.modules.smsgateway
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
-import android.provider.Telephony
-import android.telephony.SmsMessage
-import android.util.Log
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
 class ExpoSmsGatewayModule : Module() {
-  private var smsReceiver: BroadcastReceiver? = null
   private var isListening = false
 
   override fun definition() = ModuleDefinition {
     Name("ExpoSmsGateway")
 
-    Events("onSmsReceived")
-
-    Function("startListening") {
+    Function("startListening") { supabaseUrl: String, supabaseKey: String ->
       if (isListening) return@Function true
       
       val context = appContext.reactContext ?: return@Function false
       
-      smsReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-          if (intent?.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
-            val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-            for (sms in messages) {
-              val body = sms.displayMessageBody
-              val sender = sms.originatingAddress
-              Log.d("ExpoSmsGateway", "Received SMS from $sender: $body")
-              
-              sendEvent("onSmsReceived", mapOf(
-                "sender" to sender,
-                "body" to body
-              ))
-            }
-          }
-        }
+      val intent = Intent(context, SmsForegroundService::class.java).apply {
+        putExtra("SUPABASE_URL", supabaseUrl)
+        putExtra("SUPABASE_KEY", supabaseKey)
       }
 
-      val filter = IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)
-      filter.priority = 999
-      
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        context.registerReceiver(smsReceiver, filter, Context.RECEIVER_EXPORTED)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        context.startForegroundService(intent)
       } else {
-        context.registerReceiver(smsReceiver, filter)
+        context.startService(intent)
       }
       
       isListening = true
@@ -57,13 +33,9 @@ class ExpoSmsGatewayModule : Module() {
     }
 
     Function("stopListening") {
-      if (!isListening) return@Function true
-      
       val context = appContext.reactContext ?: return@Function false
-      smsReceiver?.let {
-        context.unregisterReceiver(it)
-      }
-      smsReceiver = null
+      val intent = Intent(context, SmsForegroundService::class.java)
+      context.stopService(intent)
       isListening = false
       return@Function true
     }

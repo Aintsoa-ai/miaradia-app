@@ -280,7 +280,9 @@ export default function SmsGatewayScreen() {
           processIncomingSms(body, sender);
         });
 
-        ExpoSmsGatewayModule.startListening();
+        const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
+        const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+        ExpoSmsGatewayModule.startListening(supabaseUrl, supabaseKey);
         globalIsListening = true;
         setIsListening(true);
         AsyncStorage.setItem('sms_listening_pref', 'true');
@@ -293,17 +295,15 @@ export default function SmsGatewayScreen() {
 
     const requestSmsPermission = async () => {
       try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
-          {
-            title: "Permission SMS",
-            message: "Miara-Dia a besoin de lire vos SMS pour valider automatiquement les paiements Mobile Money.",
-            buttonNeutral: "Plus tard",
-            buttonNegative: "Annuler",
-            buttonPositive: "Autoriser"
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        const permissionsToRequest = [PermissionsAndroid.PERMISSIONS.RECEIVE_SMS];
+        
+        if (Platform.OS === 'android' && Platform.Version >= 33) {
+          permissionsToRequest.push(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+        }
+
+        const granted = await PermissionsAndroid.requestMultiple(permissionsToRequest);
+        
+        if (granted[PermissionsAndroid.PERMISSIONS.RECEIVE_SMS] === PermissionsAndroid.RESULTS.GRANTED) {
           startListenerActual();
         } else {
           CustomAlert.alert("Permission refusée", "L'écoute automatique des SMS ne peut pas fonctionner sans cette permission.");
