@@ -71,12 +71,24 @@ class SmsForegroundService : Service() {
         smsReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
-                    val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-                    for (sms in messages) {
-                        val body = sms.displayMessageBody
-                        val sender = sms.originatingAddress ?: continue
-                        Log.d("SmsGatewayService", "SMS Received: $body")
-                        processSms(sender, body)
+                    try {
+                        val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
+                        if (messages.isNullOrEmpty()) return
+                        
+                        val fullBody = StringBuilder()
+                        var sender = ""
+                        for (sms in messages) {
+                            fullBody.append(sms.displayMessageBody)
+                            if (sms.originatingAddress != null) {
+                                sender = sms.originatingAddress!!
+                            }
+                        }
+                        
+                        Log.d("SmsGatewayService", "SMS Received: $fullBody")
+                        showDebugNotification("SMS Intercepté", "De: $sender - Lecture en cours...")
+                        processSms(sender, fullBody.toString())
+                    } catch (e: Exception) {
+                        showDebugNotification("Crash onReceive", e.message ?: "Erreur inconnue")
                     }
                 }
             }
@@ -93,15 +105,18 @@ class SmsForegroundService : Service() {
     }
 
     private fun processSms(sender: String, body: String) {
-        if (!sender.equals("MVOLA", ignoreCase = true) && !sender.equals("OrangeMoney", ignoreCase = true) && !sender.equals("AirtelMoney", ignoreCase = true)) {
-            // Optionnel: filtrer uniquement les SMS provenant des opérateurs connus
-            // Mais pour être sûr, on peut aussi laisser passer si le corps ressemble à un paiement
+        try {
+            if (!sender.equals("MVOLA", ignoreCase = true) && !sender.equals("OrangeMoney", ignoreCase = true) && !sender.equals("AirtelMoney", ignoreCase = true)) {
+                // Optionnel: filtrer uniquement les SMS provenant des opérateurs connus
+            }
+
+            val reference = extractPhoneNumberAsReference(body) ?: extractReferenceFallback(body)
+            val amount = extractAmount(body)
+
+            sendToSupabase(sender, body, reference, amount)
+        } catch (e: Exception) {
+            showDebugNotification("Crash processSms", e.message ?: "Erreur interne")
         }
-
-        val reference = extractPhoneNumberAsReference(body) ?: extractReferenceFallback(body)
-        val amount = extractAmount(body)
-
-        sendToSupabase(sender, body, reference, amount)
     }
 
     private fun extractPhoneNumberAsReference(body: String): String? {
@@ -124,44 +139,55 @@ class SmsForegroundService : Service() {
     }
 
     private fun sendToSupabase(sender: String, body: String, reference: String?, amount: Double?) {
-        val prefs = getSharedPreferences("SmsGatewayPrefs", Context.MODE_PRIVATE)
-        val supabaseUrl = prefs.getString("SUPABASE_URL", null)
-        val supabaseKey = prefs.getString("SUPABASE_KEY", null)
+        try {
+            val prefs = getSharedPreferences("SmsGatewayPrefs", Context.MODE_PRIVATE)
+            val supabaseUrl = prefs.getString("SUPABASE_URL", null)
+            val supabaseKey = prefs.getString("SUPABASE_KEY", null)
 
-        if (supabaseUrl == null || supabaseKey == null) {
-            Log.e("SmsGatewayService", "Supabase credentials missing")
-            return
-        }
-
-        // URL directe vers la Edge Function ou l'API REST de Supabase
-        val url = "$supabaseUrl/functions/v1/sms-webhook"
-
-        val json = JSONObject().apply {
-            put("sender", sender)
-            put("body", body)
-            put("reference", reference ?: JSONObject.NULL)
-            put("amount", amount ?: JSONObject.NULL)
-        }
-
-        val requestBody = json.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
-
-        val request = Request.Builder()
-            .url(url)
-            .post(requestBody)
-            .addHeader("Authorization", "Bearer $supabaseKey")
-            .addHeader("apikey", supabaseKey)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("SmsGatewayService", "Failed to send SMS to Supabase", e)
+            if (supabaseUrl.isNullOrEmpty() || supabaseKey.isNullOrEmpty()) {
+                Log.e("SmsGatewayService", "Supabase credentials missing")
+                showDebugNotification("Erreur URL", "URL Supabase ou Clé manquante dans les préférences")
+                return
             }
 
-            override fun onResponse(call: Call, response: Response) {
-                Log.d("SmsGatewayService", "Supabase Response: ${response.code}")
-                response.close()
+            val url = "$supabaseUrl/functions/v1/sms-webhook"
+
+            val json = JSONObject().apply {
+                put("sender", sender)
+                put("body", body)
+                put("reference", reference ?: JSONObject.NULL)
+                put("amount", amount ?: JSONObject.NULL)
             }
-        })
+
+            val requestBody = json.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
+
+            val request = Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer $supabaseKey")
+                .addHeader("apikey", supabaseKey)
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e("SmsGatewayService", "Failed to send SMS to Supabase", e)
+                    showDebugNotification("Erreur Réseau OkHttp", e.message ?: "Impossible de joindre Supabase")
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val code = response.code
+                    Log.d("SmsGatewayService", "Supabase Response: $code")
+                    if (code in 200..299) {
+                        showDebugNotification("Succès Supabase", "Requête envoyée avec succès (Code $code)")
+                    } else {
+                        showDebugNotification("Erreur Supabase HTTP", "Supabase a retourné le code $code")
+                    }
+                    response.close()
+                }
+            })
+        } catch (e: Exception) {
+            showDebugNotification("Crash sendToSupabase", e.message ?: "Erreur HTTP/JSON")
+        }
     }
 
     private fun createNotificationChannel() {
@@ -174,5 +200,15 @@ class SmsForegroundService : Service() {
             val manager = getSystemService(NotificationManager::class.java)
             manager?.createNotificationChannel(channel)
         }
+    }
+
+    private fun showDebugNotification(title: String, message: String) {
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = NotificationCompat.Builder(this, "SmsGatewayChannel")
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .build()
+        manager.notify(System.currentTimeMillis().toInt(), notification)
     }
 }

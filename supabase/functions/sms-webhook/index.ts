@@ -90,7 +90,17 @@ Deno.serve(async (req) => {
     // Format SMS Gateway (MessageCore) :
     // { message: "Vous avez recu...", phoneNumber: "+261XXXXXXXXX", receivedAt: "..." }
     const smsText = body.message || body.text || body.body || '';
-    const smsFrom = body.phoneNumber || body.from || '';
+    const smsFrom = body.phoneNumber || body.from || body.sender || '';
+
+    // Connexion Supabase avec droits admin
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // DEBUG: Toujours sauvegarder la requête brute
+    await supabase.from('sms_logs').insert([{
+      sms_body: `[RAW HTTP REQUEST] ${JSON.stringify(body).substring(0, 500)}`,
+      matched: false,
+      received_at: new Date().toISOString()
+    }]);
 
     if (!smsText) {
       return new Response(JSON.stringify({ error: 'Pas de contenu SMS' }), { status: 400 });
@@ -108,9 +118,6 @@ Deno.serve(async (req) => {
         reason: 'Pas de référence Mobile Money détectée dans ce SMS' 
       }), { status: 200 });
     }
-
-    // Connexion Supabase avec droits admin
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Autoriser la recherche si le client a tapé la référence OU son numéro de téléphone
     const { data: bookings, error: searchError } = await supabase
