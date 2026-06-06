@@ -1,6 +1,6 @@
 # 🛡️ Rapport d'Audit Complet - Miara-Dia 🚙🇲🇬
 
-Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la Session 17 (6 Juin 2026).
+Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la Session 18 (6 Juin 2026).
 
 > [!IMPORTANT]
 > **Critère d'Éligibilité des Audits :** Toute fonctionnalité auditée doit passer avec succès les tests d'ergonomie et de performance sur **version ordinateur (Desktop)** et **version téléphone (Mobile)**. 
@@ -10,6 +10,8 @@ Ce document récapitule l'état de santé technique et fonctionnel de l'applicat
 ## ✅ 1. État des Lieux : Fonctionnalités Opérationnelles
 L'application est considérée comme **STABLE** sur les piliers suivants :
 
+*   **Diagnostic Root Cause SMS Listener (S18) 🔍 :** Identification de la cause racine bloquée depuis plusieurs sessions : `react-native-android-sms-listener` v0.8 est incompatible avec `newArchEnabled: true` (Expo SDK 53 / New Architecture / TurboModules). Le module fonctionnait en JavaScript mais le pont natif Android (BroadcastReceiver) était silencieusement désactivé. De plus, Android 13+ exige `android:exported="true"` explicite sur tout `<receiver>` sans quoi il est ignoré. Corrections appliquées : (1) `newArchEnabled: false` dans `app.json`, (2) Plugin `withSmsReceiver.js` enregistrant le BroadcastReceiver avec `android:priority="999"`, (3) Service `lib/smsAutoStart.ts` démarrant le listener dès le lancement de l'app via `_layout.tsx`.
+*   **Actualisation "Mes Trajets" instantanée (S18) 🔄 :** Migration de `useEffect` vers `useFocusEffect` sur `rides.tsx`. La liste des trajets publiés se rafraîchit automatiquement à chaque retour sur l'onglet, sans actualisation manuelle.
 *   **Fiabilité du Déverrouillage Client & Kiosque Admin (S17) 🔄 :** Implémentation d'un système de scrutation silencieuse (polling). Le client interroge automatiquement son statut toutes les 3 secondes, et le tableau de bord Kiosque toutes les 5 secondes, permettant une expérience visuelle 100% "zéro-clic" lors des validations SMS.
 *   **Correction Permissions Android 8+ SMS Gateway (S17) 🔒 :** Résolution d'un blocage critique de l'interception SMS par les systèmes Android modernes. L'app implémente désormais l'appel explicite au module natif `PermissionsAndroid.request` obligatoire, débloquant définitivement l'écoute des SMS Mobile Money.
 *   **Résolution Crash Navigation Web Vercel (S17) 🌐 :** Correction de la flèche de retour (<-). L'appel brutal à `router.back()` causait des écrans blancs (`TypeError: router.canGoBack is not a function` ou impossibilité d'aller en arrière) sur navigateur lorsqu'un utilisateur actualisait la page. L'appel est désormais sécurisé avec `try/catch` et bascule sur l'accueil par défaut.
@@ -108,4 +110,4 @@ L'audit a révélé quelques points d'amélioration cruciaux pour l'expérience 
 3.  **Phase "Légale"** : Intégrer la vérification de CIN (KYC) pour les Super Drivers.
 
 ---
-*Audit mis à jour le 6 Juin 2026 par Antigravity à l'issue de la Session 17.*
+*Audit mis à jour le 6 Juin 2026 par Antigravity à l'issue de la Session 18.*

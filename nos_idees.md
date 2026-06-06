@@ -47,6 +47,8 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Auto-Rafraîchissement Bilan Client *(RÉALISÉ - S17)* :** Mise en place d'un radar de scrutation (polling) toutes les 3 secondes côté passager. Le contact du chauffeur s'affiche instantanément dès la validation SMS, sans aucune actualisation manuelle nécessaire.
 - [x] **Auto-Rafraîchissement Kiosque Admin *(RÉALISÉ - S17)* :** Actualisation silencieuse en arrière-plan toutes les 5 secondes du tableau de bord Kiosque pour détecter instantanément l'arrivée de nouveaux paiements, sans bloquer l'interface.
 - [x] **Correction Historique Web *(RÉALISÉ - S17)* :** Fiabilisation de la flèche de retour (<-) sur Vercel/Web via un bloc de sécurité `try/catch` sur `router.canGoBack()` évitant les crashs d'affichage des détails de trajet en cas d'accès direct sans historique de navigation.
+- [x] **Actualisation Instantanée "Mes Trajets" *(RÉALISÉ - S18)* :** Utilisation de `useFocusEffect` sur la page "Mes Trajets" du conducteur. Dès qu'il revient sur l'onglet après publication, la liste se recharge automatiquement sans actualisation manuelle.
+- [x] **Fix SMS Listener New Architecture Expo *(EN COURS - S18)* :** Diagnostic confirmé : `react-native-android-sms-listener` incompatible avec `newArchEnabled: true` (Expo SDK 53). Corrections appliquées : désactivation de la nouvelle architecture, plugin natif `withSmsReceiver.js` pour enregistrer le `BroadcastReceiver` explicitement avec `android:exported="true"` (Android 13+), auto-démarrage du listener dans `_layout.tsx` dès le lancement de l'app.
 
 ---
 
@@ -71,8 +73,9 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Déverrouillage et Validité des Contacts *(NOUVEAU)* :** Définir une règle métier précise : Combien de temps un contact reste-t-il déverrouillé après paiement ? (ex: 24h, 48h ou illimité pour le trajet donné). Doit-on payer pour chaque contact ou y a-t-il une limite de contacts par paiement ?
 - [ ] **Programme de Fidélité Voyageur (Bonus d'Activité) :** Récompenser les passagers fidèles pour stimuler l'activité.
 - [ ] **Booster une Publication *(NOUVEAU)* :** Option payante pour les chauffeurs permettant de mettre en avant (Boost) leur annonce de trajet en tête des résultats de recherche (comme sur Facebook).
-- [ ] **Publication de Location de Voiture *(NOUVEAU)* :** Création d'une catégorie dédiée aux loueurs. Moyennant un petit frais de solidarité (ex: 1 000 Ar) payé par Mobile Money, l'annonce reste active pendant 24h en tête de liste pour soutenir l'évolution du site. Les clients cherchant une voiture de location paieront de la même manière pour obtenir le contact du loueur.
-- [ ] **Location Voiture pour Sortie en Famille *(NOUVEAU)* :** Sous-catégorie spécifique permettant à un utilisateur de publier une demande de "Recherche Voiture Familiale" pour les excursions (frais de publication 1 000 Ar).
+- [ ] **Publication de Location de Voiture *(NOUVEAU - S17/S18)* :** Création d'une catégorie dédiée aux loueurs. Moyennant un petit frais de solidarité (1 000 Ar) payé par Mobile Money lors de la publication, l'annonce reste active pendant 24h. Les clients cherchant une voiture de location paieront également 1 000 Ar pour obtenir le contact du loueur — **même expérience UX que le déblocage du numéro conducteur** avec message de confirmation style : *"1 000 Ar pour 24h pour soutenir l'évolution du site"*.
+- [ ] **Sortie en Famille / Voiture Privée *(NOUVEAU - S18)* :** Sous-catégorie spécifique pour les excursions ou sorties familiales privées (pas du covoiturage classique). Frais de publication 1 000 Ar. Le client intéressé paie de même pour obtenir le contact, avec le même système Mobile Money.
+- [ ] **Boost d'Annonce *(NOUVEAU - S18)* :** Option payante pour les chauffeurs permettant de faire remonter leur annonce en tête des résultats de recherche (comme "Booster une publication" sur Facebook).
 
 ### 🤝 Communauté & Confiance
 - [ ] **Vérification d'Identité (KYC)** : Permettre aux utilisateurs d'uploader leur CIN pour obtenir un badge "Profil Vérifié par CIN".
@@ -89,8 +92,21 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Notifications Push** : Alerter le passager quand son trajet va bientôt partir ou quand un nouveau message arrive.
 - [ ] **Appels In-App (VoIP)** : Intégrer un bouton d'appel direct via l'app (type Messenger) après déblocage du contact.
 - [ ] **Dashboard Admin Mobile** : Une application simplifiée pour l'admin pour valider les paiements en déplacement.
-- [ ] **Surveillance de Stockage Supabase *(NOUVEAU)* :** Intégrer un widget directement sur la page Kiosque de l'administrateur affichant l'espace de stockage libre restant de la base de données Supabase, afin d'anticiper les besoins d'évolution.
+- [ ] **Surveillance de Stockage Supabase *(NOUVEAU - S17)* :** Intégrer un widget directement sur la page Kiosque de l'administrateur affichant l'espace de stockage libre restant de la base de données Supabase, afin d'anticiper les besoins d'évolution.
+- [ ] **Expiration Automatique des Trajets *(NOUVEAU - S18)* :** Un trajet ne doit plus apparaître dans les résultats de recherche dès que sa date de départ est passée. Exemple : trajet publié aujourd'hui → disparaît des résultats dès demain. Implémenter un filtre côté requête Supabase (`.gte('date', today)`).
+- [ ] **Règle de Validité du Contact Déverrouillé *(NOUVEAU - S18)* :** Définir la politique métier : chaque paiement déverrouille le contact d'**un seul** conducteur. Pour voir le contact d'un autre conducteur sur un autre trajet, un nouveau paiement est requis (pas d'accès illimité sur paiement unique, sauf abonnement).
+- [ ] **Message Automatique Post-Validation *(NOUVEAU - S18)* :** Après qu'un paiement est validé et que le contact du conducteur est affiché, envoyer automatiquement un message In-App du style : *"Une personne va vous appeler dans les minutes ou secondes qui viennent."* (en plus du message existant côté chauffeur).
+- [ ] **Trajet Intra-District / Taxi de Quartier *(NOUVEAU - S18)* :** Permettre aux conducteurs de publier des trajets courts (domicile ↔ travail). Le conducteur publie son retour du soir : des gens de son quartier peuvent réserver une place s'il passe près de chez eux.
 - [ ] **Optimisation Realtime** : Centraliser la gestion des WebSockets Supabase (via un Context global) pour éviter les souscriptions multiples et améliorer les performances.
 
 ---
-*Dernière mise à jour : 6 Juin 2026 - Session 17*
+
+## 📋 Règles de Documentation (Charte de Mise à Jour)
+
+> - `nos_idees.md` : Idées futures et ce qui est déjà réalisé
+> - `audit.md` : Rapport d'état de santé technique de l'app
+> - `README.md` : Toutes les fonctionnalités actives de l'application
+> - `plan.md` : Plan de conception et architecture technique
+> - **Règle :** Après chaque modification, vérifier l'impact sur mobile ET desktop, et synchroniser ces 4 documents.
+
+*Dernière mise à jour : 6 Juin 2026 - Session 18*
