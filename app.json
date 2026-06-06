@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "miaradiaapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.aintsoa.miaradia"
@@ -49,7 +49,8 @@
         }
       ],
       "@react-native-community/datetimepicker",
-      "expo-font"
+      "expo-font",
+      "./plugins/withSmsReceiver"
     ],
     "experiments": {
       "typedRoutes": true,
