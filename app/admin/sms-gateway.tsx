@@ -10,12 +10,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let globalSubscription: any = null;
 let globalIsListening = false;
-let SmsListener: any = null;
+let ExpoSmsGatewayModule: any = null;
 if (Platform.OS === 'android') {
   try {
-    SmsListener = require('react-native-android-sms-listener').default;
+    ExpoSmsGatewayModule = require('../../modules/expo-sms-gateway/src/ExpoSmsGatewayModule').default;
   } catch (e) {
-    console.log('SmsListener non disponible sur cette plateforme');
+    console.log('ExpoSmsGatewayModule non disponible sur cette plateforme', e);
   }
 }
 
@@ -263,7 +263,7 @@ export default function SmsGatewayScreen() {
       return;
     }
 
-    if (!SmsListener) {
+    if (!ExpoSmsGatewayModule) {
       CustomAlert.alert(
         'Module non disponible',
         'Pour activer cette fonctionnalité, l\'application doit être compilée en APK. Utilisez : eas build --platform android'
@@ -273,13 +273,14 @@ export default function SmsGatewayScreen() {
 
     const startListenerActual = () => {
       try {
-        globalSubscription = SmsListener.addListener((message: any) => {
-          const body = message.body || message.messageBody || '';
-          const sender = message.originatingAddress || '';
+        globalSubscription = ExpoSmsGatewayModule.addListener('onSmsReceived', (event: any) => {
+          const body = event.body || '';
+          const sender = event.sender || '';
           console.log('📱 SMS reçu de:', sender, '→', body.substring(0, 50));
           processIncomingSms(body, sender);
         });
 
+        ExpoSmsGatewayModule.startListening();
         globalIsListening = true;
         setIsListening(true);
         AsyncStorage.setItem('sms_listening_pref', 'true');
@@ -322,6 +323,11 @@ export default function SmsGatewayScreen() {
       globalSubscription.remove();
       globalSubscription = null;
     }
+    
+    if (ExpoSmsGatewayModule) {
+      ExpoSmsGatewayModule.stopListening();
+    }
+    
     globalIsListening = false;
     setIsListening(false);
     AsyncStorage.setItem('sms_listening_pref', 'false');

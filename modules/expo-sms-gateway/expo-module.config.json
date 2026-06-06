@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["ExpoSmsGatewayModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.smsgateway.ExpoSmsGatewayModule"]
+  }
+}

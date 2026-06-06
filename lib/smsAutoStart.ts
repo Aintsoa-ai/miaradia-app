@@ -10,13 +10,13 @@ import { supabase } from './supabase';
 let globalSmsSubscription: any = null;
 let isListenerActive = false;
 
-// Charger le module SMS natif une seule fois
-let SmsListener: any = null;
+// Charger le module SMS natif personnalisé
+let ExpoSmsGatewayModule: any = null;
 if (Platform.OS === 'android') {
   try {
-    SmsListener = require('react-native-android-sms-listener').default;
+    ExpoSmsGatewayModule = require('../modules/expo-sms-gateway/src/ExpoSmsGatewayModule').default;
   } catch (e) {
-    console.log('[SmsAutoStart] Module SMS non disponible');
+    console.log('[SmsAutoStart] Module ExpoSmsGateway non disponible', e);
   }
 }
 
@@ -162,7 +162,7 @@ async function handleIncomingSms(smsBody: string, rawSender?: string) {
 // ========== Démarrage du listener ==========
 export async function autoStartSmsListener(): Promise<void> {
   if (Platform.OS !== 'android') return;
-  if (!SmsListener) return;
+  if (!ExpoSmsGatewayModule) return;
   if (isListenerActive) return; // Déjà actif
 
   // Vérifier la préférence sauvegardée
@@ -179,10 +179,13 @@ export async function autoStartSmsListener(): Promise<void> {
       return;
     }
 
-    // Démarrer l'écoute
-    globalSmsSubscription = SmsListener.addListener((message: any) => {
-      const body = message.body || message.messageBody || '';
-      const senderAddr = message.originatingAddress || '';
+    // Démarrer l'écoute via le module natif
+    ExpoSmsGatewayModule.startListening();
+    
+    // Ecouter les événements
+    globalSmsSubscription = ExpoSmsGatewayModule.addListener('onSmsReceived', (event: any) => {
+      const body = event.body || '';
+      const senderAddr = event.sender || '';
       handleIncomingSms(body, senderAddr);
     });
 
@@ -194,12 +197,16 @@ export async function autoStartSmsListener(): Promise<void> {
 }
 
 export function stopSmsListener(): void {
+  if (Platform.OS !== 'android' || !ExpoSmsGatewayModule) return;
+  
   if (globalSmsSubscription) {
     globalSmsSubscription.remove();
     globalSmsSubscription = null;
-    isListenerActive = false;
-    console.log('[SmsAutoStart] 🔴 Listener SMS arrêté');
   }
+  
+  ExpoSmsGatewayModule.stopListening();
+  isListenerActive = false;
+  console.log('[SmsAutoStart] 🔴 Listener SMS arrêté');
 }
 
 export function isSmsListenerActive(): boolean {
