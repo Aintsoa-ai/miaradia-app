@@ -5,7 +5,7 @@
  */
 import { Platform, PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from './supabase';
+import { supabase, supabaseUrl, supabaseAnonKey } from './supabase';
 
 let globalSmsSubscription: any = null;
 let isListenerActive = false;
@@ -180,9 +180,7 @@ export async function autoStartSmsListener(): Promise<void> {
     }
 
     // Démarrer l'écoute via le module natif
-    const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
-    ExpoSmsGatewayModule.startListening(supabaseUrl, supabaseKey);
+    ExpoSmsGatewayModule.startListening(supabaseUrl, supabaseAnonKey);
     
     // Ecouter les événements
     globalSmsSubscription = ExpoSmsGatewayModule.addListener('onSmsReceived', (event: any) => {

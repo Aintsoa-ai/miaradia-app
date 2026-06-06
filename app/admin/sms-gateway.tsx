@@ -4,7 +4,7 @@ import {
   Platform, Alert, ActivityIndicator, AppState, AppStateStatus, PermissionsAndroid
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { supabase } from '../../lib/supabase';
+import { supabase, supabaseUrl, supabaseAnonKey } from '../../lib/supabase';
 import { CustomAlert } from '../../utils/alert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -280,9 +280,7 @@ export default function SmsGatewayScreen() {
           processIncomingSms(body, sender);
         });
 
-        const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
-        const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
-        ExpoSmsGatewayModule.startListening(supabaseUrl, supabaseKey);
+        ExpoSmsGatewayModule.startListening(supabaseUrl, supabaseAnonKey);
         globalIsListening = true;
         setIsListening(true);
         AsyncStorage.setItem('sms_listening_pref', 'true');
