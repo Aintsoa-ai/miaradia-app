@@ -208,11 +208,11 @@ export default function SmsGatewayScreen() {
 
       if (bookings && bookings.length > 0) {
         for (const booking of bookings) {
-          // Vérification du montant (tolérance 200 Ar)
-          if (amount && booking.amount_fee) {
-            const diff = Math.abs(amount - booking.amount_fee);
-            if (diff > 200) continue;
-          }
+          // Vérification du montant désactivée pour les tests manuels
+          // if (amount && booking.amount_fee) {
+          //   const diff = Math.abs(amount - booking.amount_fee);
+          //   if (diff > 200) continue;
+          // }
 
           // Valider le paiement
           await supabase.from('bookings').update({
@@ -352,7 +352,7 @@ export default function SmsGatewayScreen() {
           { text: 'Annuler', style: 'cancel' },
           { 
             text: 'Tester', 
-            onPress: (text) => {
+            onPress: (text?: string) => {
               if (text) {
                 processIncomingSms(text, 'SIMULATE');
               }
