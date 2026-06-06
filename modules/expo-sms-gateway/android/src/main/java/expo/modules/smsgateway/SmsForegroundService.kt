@@ -93,23 +93,34 @@ class SmsForegroundService : Service() {
     }
 
     private fun processSms(sender: String, body: String) {
-        val reference = extractReference(body)
+        if (!sender.equals("MVOLA", ignoreCase = true) && !sender.equals("OrangeMoney", ignoreCase = true) && !sender.equals("AirtelMoney", ignoreCase = true)) {
+            // Optionnel: filtrer uniquement les SMS provenant des opérateurs connus
+            // Mais pour être sûr, on peut aussi laisser passer si le corps ressemble à un paiement
+        }
+
+        val reference = extractPhoneNumberAsReference(body) ?: extractReferenceFallback(body)
         val amount = extractAmount(body)
 
-        // On envoie toujours au webhook, le webhook fera le filtrage si ce n'est pas un SMS MVola
         sendToSupabase(sender, body, reference, amount)
     }
 
-    private fun extractAmount(body: String): Double? {
-        val regex = Regex("([\\d][\\d\\s]*[\\d])\\s*(?:Ar|Ariary|MGA)", RegexOption.IGNORE_CASE)
+    private fun extractPhoneNumberAsReference(body: String): String? {
+        // Capture le numéro de téléphone (10 chiffres) après le nom, e.g. "recu de Sahara vololoniaina 0345321202"
+        val regex = Regex("(?:recu|envoye|recu de|envoye a)\\s+.+?\\s+(\\d{10})", RegexOption.IGNORE_CASE)
         val match = regex.find(body)
-        return match?.groupValues?.get(1)?.replace("\\s+".toRegex(), "")?.toDoubleOrNull()
+        return match?.groupValues?.get(1)
     }
 
-    private fun extractReference(body: String): String? {
+    private fun extractReferenceFallback(body: String): String? {
         val regex = Regex("(?:Ref|Reference|ID|Txn)\\s*:?\\s*([A-Z0-9]{4,20})", RegexOption.IGNORE_CASE)
         val match = regex.find(body)
         return match?.groupValues?.get(1)
+    }
+
+    private fun extractAmount(body: String): Double? {
+        val regex = Regex("([0-9\\s]+)\\s*(?:Ar|Ariary|MGA)", RegexOption.IGNORE_CASE)
+        val match = regex.find(body)
+        return match?.groupValues?.get(1)?.replace("\\s+".toRegex(), "")?.toDoubleOrNull()
     }
 
     private fun sendToSupabase(sender: String, body: String, reference: String?, amount: Double?) {

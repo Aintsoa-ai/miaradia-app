@@ -16,45 +16,53 @@ function parseMobileMoneySMS(smsBody: string): { reference: string | null; amoun
   const body = smsBody.toUpperCase();
   
   // === MVOLA (Telma) ===
-  // Ex: "Vous avez recu 1000.00 Ar de 034XXXXXXX. Ref transaction: TXN123456789"
-  const mvolaMatch = body.match(/RECU\s+([\d,\.]+)\s*AR.*?(\d{10,13}).*?REF[^:]*:\s*([A-Z0-9]+)/i);
-  if (mvolaMatch) {
+  const mvolaReceived = body.match(/([\d][\d\s]*[\d])\s*AR\s+RECU\s+DE\s+.+?\s+(\d{10})\s+LE\s+[\d\/]+\s+A\s+[\d:]+\..*?REF\s*:?\s*(\d+)/i);
+  if (mvolaReceived) {
     return {
-      amount: parseFloat(mvolaMatch[1].replace(',', '.')),
-      sender: mvolaMatch[2],
-      reference: mvolaMatch[3]
+      amount: parseFloat(mvolaReceived[1].replace(/\s+/g, '')),
+      sender: mvolaReceived[2],
+      reference: mvolaReceived[3]
+    };
+  }
+
+  const mvolaSent = body.match(/([\d][\d\s]*[\d])\s*AR\s+ENVOYE\s+A\s+.+?\s+(\d{10})\s+LE\s+[\d\/]+.*?REF\s*:?\s*(\d+)/i);
+  if (mvolaSent) {
+    return {
+      amount: parseFloat(mvolaSent[1].replace(/\s+/g, '')),
+      sender: mvolaSent[2],
+      reference: mvolaSent[3]
     };
   }
 
   // === ORANGE MONEY ===
-  // Ex: "Transaction reussie. Vous avez recu 1000 Ariary de 032XXXXXXX. ID: OM123456"
-  const orangeMatch = body.match(/RECU\s+([\d,\.]+)\s*ARIARY.*?(\d{10,13}).*?ID[^:]*:\s*([A-Z0-9]+)/i);
+  const orangeMatch = body.match(/([\d][\d\s]*[\d])\s*ARIARY.*?(\d{10}).*?(?:ID|REF)\s*:?\s*([A-Z0-9]+)/i);
   if (orangeMatch) {
     return {
-      amount: parseFloat(orangeMatch[1].replace(',', '.')),
+      amount: parseFloat(orangeMatch[1].replace(/\s+/g, '')),
       sender: orangeMatch[2],
       reference: orangeMatch[3]
     };
   }
 
   // === AIRTEL MONEY ===
-  const airtelMatch = body.match(/TRANSFERT.*?([\d,\.]+)\s*MGA.*?(\d{10,13}).*?REF[^:]*:\s*([A-Z0-9]+)/i);
+  const airtelMatch = body.match(/([\d][\d\s]*[\d])\s*(?:MGA|AR).*?(\d{10}).*?(?:REF|ID)\s*:?\s*([A-Z0-9]+)/i);
   if (airtelMatch) {
     return {
-      amount: parseFloat(airtelMatch[1].replace(',', '.')),
+      amount: parseFloat(airtelMatch[1].replace(/\s+/g, '')),
       sender: airtelMatch[2],
       reference: airtelMatch[3]
     };
   }
 
   // Fallback : chercher juste une référence numérique dans le SMS
-  const refMatch = body.match(/(?:REF|REFERENCE|ID|TXN)[^:]*:\s*([A-Z0-9]{6,20})/i);
-  const amountMatch = body.match(/([\d]+(?:[,\.]\d+)?)\s*(?:AR|ARIARY|MGA)/i);
+  const refMatch = body.match(/(?:REF|REFERENCE|ID|TXN)\s*:?\s*([A-Z0-9]{4,20})/i);
+  const amountMatch = body.match(/([\d][\d\s]*[\d])\s*(?:AR|ARIARY|MGA)/i);
+  const senderMatch = body.match(/(\d{10})/);
   
   return {
     reference: refMatch ? refMatch[1] : null,
-    amount: amountMatch ? parseFloat(amountMatch[1].replace(',', '.')) : null,
-    sender: null
+    amount: amountMatch ? parseFloat(amountMatch[1].replace(/\s+/g, '')) : null,
+    sender: senderMatch ? senderMatch[1] : null
   };
 }
 
