@@ -340,13 +340,29 @@ export default function SmsGatewayScreen() {
   };
 
   const testWithManualSms = async () => {
-    // Simulation pour tester sans APK
-    const testSms = 'Vous avez recu 1000.00 Ar de 0341234567. Ref transaction: TEST123456';
-    CustomAlert.alert(
-      '🧪 Test SMS Simulé',
-      `SMS simulé :\n"${testSms}"\n\nTraitement en cours...`,
-      [{ text: 'OK', onPress: () => processIncomingSms(testSms, '0341234567') }]
-    );
+    // Demander le texte du SMS au lieu de hardcoder
+    if (Platform.OS === 'web') {
+      const text = window.prompt('Collez le texte exact du SMS MVola :', '11000 Ar recu de Sahara vololoniaina 0345321202 le 07/06/26 a 00:25. Raison: cf. Solde: 1 321 Ar. Ref 1765508382');
+      if (text) processIncomingSms(text, 'SIMULATE');
+    } else {
+      Alert.prompt(
+        '🧪 Test SMS Simulé',
+        'Collez le texte exact du SMS MVola :',
+        [
+          { text: 'Annuler', style: 'cancel' },
+          { 
+            text: 'Tester', 
+            onPress: (text) => {
+              if (text) {
+                processIncomingSms(text, 'SIMULATE');
+              }
+            }
+          }
+        ],
+        'plain-text',
+        '11000 Ar recu de Sahara vololoniaina 0345321202 le 07/06/26 a 00:25. Raison: cf. Solde: 1 321 Ar. Ref 1765508382'
+      );
+    }
   };
 
   if (loading) {
