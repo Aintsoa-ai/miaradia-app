@@ -127,10 +127,11 @@ export default function ProfileScreen() {
         data: { avatar_url: publicUrlWithTimestamp }
       });
 
-      // 5. Mettre à jour la table publique profiles
+      // 5. Mettre à jour la table publique profiles (inclure le phone pour ne pas l'effacer)
       await supabase.from('profiles').upsert({
         id: user.id,
         avatar_url: publicUrlWithTimestamp,
+        phone: phone.replace(/\s/g, '') || undefined,
         updated_at: new Date()
       });
 
@@ -286,10 +287,14 @@ export default function ProfileScreen() {
         return;
       }
 
-      const errorPhone = validatePhone(phone);
-      if (errorPhone) {
-        CustomAlert.alert("Numéro invalide", errorPhone);
-        return;
+      // Valider le téléphone seulement si l'utilisateur a saisi quelque chose
+      const rawPhone = phone.replace(/\s/g, '');
+      if (rawPhone.length > 0) {
+        const errorPhone = validatePhone(phone);
+        if (errorPhone) {
+          CustomAlert.alert("Numéro invalide", errorPhone + "\n\nLe reste du profil sera quand même sauvegardé.");
+          // On continue quand même la sauvegarde — on ne bloque pas
+        }
       }
 
       if (containsHiddenPhone(bio)) {
