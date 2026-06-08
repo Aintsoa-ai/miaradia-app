@@ -563,6 +563,21 @@ export default function RideDetailsScreen() {
           <View style={{ flex: 1, minWidth: isDesktop ? 320 : '100%' }}>
             <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 2, gap: 20 }}>
               
+              {/* ALWAYS SHOW PRICE AND SEATS */}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View>
+                  <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 11, textTransform: 'uppercase' }}>Tarif Trajet</Text>
+                  <Text style={{ fontSize: 26, fontWeight: '900', color: '#0F172A', marginTop: 2 }}>{formatPrice(ride.price)} Ar</Text>
+                </View>
+                <View>
+                  <Text style={{ fontSize: 13, fontWeight: '900', textTransform: 'uppercase', color: ride.seats <= 0 ? '#EF4444' : '#2563EB' }}>
+                    {ride.seats <= 0 ? 'Complet' : `${ride.seats} dispo`}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ height: 1, backgroundColor: '#F1F5F9' }} />
+
               {currentUserId === ride.driver_id ? (
                 // DRIVER CONTROLS
                 <View style={{ gap: 16 }}>
@@ -599,19 +614,6 @@ export default function RideDetailsScreen() {
               ) : (
                 // PASSENGER ACTIONS
                 <View style={{ gap: 20 }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <View>
-                      <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 11, textTransform: 'uppercase' }}>Tarif Trajet</Text>
-                      <Text style={{ fontSize: 26, fontWeight: '900', color: '#0F172A', marginTop: 2 }}>{formatPrice(ride.price)} Ar</Text>
-                    </View>
-                    <View style={{ backgroundColor: ride.seats <= 0 ? '#FEF2F2' : '#EFF6FF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 }}>
-                      <Text style={{ fontSize: 10, fontWeight: '900', textTransform: 'uppercase', color: ride.seats <= 0 ? '#EF4444' : '#2563EB' }}>
-                        {ride.seats <= 0 ? 'Complet' : `${ride.seats} dispo`}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={{ height: 1, backgroundColor: '#F1F5F9' }} />
 
                   {isUnlocked ? (
                     <View style={{ gap: 12 }}>
