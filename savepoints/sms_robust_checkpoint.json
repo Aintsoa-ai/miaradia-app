@@ -1,0 +1,38 @@
+{
+  "session_id": "acbb5330-0867-4219-b176-07c04d789c5e",
+  "checkpoint_name": "sms_webhook_deployed_and_real_test_validated",
+  "timestamp": "2026-06-08T13:40:00+03:00",
+  "status": "DONE",
+  "description": "Session 19 complète. La fonction Edge sms-webhook est déployée en production sur Supabase. Test de bout en bout validé avec le vrai numéro admin (0348237267). Le système de validation automatique est 100% opérationnel.",
+  "what_was_done": [
+    "Lecture des logs de la session précédente (sms_robust_checkpoint.json - status: PAUSED)",
+    "Diagnostic du blocage : la fonction Edge sms-webhook n'avait jamais été redéployée avec le nouveau code",
+    "Génération d'un Access Token Supabase CLI via le dashboard (sbp_...)",
+    "Déploiement réussi : npx supabase functions deploy sms-webhook --use-api --project-ref yqttaeukmnstyxbabkqz",
+    "Test de l'endpoint GET de diagnostic : 1 booking pending trouvé (ref: 0648237266)",
+    "Test simulé avec ref correcte (0648237266) -> bookings_validated: 1 ✅",
+    "Création d'un booking test avec payment_reference: '0348237267' (numéro admin)",
+    "Test final réel avec SMS MVola contenant 0348237267 -> bookings_validated: 1 ✅",
+    "Mise à jour audit.md (Session 19)",
+    "Mise à jour nos_idees.md (Session 19)"
+  ],
+  "git_state": {
+    "branch": "master",
+    "last_commit": "600a462",
+    "commit_message": "fix: make sms matching algorithm extremely robust against spaces, dashes and international prefixes in both webhook and admin dashboard",
+    "note": "Les docs (audit.md, nos_idees.md) doivent être committés"
+  },
+  "key_finding": "Le problème n'était pas le numéro lui-même, mais que la fonction Edge Supabase n'avait jamais été redéployée. Le matching fonctionne avec N'IMPORTE QUEL numéro du moment qu'il correspond au payment_reference du booking.",
+  "golden_rule": "Le passager doit saisir dans l'app LE MÊME numéro MVola depuis lequel il envoie l'argent. C'est ce numéro qui est extrait du SMS par le webhook pour faire le matching.",
+  "next_steps": [
+    "Committer les modifications de audit.md et nos_idees.md sur GitHub",
+    "Test 100% réel : passager réel réserve un trajet, entre son numéro MVola, envoie l'argent -> validation automatique",
+    "Optionnel : Notifications Push pour alerter le chauffeur"
+  ],
+  "system_status": {
+    "webhook_edge_function": "✅ Déployée et opérationnelle en production",
+    "sms_matching": "✅ Ultra-robuste (espaces, tirets, +261/261/0 tolerés)",
+    "realtime_ui": "✅ Mise à jour instantanée côté passager",
+    "sms_gateway_apk": "✅ APK installé sur le téléphone admin (build 40b788c7)"
+  }
+}

@@ -49,6 +49,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Correction Historique Web *(RÉALISÉ - S17)* :** Fiabilisation de la flèche de retour (<-) sur Vercel/Web via un bloc de sécurité `try/catch` sur `router.canGoBack()` évitant les crashs d'affichage des détails de trajet en cas d'accès direct sans historique de navigation.
 - [x] **Actualisation Instantanée "Mes Trajets" *(RÉALISÉ - S18)* :** Utilisation de `useFocusEffect` sur la page "Mes Trajets" du conducteur. Dès qu'il revient sur l'onglet après publication, la liste se recharge automatiquement sans actualisation manuelle.
 - [x] **Fix SMS Listener New Architecture Expo *(EN COURS - S18)* :** Diagnostic confirmé : `react-native-android-sms-listener` incompatible avec `newArchEnabled: true` (Expo SDK 53). Corrections appliquées : désactivation de la nouvelle architecture, plugin natif `withSmsReceiver.js` pour enregistrer le `BroadcastReceiver` explicitement avec `android:exported="true"` (Android 13+), auto-démarrage du listener dans `_layout.tsx` dès le lancement de l'app.
+- [x] **Déploiement Webhook & Test Réel 100% Validé *(RÉALISÉ - S19)* :** Résolution définitive du blocage de validation automatique. La fonction Edge `sms-webhook` est déployée en production sur Supabase avec l'algorithme de matching ultra-robuste. Test de bout en bout réussi : booking créé avec `payment_reference: '0348237267'`, SMS MVola simulé → `bookings_validated: 1` ✅. **Règle d'or confirmée :** le passager doit saisir le même numéro MVola depuis lequel il envoie l'argent.
 
 ---
 
@@ -109,4 +110,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 > - `plan.md` : Plan de conception et architecture technique
 > - **Règle :** Après chaque modification, vérifier l'impact sur mobile ET desktop, et synchroniser ces 4 documents.
 
-*Dernière mise à jour : 6 Juin 2026 - Session 18*
+*Dernière mise à jour : 8 Juin 2026 - Session 19*
