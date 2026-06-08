@@ -68,6 +68,11 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ## ⏳ À ACCOMPLIR
 
+### ⚠️ Points Faibles / Points d'Amélioration restants
+- [ ] **Dépendance au Téléphone Administrateur (Kiosque) :** Tant que nous utilisons la "Passerelle SMS", l'application dépend de l'état de la batterie et de la couverture réseau du téléphone physique de l'administrateur qui reçoit les paiements Mobile Money. *Solution future : Intégrer l'API B2B officielle MVola Telma.*
+- [ ] **Absence de Mode Hors-Ligne (Offline) :** Sur la Route Nationale, les voyageurs peuvent traverser des "zones blanches" (sans réseau). Actuellement, ils ne peuvent pas consulter les détails de leur réservation ou le numéro du chauffeur s'ils ferment l'application. *Solution future : Stocker les billets validés dans le cache local du téléphone.*
+- [ ] **Paiement "Gating" vs "Séquestre" :** Actuellement, le voyageur paie une petite somme (ex: 1 000 Ar) pour "débloquer" le contact du chauffeur. Le reste du billet est payé en main propre. L'application ne garantit donc pas financièrement au chauffeur que le passager viendra vraiment. *Solution future : Permettre le paiement de la totalité du billet via l'application.*
+
 ### 🗺️ Géographie & Itinéraires
 - [ ] **Détection d'embouteillages (Tana)** : Intégrer une alerte ou une estimation de temps supplémentaire pour les axes saturés (ex: Anosizato, 67ha).
 - [ ] **Axe Fluvial** : Ajouter la possibilité de publier des trajets en bateau (ex: Canal des Pangalanes ou traversées vers Sainte-Marie / Nosy Be).
