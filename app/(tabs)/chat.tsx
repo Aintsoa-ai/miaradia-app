@@ -103,34 +103,45 @@ export default function ChatListScreen() {
         pathname: "/chat/[id]",
         params: { id: item.id, other_id: item.other_id, other_name: item.other_name }
       } as any)}
-      className="bg-white px-6 py-4 flex-row items-center border-b border-gray-50"
+      style={{
+        backgroundColor: 'white',
+        borderRadius: 24,
+        padding: 20,
+        marginBottom: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.06, shadowRadius: 20, elevation: 4,
+        borderWidth: 1, borderColor: item.unread ? '#DBEAFE' : 'transparent'
+      }}
     >
-      <View className="w-14 h-14 rounded-full bg-blue-50 items-center justify-center mr-4 border border-blue-100 relative">
+      <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 16, borderWidth: 2, borderColor: item.unread ? '#3B82F6' : '#F8FAFC' }}>
         {item.other_avatar ? (
-          <Image source={{ uri: item.other_avatar }} className="w-full h-full rounded-full" />
+          <Image source={{ uri: item.other_avatar }} style={{ width: '100%', height: '100%', borderRadius: 32 }} />
         ) : (
-          <Ionicons name="person" size={24} color="#2563EB" />
+          <Ionicons name="person" size={28} color="#2563EB" />
         )}
         {item.unread && (
-          <View className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
+          <View style={{ position: 'absolute', top: 0, right: 0, width: 16, height: 16, backgroundColor: '#EF4444', borderRadius: 8, borderWidth: 3, borderColor: 'white' }} />
         )}
       </View>
 
-      <View className="flex-1">
-        <View className="flex-row justify-between items-center mb-1">
-          <Text className="text-base font-black text-gray-900" numberOfLines={1}>{item.other_name}</Text>
-          <Text className="text-[10px] text-gray-400 font-bold">
+      <View style={{ flex: 1 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#0F172A' }} numberOfLines={1}>{item.other_name}</Text>
+          <Text style={{ fontSize: 11, color: item.unread ? '#2563EB' : '#94A3B8', fontWeight: item.unread ? '800' : '600' }}>
             {new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </Text>
         </View>
         
-        <Text className="text-blue-600 text-[10px] font-black uppercase mb-1">{item.ride_info}</Text>
-        <Text className={`text-sm ${item.unread ? 'text-gray-900 font-bold' : 'text-gray-500'}`} numberOfLines={1}>
+        <Text style={{ color: '#2563EB', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>{item.ride_info}</Text>
+        <Text style={{ fontSize: 14, color: item.unread ? '#0F172A' : '#64748B', fontWeight: item.unread ? '700' : '500' }} numberOfLines={1}>
           {item.last_message}
         </Text>
       </View>
 
-      <Ionicons name="chevron-forward" size={20} color="#CBD5E1" style={{ marginLeft: 8 }} />
+      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#F8FAFC', alignItems: 'center', justifyContent: 'center', marginLeft: 12 }}>
+        <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+      </View>
     </TouchableOpacity>
   );
 
@@ -138,64 +149,85 @@ export default function ChatListScreen() {
   const isDesktop = width > 768;
 
   return (
-    <View className="flex-1 bg-slate-50">
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: '#F1F5F9' }}>
+      <StatusBar style="light" />
       
-      <View className={`flex-1 ${isDesktop ? 'max-w-4xl mx-auto w-full py-10' : ''}`}>
-        <View className={`${isDesktop ? 'bg-white rounded-[32px] shadow-sm border border-slate-200 flex-1 overflow-hidden' : 'flex-1'}`}>
-          {/* HEADER */}
-          <View className="bg-white px-8 pb-6 pt-6 border-b border-slate-100 flex-row justify-between items-center">
-            <View>
-              <Text className="text-3xl font-black text-slate-900 tracking-tight">Messages</Text>
-              <Text className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Discussions en cours</Text>
-            </View>
-            <View className="flex-row">
-              <TouchableOpacity 
-                onPress={simulateMessage}
-                className="w-10 h-10 bg-orange-50 rounded-full items-center justify-center mr-3 hover:bg-orange-100 transition-colors"
-                accessibilityLabel="Simuler un message"
-              >
-                <Ionicons name="flask" size={20} color="#EA580C" />
-              </TouchableOpacity>
-              <TouchableOpacity className="w-10 h-10 bg-slate-50 rounded-full items-center justify-center border border-slate-100 hover:bg-slate-100 transition-colors">
-                <Ionicons name="search" size={20} color="#64748B" />
-              </TouchableOpacity>
-            </View>
+      {/* HERO HEADER */}
+      <View style={{
+        backgroundColor: '#1E3A5F',
+        paddingTop: isDesktop ? 60 : 80,
+        paddingBottom: 60,
+        paddingHorizontal: 32,
+        width: '100%',
+        alignItems: isDesktop ? 'center' : 'flex-start',
+      }}>
+        <View style={{ flexDirection: 'row', width: isDesktop ? 700 : '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View>
+            <Text style={{ color: 'white', fontSize: isDesktop ? 36 : 32, fontWeight: '900', letterSpacing: -0.5, marginBottom: 8 }}>
+              Messages
+            </Text>
+            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15, fontWeight: '500', textTransform: 'uppercase', letterSpacing: 1 }}>
+              Discussions en cours
+            </Text>
           </View>
 
-          {loading ? (
-            <View className="flex-1 items-center justify-center">
-              <ActivityIndicator size="large" color="#2563EB" />
-            </View>
-          ) : (
-            <FlatList
-              data={conversations}
-              keyExtractor={item => `${item.id}-${item.other_id}`}
-              renderItem={renderConversation}
-              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
-              contentContainerStyle={{ flexGrow: 1 }}
-              ListEmptyComponent={() => (
-                <View className="flex-1 items-center justify-center p-12">
-                  <View className="w-24 h-24 bg-slate-50 rounded-full items-center justify-center mb-6">
-                    <Ionicons name="chatbubble-ellipses-outline" size={40} color="#94A3B8" />
-                  </View>
-                  <Text className="text-slate-900 text-xl font-black text-center mb-2">Aucune discussion</Text>
-                  <Text className="text-slate-500 text-center mb-8 max-w-xs font-medium">
-                    Les messages que vous envoyez ou recevez lors de vos réservations apparaîtront ici.
-                  </Text>
-                  
-                  <TouchableOpacity 
-                    onPress={simulateMessage}
-                    className="bg-white border border-slate-200 px-6 py-3 rounded-full shadow-sm flex-row items-center hover:bg-slate-50 transition-colors"
-                  >
-                    <Ionicons name="flask-outline" size={18} color="#0F172A" />
-                    <Text className="text-slate-900 font-bold ml-2">Simuler un message</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            />
-          )}
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity 
+              onPress={simulateMessage}
+              style={{ width: 44, height: 44, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}
+              accessibilityLabel="Simuler un message"
+            >
+              <Ionicons name="flask" size={20} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity style={{ width: 44, height: 44, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 22, alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="search" size={20} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
+      </View>
+
+      {/* MAIN CONTAINER */}
+      <View style={{
+        flex: 1,
+        width: '100%',
+        maxWidth: isDesktop ? 700 : '100%',
+        alignSelf: 'center',
+        marginTop: -30,
+        paddingHorizontal: isDesktop ? 40 : 16,
+      }}>
+        {loading ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <ActivityIndicator size="large" color="#2563EB" />
+          </View>
+        ) : (
+          <FlatList
+            data={conversations}
+            keyExtractor={item => `${item.id}-${item.other_id}`}
+            renderItem={renderConversation}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={() => (
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40, backgroundColor: 'white', borderRadius: 32, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+                <View style={{ width: 100, height: 100, backgroundColor: '#EFF6FF', borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+                  <Ionicons name="chatbubbles" size={40} color="#2563EB" />
+                </View>
+                <Text style={{ fontSize: 22, fontWeight: '900', color: '#0F172A', marginBottom: 12, textAlign: 'center' }}>Aucune discussion</Text>
+                <Text style={{ fontSize: 15, color: '#64748B', textAlign: 'center', lineHeight: 24, marginBottom: 32 }}>
+                  Vos futurs échanges pour vos trajets partagés apparaîtront ici.
+                </Text>
+                
+                <TouchableOpacity 
+                  onPress={simulateMessage}
+                  style={{ backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 24, flexDirection: 'row', alignItems: 'center' }}
+                >
+                  <Ionicons name="flask" size={18} color="#0F172A" />
+                  <Text style={{ color: '#0F172A', fontWeight: '800', marginLeft: 10 }}>Simuler un message</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        )}
       </View>
     </View>
   );
