@@ -356,7 +356,7 @@ export default function RideDetailsScreen() {
       </View>
 
       {/* MAIN CONTAINER */}
-      <ScrollView style={{ flex: 1, zIndex: 10 }} contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1, zIndex: 10 }} contentContainerStyle={{ paddingBottom: 200 }} showsVerticalScrollIndicator={false}>
         <View style={{
           maxWidth: 1000,
           width: '100%',
