@@ -398,7 +398,7 @@ export default function SearchResultsScreen() {
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
           {/* BARRE DE RECHERCHE DESKTOP */}
           <View style={{ backgroundColor: '#1E3A5F', paddingVertical: 20, paddingHorizontal: 48, alignItems: 'center' }}>
-            <View style={{ backgroundColor: 'white', borderRadius: 20, flexDirection: 'row', alignItems: 'center', padding: 6, maxWidth: 960, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 8 }}>
+            <View style={{ backgroundColor: 'white', borderRadius: 20, flexDirection: 'row', alignItems: 'center', padding: 6, maxWidth: 1100, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 8 }}>
               <View style={{ flex: 2, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', borderRightWidth: 1, borderRightColor: '#F1F5F9', height: 48 }}>
                 <Ionicons name="ellipse-outline" size={16} color="#94A3B8" />
                 <Text style={{ marginLeft: 10, fontSize: 15, fontWeight: '800', color: '#0F172A' }} numberOfLines={1}>{depStr}</Text>

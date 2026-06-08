@@ -77,6 +77,8 @@ export const RideCard: React.FC<RideCardProps> = ({ ride, onPress, isDesktop }) 
         {/* BAS: Conducteur + durée + équipements */}
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {/* Voiture à gauche du conducteur (détail rond rouge) */}
+            <Ionicons name="car-sport" size={20} color="#64748B" style={{ marginRight: 12 }} />
             <View style={{ width: 44, height: 44, borderRadius: 22, overflow: 'hidden', backgroundColor: '#EFF6FF', marginRight: 14, borderWidth: 2, borderColor: '#DBEAFE' }}>
               <Image 
                 source={{ uri: (ride.driver_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ride.driverName)}&background=2563EB&color=fff`) }} 
@@ -101,6 +103,13 @@ export const RideCard: React.FC<RideCardProps> = ({ ride, onPress, isDesktop }) 
             {ride.airConditioning && <Ionicons name="snow" size={18} color="#64748B" />}
             {ride.max2Back && <Ionicons name="people" size={18} color="#64748B" />}
             {ride.instantBooking && <Ionicons name="flash" size={18} color="#2563EB" />}
+            
+            {/* Passagers à droite (détail rond rouge) */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 8 }}>
+              <Ionicons name="people" size={18} color="#64748B" />
+              <Text style={{ color: '#64748B', fontSize: 13, fontWeight: '800', marginLeft: 4 }}>{ride.seatsLeft}</Text>
+            </View>
+
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0' }}>
               <Ionicons name="time-outline" size={14} color="#64748B" />
               <Text style={{ color: '#475569', fontSize: 12, fontWeight: '700', marginLeft: 6 }}>{ride.duration}</Text>
@@ -114,7 +123,7 @@ export const RideCard: React.FC<RideCardProps> = ({ ride, onPress, isDesktop }) 
     );
   }
 
-  // --- MOBILE VIEW ---
+  // --- MOBILE VIEW (BlaBlaCar-style: image 2) ---
   return (
     <TouchableOpacity 
       onPress={() => onPress(ride.id)}
@@ -122,44 +131,71 @@ export const RideCard: React.FC<RideCardProps> = ({ ride, onPress, isDesktop }) 
       activeOpacity={0.8}
       style={{
         backgroundColor: 'white',
-        borderRadius: 24,
+        borderRadius: 20,
         padding: 20,
         marginBottom: 16,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.07, shadowRadius: 20, elevation: 4,
+        shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 12, elevation: 3,
         opacity: isFull ? 0.4 : 1,
+        borderWidth: 1, borderColor: '#F1F5F9',
       }}
     >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Text style={{ fontSize: 22, fontWeight: '900', color: '#0F172A' }}>{formatPrice(ride.price)} Ar</Text>
-        <View style={{
-          paddingHorizontal: 12, paddingVertical: 4, borderRadius: 16,
-          backgroundColor: isFull ? '#F1F5F9' : isLow ? '#FEF3C7' : '#EFF6FF',
-        }}>
-          <Text style={{ fontSize: 10, fontWeight: '900', color: isFull ? '#64748B' : isLow ? '#D97706' : '#2563EB', textTransform: 'uppercase' }}>
-            {isFull ? 'COMPLET' : `${ride.seatsLeft} dispo`}
-          </Text>
-        </View>
-      </View>
-      
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        {/* Timeline */}
+      <View style={{ flexDirection: 'row', alignItems: 'stretch' }}>
+        {/* COLONNE GAUCHE: Horaires + ligne timeline */}
         <View style={{ alignItems: 'center', marginRight: 16, width: 48 }}>
           <Text style={{ fontSize: 16, fontWeight: '900', color: '#0F172A' }}>{ride.departureTime}</Text>
-          <View style={{ width: 2, height: 32, backgroundColor: '#E2E8F0', marginVertical: 4 }} />
+          <View style={{ width: 2, flex: 1, backgroundColor: '#E2E8F0', marginVertical: 6, position: 'relative', minHeight: 30 }}>
+            <View style={{ position: 'absolute', top: -3, left: -3, width: 8, height: 8, borderRadius: 4, backgroundColor: '#2563EB', borderWidth: 1.5, borderColor: 'white' }} />
+            <View style={{ position: 'absolute', bottom: -3, left: -3, width: 8, height: 8, borderRadius: 4, backgroundColor: '#EF4444', borderWidth: 1.5, borderColor: 'white' }} />
+          </View>
           <Text style={{ fontSize: 16, fontWeight: '900', color: '#0F172A' }}>{ride.arrivalTime}</Text>
         </View>
-        {/* Villes */}
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 15, fontWeight: '800', color: '#0F172A' }} numberOfLines={1}>{ride.departure}</Text>
+
+        {/* COLONNE CENTRE: Villes */}
+        <View style={{ flex: 1, justifyContent: 'space-between', paddingVertical: 2 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={{ fontSize: 16, fontWeight: '800', color: '#0F172A' }} numberOfLines={1}>{ride.departure}</Text>
+          </View>
           <Text style={{ color: '#94A3B8', fontSize: 12, fontWeight: '700', marginVertical: 4 }}>{ride.duration}</Text>
-          <Text style={{ fontSize: 15, fontWeight: '800', color: '#0F172A' }} numberOfLines={1}>{ride.arrival}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={{ fontSize: 16, fontWeight: '800', color: '#0F172A' }} numberOfLines={1}>{ride.arrival}</Text>
+          </View>
         </View>
-        {/* Avatar */}
-        <View style={{ width: 48, height: 48, borderRadius: 24, overflow: 'hidden', marginLeft: 12, borderWidth: 2, borderColor: '#EFF6FF' }}>
-          <Image 
-            source={{ uri: (ride.driver_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ride.driverName)}&background=2563EB&color=fff`) }}
-            style={{ width: '100%', height: '100%' } as any}
-          />
+
+        {/* COLONNE DROITE: Prix */}
+        <View style={{ alignItems: 'flex-end', justifyContent: 'center', paddingLeft: 12, marginLeft: 8 }}>
+          <Text style={{ fontSize: 22, fontWeight: '900', color: '#0F172A' }}>{formatPrice(ride.price)} Ar</Text>
+        </View>
+      </View>
+
+      {/* SÉPARATEUR */}
+      <View style={{ height: 1, backgroundColor: '#F1F5F9', marginVertical: 14 }} />
+
+      {/* BAS: Conducteur et icônes (ronds rouges) */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {/* Icône voiture (rond rouge gauche) */}
+          <Ionicons name="car-sport" size={18} color="#64748B" style={{ marginRight: 10 }} />
+          
+          <View style={{ width: 32, height: 32, borderRadius: 16, overflow: 'hidden', marginRight: 10, borderWidth: 1.5, borderColor: '#DBEAFE' }}>
+            <Image 
+              source={{ uri: (ride.driver_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ride.driverName)}&background=2563EB&color=fff`) }} 
+              style={{ width: '100%', height: '100%' } as any}
+            />
+          </View>
+          <View>
+            <Text style={{ fontSize: 14, fontWeight: '800', color: '#0F172A' }}>{ride.driverName}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 1 }}>
+              <Ionicons name="star" size={10} color="#F59E0B" />
+              <Text style={{ fontSize: 11, fontWeight: '800', color: '#475569', marginLeft: 3 }}>{ride.rating || '5.0'}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Icône passagers / places (rond rouge droit) */}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {ride.instantBooking && <Ionicons name="flash" size={16} color="#2563EB" style={{ marginRight: 10 }} />}
+          <Ionicons name="people" size={18} color="#64748B" />
+          <Text style={{ fontSize: 13, fontWeight: '900', color: '#64748B', marginLeft: 4 }}>{ride.seatsLeft}</Text>
         </View>
       </View>
     </TouchableOpacity>
