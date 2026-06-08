@@ -85,24 +85,34 @@ export default function RidesScreen() {
 
   const renderRideItem = (ride: any) => {
     const stopovers = Array.isArray(ride.stopovers) ? ride.stopovers : [];
+    const isExpired = activeTab === 'published' && isPastRide(ride.date);
     return (
       <TouchableOpacity 
         key={ride.id}
         onPress={() => router.push(`/ride/${ride.id}`)}
         style={{
-          backgroundColor: 'white',
+          backgroundColor: isExpired ? '#F8FAFC' : 'white',
           borderRadius: 24,
           padding: 24,
           marginBottom: 16,
-          shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.06, shadowRadius: 20, elevation: 4,
+          shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: isExpired ? 0.02 : 0.06, shadowRadius: 20, elevation: isExpired ? 1 : 4,
+          opacity: isExpired ? 0.7 : 1,
+          borderWidth: isExpired ? 1 : 0,
+          borderColor: isExpired ? '#E2E8F0' : 'transparent',
         }}
       >
         <View>
+          {isExpired && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#F1F5F9', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4, alignSelf: 'flex-start', marginBottom: 12 }}>
+              <Ionicons name="checkmark-circle-outline" size={12} color="#94A3B8" />
+              <Text style={{ color: '#94A3B8', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, marginLeft: 4 }}>Trajet terminé</Text>
+            </View>
+          )}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#00AFF5', marginRight: 12 }} />
-                <Text style={{ color: '#0F172A', fontWeight: '900', fontSize: 18 }} numberOfLines={1}>{ride.departure}</Text>
+                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: isExpired ? '#CBD5E1' : '#00AFF5', marginRight: 12 }} />
+                <Text style={{ color: isExpired ? '#94A3B8' : '#0F172A', fontWeight: '900', fontSize: 18 }} numberOfLines={1}>{ride.departure}</Text>
               </View>
               
               {/* Affichage des escales avec le + vert */}
@@ -137,8 +147,8 @@ export default function RidesScreen() {
               )}
  
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#EF4444', marginRight: 12 }} />
-                <Text style={{ color: '#0F172A', fontWeight: '900', fontSize: 18 }} numberOfLines={1}>{ride.arrival}</Text>
+                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: isExpired ? '#CBD5E1' : '#EF4444', marginRight: 12 }} />
+                <Text style={{ color: isExpired ? '#94A3B8' : '#0F172A', fontWeight: '900', fontSize: 18 }} numberOfLines={1}>{ride.arrival}</Text>
               </View>
             </View>
             
@@ -197,12 +207,21 @@ export default function RidesScreen() {
 
   const isPastRide = (rideDate: string) => {
     try {
-      if (!rideDate || !rideDate.includes(' à ')) return false;
-      const [datePart, timePart] = rideDate.split(' à ');
-      const [day, month, year] = datePart.split('/').map(Number);
-      const [hours, mins] = timePart.split(':').map(Number);
-      const d = new Date(year, month - 1, day, hours, mins);
-      return d < new Date();
+      if (!rideDate) return false;
+      // Format "DD-MM-YYYY à HH:MM"
+      if (rideDate.includes(' à ')) {
+        const datePart = rideDate.split(' à ')[0].trim();
+        const sep = datePart.includes('-') ? '-' : '/';
+        const parts = datePart.split(sep);
+        if (parts.length === 3) {
+          const [day, month, year] = parts.map(Number);
+          const rideDay = new Date(year, month - 1, day);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return rideDay < today;
+        }
+      }
+      return false;
     } catch (e) {
       return false;
     }
@@ -285,7 +304,17 @@ export default function RidesScreen() {
               <ActivityIndicator size="large" color="#2563EB" />
             </View>
           ) : rides.length > 0 ? (
-            rides.map(renderRideItem)
+            // Trajets à venir en premier, trajets passés en bas
+            [...rides]
+              .sort((a, b) => {
+                if (activeTab !== 'published') return 0;
+                const aExpired = isPastRide(a.date);
+                const bExpired = isPastRide(b.date);
+                if (aExpired && !bExpired) return 1;
+                if (!aExpired && bExpired) return -1;
+                return 0;
+              })
+              .map(renderRideItem)
           ) : (
             <View style={{ padding: 40, alignItems: 'center', backgroundColor: 'white', borderRadius: 28, marginTop: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
               <View style={{ width: 100, height: 100, backgroundColor: '#EFF6FF', borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
