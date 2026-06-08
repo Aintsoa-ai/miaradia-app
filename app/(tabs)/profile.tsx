@@ -262,6 +262,70 @@ export default function ProfileScreen() {
     );
   };
 
+  const handleDeleteAccount = () => {
+    // Première confirmation
+    CustomAlert.alert(
+      "⚠️ Supprimer mon compte",
+      "Cette action est IRRÉVERSIBLE.\n\nToutes vos données seront définitivement supprimées :\n\u2022 Votre profil et photo\n\u2022 Vos trajets publiés\n\u2022 Vos réservations\n\u2022 Vos messages\n\u2022 Vos avis\n\nVoulez-vous continuer ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Oui, supprimer",
+          style: "destructive",
+          onPress: () => {
+            // Deuxième confirmation finale
+            CustomAlert.alert(
+              "🚨 Dernière confirmation",
+              "Vous êtes sur le point de supprimer définitivement votre compte Miara-Dia.\n\nCette opération ne peut pas être annulée.",
+              [
+                { text: "Annuler", style: "cancel" },
+                {
+                  text: "🗑️ Supprimer définitivement",
+                  style: "destructive",
+                  onPress: async () => {
+                    try {
+                      setUploading(true);
+                      const { data: { session } } = await supabase.auth.getSession();
+                      if (!session) throw new Error('Session expirée');
+
+                      const supabaseUrl = 'https://yqttaeukmnstyxbabkqz.supabase.co';
+                      const response = await fetch(
+                        `${supabaseUrl}/functions/v1/delete-account`,
+                        {
+                          method: 'POST',
+                          headers: {
+                            'Authorization': `Bearer ${session.access_token}`,
+                            'Content-Type': 'application/json',
+                          },
+                        }
+                      );
+
+                      const result = await response.json();
+                      if (!response.ok) throw new Error(result.error || 'Erreur suppression');
+
+                      CustomAlert.alert(
+                        "Compte supprimé",
+                        "Votre compte a été supprimé avec succès. Nous espérons vous revoir un jour sur Miara-Dia !",
+                        [{ text: "OK", onPress: () => {
+                          try { router.replace('/welcome' as any); }
+                          catch { if (typeof window !== 'undefined') window.location.href = '/'; }
+                        }}]
+                      );
+                    } catch (error: any) {
+                      CustomAlert.alert("Erreur", error.message || "Impossible de supprimer le compte. Réessayez plus tard.");
+                    } finally {
+                      setUploading(false);
+                    }
+                  }
+                }
+              ]
+            );
+          }
+        }
+      ]
+    );
+  };
+
   const containsHiddenPhone = (text: string) => {
     if (!text) return false;
     let mappedText = text.toLowerCase();
@@ -707,7 +771,7 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            {/* Save & Disconnect */}
+            {/* Save, Déconnexion & Suppression */}
             <View className="space-y-4 mb-10">
               <TouchableOpacity 
                 onPress={handleSaveProfile}
@@ -721,6 +785,17 @@ export default function ProfileScreen() {
                 className="w-full bg-white h-14 rounded-[24px] items-center justify-center border border-red-200 hover:bg-red-50 transition-colors"
               >
                 <Text className="text-red-600 font-bold text-sm uppercase tracking-widest">Se déconnecter</Text>
+              </TouchableOpacity>
+
+              {/* Ligne de séparation discrète */}
+              <View className="h-[1px] bg-slate-100 my-2" />
+
+              <TouchableOpacity 
+                onPress={handleDeleteAccount}
+                className="w-full h-12 rounded-[24px] items-center justify-center flex-row"
+              >
+                <Ionicons name="trash-outline" size={16} color="#94A3B8" />
+                <Text className="text-slate-400 font-semibold text-xs ml-2">Supprimer mon compte</Text>
               </TouchableOpacity>
             </View>
 
