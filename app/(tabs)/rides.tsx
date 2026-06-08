@@ -89,40 +89,46 @@ export default function RidesScreen() {
       <TouchableOpacity 
         key={ride.id}
         onPress={() => router.push(`/ride/${ride.id}`)}
-        className="bg-white rounded-[16px] p-6 mb-4 shadow-sm border border-slate-200 transition-colors"
+        style={{
+          backgroundColor: 'white',
+          borderRadius: 24,
+          padding: 24,
+          marginBottom: 16,
+          shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.06, shadowRadius: 20, elevation: 4,
+        }}
       >
         <View>
-          <View className="flex-row justify-between items-start mb-4">
-            <View className="flex-1">
-              <View className="flex-row items-center mb-1">
-                <View className="w-2.5 h-2.5 rounded-full bg-[#00AFF5] mr-3" />
-                <Text className="text-[#054752] font-black text-lg" numberOfLines={1}>{ride.departure}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+            <View style={{ flex: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#00AFF5', marginRight: 12 }} />
+                <Text style={{ color: '#0F172A', fontWeight: '900', fontSize: 18 }} numberOfLines={1}>{ride.departure}</Text>
               </View>
               
               {/* Affichage des escales avec le + vert */}
               {stopovers.length > 0 && (
-                <View className="ml-1 pl-4 border-l border-slate-200 my-1 py-1">
+                <View style={{ marginLeft: 5, paddingLeft: 18, borderLeftWidth: 2, borderLeftColor: '#F1F5F9', marginVertical: 4, paddingVertical: 4 }}>
                   <TouchableOpacity 
                     onPress={(e) => {
                       e.stopPropagation();
                       setExpandedRideId(expandedRideId === ride.id ? null : ride.id);
                     }}
-                    className="flex-row items-center"
+                    style={{ flexDirection: 'row', alignItems: 'center' }}
                   >
-                    <View className="bg-emerald-50 border border-emerald-100 rounded-full p-0.5 mr-2">
-                      <Ionicons name={expandedRideId === ride.id ? "chevron-up" : "add"} size={10} color="#10B981" />
+                    <View style={{ backgroundColor: '#ECFDF5', borderColor: '#D1FAE5', borderWidth: 1, borderRadius: 12, padding: 2, marginRight: 8 }}>
+                      <Ionicons name={expandedRideId === ride.id ? "chevron-up" : "add"} size={12} color="#10B981" />
                     </View>
-                    <Text className="text-emerald-700 text-xs font-extrabold uppercase tracking-wider">
+                    <Text style={{ color: '#047857', fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                       {stopovers.length} {stopovers.length > 1 ? 'escales' : 'escale'}
                     </Text>
                   </TouchableOpacity>
  
                   {expandedRideId === ride.id && (
-                    <View className="mt-2 bg-slate-50 border border-slate-100 rounded-[8px] p-3 mr-4 space-y-1">
+                    <View style={{ marginTop: 12, backgroundColor: '#F8FAFC', borderRadius: 12, padding: 12, marginRight: 16, gap: 4 }}>
                       {stopovers.map((stop: any, idx: number) => (
-                        <View key={idx} className="flex-row justify-between py-1 border-b border-slate-100 last:border-0">
-                          <Text className="text-[#054752] text-xs font-bold">{stop.city}</Text>
-                          <Text className="text-emerald-700 text-xs font-black">{formatPrice(stop.price)} Ar</Text>
+                        <View key={idx} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 }}>
+                          <Text style={{ color: '#334155', fontSize: 13, fontWeight: '700' }}>{stop.city}</Text>
+                          <Text style={{ color: '#059669', fontSize: 13, fontWeight: '900' }}>{formatPrice(stop.price)} Ar</Text>
                         </View>
                       ))}
                     </View>
@@ -130,27 +136,28 @@ export default function RidesScreen() {
                 </View>
               )}
  
-              <View className="flex-row items-center mt-1">
-                <View className="w-2.5 h-2.5 rounded-full bg-[#EF4444] mr-3" />
-                <Text className="text-[#054752] font-black text-lg" numberOfLines={1}>{ride.arrival}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#EF4444', marginRight: 12 }} />
+                <Text style={{ color: '#0F172A', fontWeight: '900', fontSize: 18 }} numberOfLines={1}>{ride.arrival}</Text>
               </View>
             </View>
-            <View className="items-end pl-4">
-              <Text className="text-[#054752] font-black text-xl">{formatPrice(ride.price)} Ar</Text>
-              <Text className="text-[#707070] text-[10px] font-bold uppercase tracking-wider mt-1">Par place</Text>
+            
+            <View style={{ alignItems: 'flex-end', paddingLeft: 16 }}>
+              <Text style={{ color: '#0F172A', fontWeight: '900', fontSize: 20 }}>{formatPrice(ride.price)} Ar</Text>
+              <Text style={{ color: '#64748B', fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 }}>Par place</Text>
             </View>
           </View>
 
-          {/* BOUTON D'ACTION (Avis ou Statut) */}
-          <View className="h-[1px] bg-gray-50 w-full mb-4" />
+          {/* Ligne de séparation */}
+          <View style={{ height: 1, backgroundColor: '#F1F5F9', width: '100%', marginBottom: 16 }} />
           
-          <View className="flex-row justify-between items-center">
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             {activeTab === 'booked' ? (
-              <View className="flex-row items-center">
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 {reviewedRideIds.includes(ride.id) ? (
-                  <View className="flex-row items-center bg-green-50 px-3 py-1 rounded-full">
+                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#ECFDF5', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 }}>
                     <Ionicons name="checkmark-circle" size={14} color="#10B981" />
-                    <Text className="text-green-600 text-xs font-bold ml-1">Déjà noté</Text>
+                    <Text style={{ color: '#059669', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>Déjà noté</Text>
                   </View>
                 ) : isPastRide(ride.date) ? (
                   <TouchableOpacity 
@@ -159,28 +166,28 @@ export default function RidesScreen() {
                       setSelectedRideForReview(ride);
                       setIsReviewModalVisible(true);
                     }}
-                    className="bg-amber-100 px-4 py-2 rounded-xl flex-row items-center border border-amber-200"
+                    style={{ backgroundColor: '#FEF3C7', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#FDE68A' }}
                   >
                     <Ionicons name="star" size={14} color="#D97706" />
-                    <Text className="text-amber-700 text-xs font-black ml-2 uppercase">Noter le chauffeur</Text>
+                    <Text style={{ color: '#B45309', fontSize: 12, fontWeight: '900', marginLeft: 8, textTransform: 'uppercase' }}>Noter le chauffeur</Text>
                   </TouchableOpacity>
                 ) : (
-                  <View className="flex-row items-center bg-blue-50 px-3 py-1 rounded-full">
+                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#EFF6FF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 }}>
                     <Ionicons name="time-outline" size={14} color="#2563EB" />
-                    <Text className="text-blue-600 text-xs font-bold ml-1">{ride.payment_status === 'completed' ? 'Réservé' : 'En attente'}</Text>
+                    <Text style={{ color: '#2563EB', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>{ride.payment_status === 'completed' ? 'Réservé' : 'En attente'}</Text>
                   </View>
                 )}
               </View>
             ) : (
-              <View className="flex-row items-center">
-                <Ionicons name="calendar-outline" size={16} color="#6B7280" />
-                <Text className="text-gray-600 text-sm ml-2">{ride.date}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="calendar-outline" size={16} color="#64748B" />
+                <Text style={{ color: '#475569', fontSize: 14, fontWeight: '600', marginLeft: 8 }}>{ride.date}</Text>
               </View>
             )}
 
-            <View className="flex-row items-center bg-gray-50 px-3 py-1 rounded-full">
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 }}>
               <Ionicons name="people" size={14} color="#2563EB" />
-              <Text className="text-blue-600 text-xs font-bold ml-1">{ride.seats} places</Text>
+              <Text style={{ color: '#2563EB', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>{ride.seats} places</Text>
             </View>
           </View>
         </View>
@@ -205,69 +212,104 @@ export default function RidesScreen() {
   const isDesktop = width > 768;
 
   return (
-    <View className="flex-1 bg-[#F6F6F6]">
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: '#F1F5F9' }}>
+      <StatusBar style="light" />
       
-      <View className={`flex-1 ${isDesktop ? 'max-w-4xl mx-auto w-full py-10' : 'pt-16'}`}>
-        <View className={`${isDesktop ? 'bg-white rounded-[16px] shadow-sm border border-slate-200 flex-1 overflow-hidden' : 'flex-1'}`}>
-          <View className={`px-8 flex-row items-center ${isDesktop ? 'py-6 border-b border-slate-100' : 'mb-6 px-6'}`}>
-            <View>
-              <Text className="text-3xl font-black text-[#054752] tracking-tight">Mes Voyages</Text>
-              <Text className="text-[#707070] text-xs font-bold uppercase tracking-widest mt-1">Gérer vos réservations</Text>
-            </View>
-          </View>
+      {/* HERO HEADER */}
+      <View style={{
+        backgroundColor: '#1E3A5F',
+        paddingTop: isDesktop ? 60 : 80,
+        paddingBottom: 90,
+        paddingHorizontal: 32,
+        width: '100%',
+        alignItems: isDesktop ? 'center' : 'flex-start',
+      }}>
+        <Text style={{ color: 'white', fontSize: isDesktop ? 36 : 32, fontWeight: '900', letterSpacing: -0.5, marginBottom: 8 }}>
+          Mes Voyages
+        </Text>
+        <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15, fontWeight: '500', textTransform: 'uppercase', letterSpacing: 1 }}>
+          Gérer vos réservations
+        </Text>
+      </View>
 
-          {/* Onglets */}
-          <View className={`flex-row px-8 mb-6 ${isDesktop ? 'mt-6' : ''}`}>
-            <TouchableOpacity 
-              onPress={() => setActiveTab('published')}
-              className={`flex-1 py-3.5 items-center rounded-full mr-2 transition-colors ${activeTab === 'published' ? 'bg-[#00AFF5]' : 'bg-white border border-slate-200 hover:bg-slate-50'}`}
-            >
-              <Text className={`font-black text-[13px] uppercase tracking-wider ${activeTab === 'published' ? 'text-white' : 'text-[#707070]'}`}>Je conduis</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => setActiveTab('booked')}
-              className={`flex-1 py-3.5 items-center rounded-full ml-2 transition-colors ${activeTab === 'booked' ? 'bg-[#00AFF5]' : 'bg-white border border-slate-200 hover:bg-slate-50'}`}
-            >
-              <Text className={`font-black text-[13px] uppercase tracking-wider ${activeTab === 'booked' ? 'text-white' : 'text-[#707070]'}`}>Je voyage</Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView 
-            contentContainerStyle={{ paddingHorizontal: isDesktop ? 32 : 24, paddingBottom: 40 }}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0F172A" />}
+      {/* MAIN CONTAINER */}
+      <View style={{
+        flex: 1,
+        width: '100%',
+        maxWidth: isDesktop ? 700 : '100%',
+        alignSelf: 'center',
+        marginTop: -60,
+        paddingHorizontal: isDesktop ? 40 : 16,
+      }}>
+        
+        {/* ONGLETS FLOTTANTS */}
+        <View style={{
+          flexDirection: 'row',
+          backgroundColor: 'white',
+          borderRadius: 24,
+          padding: 8,
+          marginBottom: 24,
+          shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.06, shadowRadius: 20, elevation: 6,
+        }}>
+          <TouchableOpacity 
+            onPress={() => setActiveTab('published')}
+            style={{
+              flex: 1, paddingVertical: 14, alignItems: 'center', borderRadius: 16,
+              backgroundColor: activeTab === 'published' ? '#2563EB' : 'transparent',
+            }}
           >
-            {loading && !refreshing ? (
-              <View className="py-20 items-center">
-                <ActivityIndicator size="large" color="#00AFF5" />
-              </View>
-            ) : rides.length > 0 ? (
-              rides.map(renderRideItem)
-            ) : (
-              <View className={`py-20 items-center bg-white rounded-[16px] border border-slate-200 px-10`}>
-                <View className="w-20 h-20 bg-slate-50 border border-slate-100 rounded-full items-center justify-center mb-6">
-                  <Ionicons name={activeTab === 'published' ? "car-sport-outline" : "ticket-outline"} size={36} color="#94A3B8" />
-                </View>
-                <Text className="text-xl font-black text-[#054752] tracking-tight text-center mb-2">
-                  {activeTab === 'published' ? "Aucune annonce" : "Aucune réservation"}
-                </Text>
-                <Text className="text-[#707070] text-sm text-center mb-6 font-bold">
-                  {activeTab === 'published' 
-                    ? "Vous n'avez pas encore publié de trajet. Partagez votre route !" 
-                    : "Vous n'avez pas encore réservé de trajet pour le moment."}
-                </Text>
-                {activeTab === 'published' && (
-                  <TouchableOpacity 
-                    onPress={() => router.push('/publish')}
-                    className="bg-[#00AFF5] px-6 py-3.5 rounded-full hover:bg-[#0096D1] transition-colors"
-                  >
-                    <Text className="text-white font-extrabold text-xs uppercase tracking-wider">Publier un trajet</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-          </ScrollView>
+            <Text style={{ fontWeight: '900', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1, color: activeTab === 'published' ? 'white' : '#64748B' }}>
+              Je conduis
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setActiveTab('booked')}
+            style={{
+              flex: 1, paddingVertical: 14, alignItems: 'center', borderRadius: 16,
+              backgroundColor: activeTab === 'booked' ? '#2563EB' : 'transparent',
+            }}
+          >
+            <Text style={{ fontWeight: '900', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1, color: activeTab === 'booked' ? 'white' : '#64748B' }}>
+              Je voyage
+            </Text>
+          </TouchableOpacity>
         </View>
+
+        <ScrollView 
+          contentContainerStyle={{ paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
+        >
+          {loading && !refreshing ? (
+            <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+              <ActivityIndicator size="large" color="#2563EB" />
+            </View>
+          ) : rides.length > 0 ? (
+            rides.map(renderRideItem)
+          ) : (
+            <View style={{ padding: 40, alignItems: 'center', backgroundColor: 'white', borderRadius: 28, marginTop: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+              <View style={{ width: 100, height: 100, backgroundColor: '#EFF6FF', borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+                <Ionicons name={activeTab === 'published' ? "car-sport" : "ticket"} size={40} color="#2563EB" />
+              </View>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#0F172A', marginBottom: 12, textAlign: 'center' }}>
+                {activeTab === 'published' ? "Aucun trajet publié" : "Aucune réservation"}
+              </Text>
+              <Text style={{ fontSize: 15, color: '#64748B', textAlign: 'center', lineHeight: 24, marginBottom: 32 }}>
+                {activeTab === 'published' 
+                  ? "Vous n'avez pas encore proposé de trajet. Partagez votre route dès aujourd'hui !" 
+                  : "Vous n'avez pas de voyage prévu pour le moment."}
+              </Text>
+              {activeTab === 'published' && (
+                <TouchableOpacity 
+                  onPress={() => router.push('/publish')}
+                  style={{ backgroundColor: '#2563EB', paddingHorizontal: 24, paddingVertical: 16, borderRadius: 24, shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 10 }}
+                >
+                  <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, textTransform: 'uppercase', letterSpacing: 0.5 }}>Publier un trajet</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </ScrollView>
       </View>
 
       {/* MODAL D'AVIS */}
