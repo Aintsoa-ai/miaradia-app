@@ -66,6 +66,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Correctif UI Bande Bleue \& Contenu Caché *(RÉALISÉ - S21)* :** Sur l'écran Détails du Trajet (`app/ride/[id].tsx`), réduction de la largeur de la colonne timeline verticale bleue (`width: 56 → 44`, `marginRight: 16 → 12`) pour libérer de l'espace horizontal. Augmentation du `paddingBottom` du `ScrollView` (`80 → 120`) pour rendre visible le badge "Bagages: Moyen" et les équipements du véhicule sur les petits écrans mobiles.
 - [x] **Expiration Automatique des Trajets Passés *(RÉALISÉ - S21)* :** Dans les résultats de recherche (`resultats-recherche.tsx`), filtre `isRideExpired()` actif : les trajets dont la date est antérieure à aujourd'hui sont exclus de l'affichage. Dans l'onglet "Je conduis" (`rides.tsx`), les trajets terminés affichent un badge gris "Trajet terminé", sont grisés (opacity 0.7) et triés automatiquement en bas de la liste — le conducteur garde son historique sans pollution visuelle.
 - [x] **Configuration Officielle Notifications Push *(RÉALISÉ - S21)* :** Correction du `projectId` EAS officiel (`f2da6b63-f8d9-471a-8d58-252014dada76`) dans la configuration expo-notifications (`lib/notifications.ts`). Intégration d'un écouteur global de tap sur notification dans le Root Layout (`_layout.tsx`) redirigeant automatiquement le passager vers le détail de son voyage (`/ride/[id]`) dès validation de son paiement Mobile Money.
+- [x] **Widget Stockage Supabase *(RÉALISÉ - S21)* :** Ajout d'un widget de supervision de la consommation d'espace disque des avatars (`supabase.storage.from('avatars').list()`) directement sur le tableau de bord administrateur (Kiosque).
 
 ---
 
@@ -84,7 +85,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **🟡 MODÉRÉ — Souscriptions WebSocket Multiples :** Chaque écran crée ses propres souscriptions Supabase Realtime sans centralisation. Risque de fuite mémoire sur des sessions longues. *Solution : Créer un Context React global pour gérer un seul canal Realtime partagé.*
 - [ ] **🟡 MODÉRÉ — Pas de Support Malagasy :** L'application est 100% en français. La majorité des utilisateurs potentiels (chauffeurs de brousse) parle malagasy. *Solution future : i18n avec les chaînes en malagasy officiel.*
 - [ ] **🟢 MINEUR — Surveillance Continue Responsive :** Après la réduction de la bande bleue timeline (S21), surveiller l'affichage sur d'autres tailles d'écran (Galaxy Fold, tablettes). *Solution : Tests visuels réguliers.*
-- [x] **🟢 MINEUR — Widget Stockage Supabase (RÉSOLU) :** Pas de visibilité sur l'espace de stockage restant pour les photos de profil dans le tableau de bord admin. *Solution : Widget intégré à la page Kiosque.*
+
 ### 🗺️ Géographie & Itinéraires
 - [ ] **Détection d'embouteillages (Tana)** : Intégrer une alerte ou une estimation de temps supplémentaire pour les axes saturés (ex: Anosizato, 67ha).
 - [ ] **Axe Fluvial** : Ajouter la possibilité de publier des trajets en bateau (ex: Canal des Pangalanes ou traversées vers Sainte-Marie / Nosy Be).
@@ -122,7 +123,6 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Notifications Push de Validation *(RÉALISÉ - S21)* :** Redirection instantanée au clic sur la notification et fiabilisation de l'EAS Project ID. Reste à déclencher pour le chat.
 - [ ] **Appels In-App (VoIP)** : Intégrer un bouton d'appel direct via l'app (type Messenger) après déblocage du contact.
 - [ ] **Dashboard Admin Mobile** : Une application simplifiée pour l'admin pour valider les paiements en déplacement.
-- [ ] **Surveillance de Stockage Supabase :** Intégrer un widget directement sur la page Kiosque de l'administrateur affichant l'espace de stockage libre restant de la base de données Supabase.
 - [ ] **Expiration Automatique des Trajets :** Un trajet ne doit plus apparaître dans les résultats de recherche dès que sa date de départ est passée.
 - [ ] **Message Automatique Post-Validation :** Après qu'un paiement est validé et que le contact du conducteur est affiché, envoyer automatiquement un message In-App du style : *"Une personne va vous appeler dans les minutes ou secondes qui viennent."*
 - [ ] **Optimisation Realtime** : Centraliser la gestion des WebSockets Supabase (via un Context global) pour éviter les souscriptions multiples et améliorer les performances.

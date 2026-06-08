@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [stats, setStats] = useState({ drivers: 0, clients: 0, online: 0 });
   const [recentSmsLogs, setRecentSmsLogs] = useState<any[]>([]);
-  const [storageUsed, setStorageUsed] = useState(0); // en Mo
+  const [storageUsage, setStorageUsage] = useState(0);
 
   useEffect(() => {
     checkAdmin();
@@ -131,16 +131,11 @@ export default function AdminDashboard() {
         setRecentSmsLogs(smsLogs);
       }
 
-      // 5. Fetch Storage size (Approximation based on 'avatars' bucket)
-      try {
-        const { data: files, error: storageError } = await supabase.storage.from('avatars').list();
-        if (!storageError && files) {
-          const totalBytes = files.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
-          const totalMB = totalBytes / (1024 * 1024);
-          setStorageUsed(Number(totalMB.toFixed(2)));
-        }
-      } catch (err) {
-        console.log("Could not fetch storage size:", err);
+      // 5. Calculate storage usage (avatars)
+      const { data: storageFiles, error: storageError } = await supabase.storage.from('avatars').list('', { limit: 1000 });
+      if (!storageError && storageFiles) {
+        const sizeInBytes = storageFiles.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+        setStorageUsage(sizeInBytes);
       }
 
     } catch (error: any) {
@@ -336,23 +331,6 @@ export default function AdminDashboard() {
           ))
         )}
 
-        {/* WIDGET : STOCKAGE SUPABASE */}
-        <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 20, marginTop: 8, borderWidth: 1, borderColor: '#F3F4F6', flexDirection: 'row', alignItems: 'center' }}>
-          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
-            <Ionicons name="cloud" size={22} color="#2563EB" />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ color: '#111827', fontWeight: '900', fontSize: 14 }}>Stockage Base de Données</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, marginBottom: 4 }}>
-              <Text style={{ fontSize: 12, color: '#6B7280', fontWeight: '600' }}>{storageUsed} Mo / 500 Mo</Text>
-              <Text style={{ fontSize: 12, color: '#2563EB', fontWeight: '800' }}>{((storageUsed / 500) * 100).toFixed(1)}%</Text>
-            </View>
-            <View style={{ height: 6, backgroundColor: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
-              <View style={{ width: `${(storageUsed / 500) * 100}%`, height: '100%', backgroundColor: '#2563EB', borderRadius: 3 }} />
-            </View>
-          </View>
-        </View>
-
         {/* WIDGET : DERNIERS SMS REÇUS */}
         <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 20, marginTop: 8, borderWidth: 1, borderColor: '#F3F4F6' }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -393,6 +371,35 @@ export default function AdminDashboard() {
               </View>
             ))
           )}
+        </View>
+
+        {/* WIDGET : STOCKAGE SUPABASE */}
+        <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 20, marginTop: 16, borderWidth: 1, borderColor: '#F3F4F6' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="cloud-done" size={20} color="#054752" />
+              <Text style={{ fontSize: 14, fontWeight: '800', color: '#054752', textTransform: 'uppercase', letterSpacing: 1, marginLeft: 8 }}>
+                Stockage Avatars
+              </Text>
+            </View>
+          </View>
+          
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 }}>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#0F172A' }}>
+              {(storageUsage / (1024 * 1024)).toFixed(2)} Mo
+            </Text>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: '#64748B', marginBottom: 4 }}>
+              / 1024 Mo (1Go)
+            </Text>
+          </View>
+          
+          {/* Progress bar */}
+          <View style={{ height: 8, backgroundColor: '#E2E8F0', borderRadius: 4, overflow: 'hidden' }}>
+            <View style={{ height: '100%', width: `${Math.max(1, Math.min(100, (storageUsage / (1024 * 1024 * 1024)) * 100))}%`, backgroundColor: '#10B981', borderRadius: 4 }} />
+          </View>
+          <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 8, fontStyle: 'italic' }}>
+            Espace consommé par les photos de profil (compressées à 40%).
+          </Text>
         </View>
 
         {/* PASSERELLE SMS AUTOMATIQUE */}
