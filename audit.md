@@ -28,6 +28,7 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 *   **Refonte Premium UI & Z-Index Fixes (S20) ✨** : Déploiement d'un "Dark Hero Header" sur tous les écrans principaux (Détails, Profil Conducteur, Chat, Mon Profil). Résolution totale des problèmes de chevauchement visuel (`zIndex`) entre le header et les conteneurs superposés (`ScrollView`).
 *   **Optimisation Densité & Poids (S20) ⚡** : Marges verticales des en-têtes drastiquement réduites sur petits écrans (ex: iPhone SE) pour minimiser le scrolling vers le bouton de réservation. Algorithme de compression des avatars porté à une résolution maximale de 300px (qualité 0.4 JPEG) garantissant une empreinte de stockage et un temps de téléchargement infimes.
 *   **Correctif UI Détails Trajet (S21) 🔧** : Réduction de la largeur de la colonne timeline bleue verticale (`width: 56` → `44`, `marginRight: 16` → `12`) pour libérer de l'espace horizontal. Augmentation du `paddingBottom` du `ScrollView` (`80` → `120`) pour que le badge "Bagages: Moyen" et les équipements du véhicule soient visibles sur les petits écrans mobiles sans être tronqués.
+*   **Expiration Automatique des Trajets Passés (S21) 📅** : Filtre `isRideExpired()` actif dans `resultats-recherche.tsx` pour exclure automatiquement les trajets dépassés des résultats. Dans `app/(tabs)/rides.tsx`, les trajets terminés reçoivent un badge gris "Trajet terminé", sont grisés (opacity 0.7) et reclassés automatiquement en bas de liste via tri dynamique — l'historique du conducteur est préservé.
 
 ---
 
@@ -56,7 +57,7 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 | 2 | **Pas de mode hors-ligne** | Les voyageurs en zone blanche (RN) ne peuvent pas consulter les détails de leur billet. | Cache local SQLite/AsyncStorage pour les billets validés. |
 | 3 | **Pas de notifications push** | Le passager doit laisser l'app ouverte pour être alerté de la validation. | Expo Notifications + EAS Push. |
 | 4 | **Paiement partiel (gating)** | Le passager paie 10% pour débloquer le contact, pas 100% du billet → pas de garantie pour le chauffeur. | Paiement en séquestre complet in-app. |
-| 5 | **Expiration des trajets passés** | Les annonces avec une date dépassée continuent d'apparaître dans les résultats. | Filtrer automatiquement par `date >= aujourd'hui` en BDD. |
+| 5 | **Expiration des trajets passés** | ~~Les annonces avec une date dépassée continuent d'apparaître dans les résultats.~~ | **✅ RÉALISÉ S21** : Filtre actif + badge "Trajet terminé" + tri dynamique. |
 | 6 | **Pas de KYC (identité)** | Les chauffeurs ne sont pas vérifiés officiellement par leur CIN. | Upload CIN + processus d'approbation admin. |
 | 7 | **Chat sans notifications sonores** | Les messages reçus hors-app ne sont pas signalés. | Notifications push sur les nouveaux messages de chat. |
 | 8 | **Pas de support multilingue** | L'application est 100% en français alors que la majorité des Malgaches parle malagasy. | Traduction malagasy officiel + dialectes. |

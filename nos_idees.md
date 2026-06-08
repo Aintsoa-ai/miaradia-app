@@ -64,6 +64,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Correction Historique Web *(RÉALISÉ - S17)* :** Fiabilisation de la flèche de retour (<-) sur Vercel/Web via un bloc de sécurité `try/catch` sur `router.canGoBack()` évitant les crashs.
 - [x] **Actualisation Instantanée "Mes Trajets" *(RÉALISÉ - S18)* :** Utilisation de `useFocusEffect` sur la page "Mes Trajets" du conducteur. Dès qu'il revient sur l'onglet après publication, la liste se recharge automatiquement.
 - [x] **Correctif UI Bande Bleue \& Contenu Caché *(RÉALISÉ - S21)* :** Sur l'écran Détails du Trajet (`app/ride/[id].tsx`), réduction de la largeur de la colonne timeline verticale bleue (`width: 56 → 44`, `marginRight: 16 → 12`) pour libérer de l'espace horizontal. Augmentation du `paddingBottom` du `ScrollView` (`80 → 120`) pour rendre visible le badge "Bagages: Moyen" et les équipements du véhicule sur les petits écrans mobiles.
+- [x] **Expiration Automatique des Trajets Passés *(RÉALISÉ - S21)* :** Dans les résultats de recherche (`resultats-recherche.tsx`), filtre `isRideExpired()` actif : les trajets dont la date est antérieure à aujourd'hui sont exclus de l'affichage. Dans l'onglet "Je conduis" (`rides.tsx`), les trajets terminés affichent un badge gris "Trajet terminé", sont grisés (opacity 0.7) et triés automatiquement en bas de la liste — le conducteur garde son historique sans pollution visuelle.
 
 ---
 
@@ -74,7 +75,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 > Ces points ont été identifiés lors de l'audit complet du 8 Juin 2026 (Session 21). Ils sont classés par priorité d'impact.
 
 - [ ] **🔴 CRITIQUE — Dépendance au Téléphone Administrateur (Kiosque) :** Tant que nous utilisons la "Passerelle SMS", l'application dépend de l'état de la batterie et de la couverture réseau du téléphone physique de l'administrateur. *Solution future : Intégrer l'API B2B officielle MVola Telma.*
-- [ ] **🔴 CRITIQUE — Expiration Automatique des Trajets :** Les trajets avec une date de départ passée continuent d'apparaître dans les résultats de recherche, polluant l'expérience utilisateur. *Solution : Ajouter un filtre `date >= today()` dans la requête Supabase des résultats de recherche.*
+- [x] **Expiration Automatique des Trajets *(RÉALISÉ - S21)* :** ~~Les trajets avec une date de départ passée continuent d'apparaître dans les résultats de recherche~~. Filtre actif dans la recherche + badge "Trajet terminé" + tri automatique en bas dans l'onglet conducteur. ✅
 - [ ] **🟠 IMPORTANT — Absence de Mode Hors-Ligne (Offline) :** Sur les Routes Nationales, les voyageurs traversent des zones sans réseau. Ils ne peuvent pas consulter leur billet ou le numéro du chauffeur s'ils ferment l'app. *Solution future : SQLite/AsyncStorage pour mettre en cache les billets validés.*
 - [ ] **🟠 IMPORTANT — Pas de Notifications Push Chat :** Les messages reçus hors-application ne sont pas signalés au destinataire. *Solution : Expo Notifications + EAS Push Service.*
 - [ ] **🟠 IMPORTANT — Paiement "Gating" vs "Séquestre" :** Le voyageur paie 10% pour débloquer le contact, mais le reste est payé en main propre. Le chauffeur n'a aucune garantie financière de présence. *Solution future : Paiement total en séquestre in-app.*
@@ -136,4 +137,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 > - `plan.md` : Plan de conception et architecture technique
 > - **Règle :** Après chaque modification, vérifier l'impact sur mobile ET desktop, et synchroniser ces 4 documents.
 
-*Dernière mise à jour : 8 Juin 2026 - Session 21 (Correctifs UI Détails Trajet + Audit Complet Points Forts/Faibles)*
+*Dernière mise à jour : 8 Juin 2026 - Session 21 (UI fixes + Audit complet + Expiration automatique des trajets passés)*
