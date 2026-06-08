@@ -77,6 +77,24 @@ Deno.serve(async (req) => {
     });
   }
 
+  // ✅ DIAGNOSTIC GET : Permet de voir l'état des bookings pending et logs SMS directement
+  if (req.method === 'GET') {
+    try {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const { data: bookings } = await supabase.from('bookings').select('*, rides(*)').eq('payment_status', 'pending');
+      const { data: logs } = await supabase.from('sms_logs').select('*').order('received_at', { ascending: false }).limit(20);
+      return new Response(JSON.stringify({ bookings, logs }), {
+        status: 200,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+    }
+  }
+
   try {
     // Vérification sécurité (optionnelle mais recommandée)
     const secret = req.headers.get('x-webhook-secret');
@@ -119,18 +137,49 @@ Deno.serve(async (req) => {
       }), { status: 200 });
     }
 
-    // Autoriser la recherche si le client a tapé la référence OU son numéro de téléphone
-    const { data: bookings, error: searchError } = await supabase
+    // Récupérer toutes les réservations en attente (pending) pour faire un matching ultra-robuste en JS
+    const { data: pendingBookings, error: searchError } = await supabase
       .from('bookings')
       .select('*, rides(*)')
-      .eq('payment_status', 'pending')
-      .or(`payment_reference.ilike.%${reference}%,payment_reference.ilike.%${sender}%`)
-      .limit(5);
+      .eq('payment_status', 'pending');
 
     if (searchError) throw searchError;
 
-    if (!bookings || bookings.length === 0) {
-      console.log(`Aucune réservation en attente trouvée pour la référence: ${reference}`);
+    // Normaliser les chaînes pour la comparaison (retrait des espaces, tirets, etc.)
+    const normalize = (str: string | null | undefined) => {
+      if (!str) return '';
+      // Retirer les espaces, tirets, parenthèses et le préfixe international +261 ou 261 au début
+      let normalized = str.replace(/[\s\-\(\)]/g, '').toLowerCase();
+      if (normalized.startsWith('+261')) {
+        normalized = '0' + normalized.substring(4);
+      } else if (normalized.startsWith('261') && normalized.length > 9) {
+        normalized = '0' + normalized.substring(3);
+      }
+      return normalized;
+    };
+
+    const cleanSmsRef = normalize(reference);
+    const cleanSmsSender = normalize(sender);
+
+    console.log('Comparaison avec les bookings pending (normalisés) :', {
+      cleanSmsRef,
+      cleanSmsSender
+    });
+
+    const bookings = (pendingBookings || []).filter(booking => {
+      const dbRef = normalize(booking.payment_reference);
+      if (!dbRef) return false;
+
+      // Match si la référence du SMS correspond à celle en base,
+      // OU si le numéro de l'envoyeur correspond à la référence en base
+      const matchesRef = cleanSmsRef && (dbRef.includes(cleanSmsRef) || cleanSmsRef.includes(dbRef));
+      const matchesSender = cleanSmsSender && (dbRef.includes(cleanSmsSender) || cleanSmsSender.includes(dbRef));
+
+      return matchesRef || matchesSender;
+    });
+
+    if (bookings.length === 0) {
+      console.log(`Aucune réservation correspondante trouvée après normalisation pour ref:${reference} ou sender:${sender}`);
       
       // Sauvegarder quand même le SMS pour audit
       await supabase.from('sms_logs').insert([{
@@ -139,14 +188,16 @@ Deno.serve(async (req) => {
         extracted_amount: amount,
         matched: false,
         received_at: new Date().toISOString()
-      }]).throwOnError();
+      }]);
 
       return new Response(JSON.stringify({ 
         status: 'no_match', 
         reference,
-        message: 'Référence reçue mais aucune réservation en attente trouvée'
+        sender,
+        message: 'SMS reçu mais aucune réservation correspondante en attente'
       }), { status: 200 });
     }
+
 
     // Valider la/les réservation(s) correspondante(s)
     let validated = 0;

@@ -196,24 +196,41 @@ export default function SmsGatewayScreen() {
         return;
       }
 
-      // Chercher les réservations correspondantes (soit par ref, soit par sender)
-      const searchSender = extractedSender || sender || 'NO_SENDER';
-      const { data: bookings } = await supabase
+      // Récupérer toutes les réservations en attente
+      const { data: pendingBookings } = await supabase
         .from('bookings')
         .select('*, rides(*)')
-        .eq('payment_status', 'pending')
-        .or(`payment_reference.ilike.%${reference}%,payment_reference.ilike.%${searchSender}%`);
+        .eq('payment_status', 'pending');
+
+      // Normaliser pour comparaison ultra-robuste
+      const normalize = (str: string | null | undefined) => {
+        if (!str) return '';
+        let normalized = str.replace(/[\s\-\(\)]/g, '').toLowerCase();
+        if (normalized.startsWith('+261')) {
+          normalized = '0' + normalized.substring(4);
+        } else if (normalized.startsWith('261') && normalized.length > 9) {
+          normalized = '0' + normalized.substring(3);
+        }
+        return normalized;
+      };
+
+      const cleanSmsRef = normalize(reference);
+      const cleanSmsSender = normalize(extractedSender || sender);
+
+      const bookings = (pendingBookings || []).filter(booking => {
+        const dbRef = normalize(booking.payment_reference);
+        if (!dbRef) return false;
+
+        const matchesRef = cleanSmsRef && (dbRef.includes(cleanSmsRef) || cleanSmsRef.includes(dbRef));
+        const matchesSender = cleanSmsSender && (dbRef.includes(cleanSmsSender) || cleanSmsSender.includes(dbRef));
+
+        return matchesRef || matchesSender;
+      });
 
       let validated = 0;
 
-      if (bookings && bookings.length > 0) {
+      if (bookings.length > 0) {
         for (const booking of bookings) {
-          // Vérification du montant désactivée pour les tests manuels
-          // if (amount && booking.amount_fee) {
-          //   const diff = Math.abs(amount - booking.amount_fee);
-          //   if (diff > 200) continue;
-          // }
-
           // Valider le paiement
           await supabase.from('bookings').update({
             payment_status: 'completed',
@@ -243,6 +260,7 @@ export default function SmsGatewayScreen() {
           setTotalValidated(prev => prev + validated);
         }
       }
+
 
       await supabase.from('sms_logs').insert([logEntry]);
       await fetchData();
