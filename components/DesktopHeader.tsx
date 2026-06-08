@@ -48,47 +48,56 @@ export function DesktopHeader() {
   if (!isDesktop) return null;
 
   return (
-    <View className="bg-white border-b border-gray-100 py-4 px-12 flex-row items-center justify-between sticky top-0 z-50">
+    <View style={{
+      backgroundColor: '#1E3A5F',
+      paddingVertical: 16,
+      paddingHorizontal: 48,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      zIndex: 50,
+      width: '100%'
+    }}>
       {/* LOGO */}
-      <TouchableOpacity onPress={() => router.push('/(tabs)')} className="flex-row items-center">
-        <View className="bg-blue-600 p-2 rounded-xl mr-2">
+      <TouchableOpacity onPress={() => router.push('/(tabs)')} style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ backgroundColor: '#2563EB', padding: 8, borderRadius: 12, marginRight: 12, shadowColor: '#2563EB', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 }}>
            <Ionicons name="car-sport" size={24} color="white" />
         </View>
-        <Text className="text-2xl font-black text-blue-600 tracking-tighter">Miara-Dia</Text>
+        <Text style={{ fontSize: 24, fontWeight: '900', color: 'white', letterSpacing: -0.5 }}>Miara-Dia</Text>
       </TouchableOpacity>
 
       {/* NAVIGATION */}
-      <View className="flex-row items-center gap-8">
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 32 }}>
         <TouchableOpacity 
           onPress={() => router.push('/(tabs)/publish')}
-          className="flex-row items-center bg-blue-50 px-4 py-2 rounded-full border border-blue-100"
+          style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#2563EB', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 24, shadowColor: '#2563EB', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 }}
         >
-          <Ionicons name="add-circle" size={20} color="#2563EB" />
-          <Text className="text-blue-600 font-bold ml-2">Proposer un trajet</Text>
+          <Ionicons name="add-circle" size={20} color="white" />
+          <Text style={{ color: 'white', fontWeight: '800', marginLeft: 8, fontSize: 14 }}>Proposer un trajet</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           onPress={() => router.push('/(tabs)/chat')}
-          className="flex-row items-center"
+          style={{ flexDirection: 'row', alignItems: 'center' }}
         >
-          <Ionicons name="chatbubble-ellipses-outline" size={24} color="#4B5563" />
-          <Text className="text-gray-600 font-medium ml-2">Messages</Text>
+          <Ionicons name="chatbubble-ellipses" size={22} color="rgba(255,255,255,0.7)" />
+          <Text style={{ color: 'white', fontWeight: '700', marginLeft: 8, fontSize: 15 }}>Messages</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           onPress={() => router.push('/(tabs)/rides')}
-          className="flex-row items-center"
+          style={{ flexDirection: 'row', alignItems: 'center' }}
         >
-          <Ionicons name="time-outline" size={24} color="#4B5563" />
-          <Text className="text-gray-600 font-medium ml-2">Mes Voyages</Text>
+          <Ionicons name="compass" size={24} color="rgba(255,255,255,0.7)" />
+          <Text style={{ color: 'white', fontWeight: '700', marginLeft: 8, fontSize: 15 }}>Mes Voyages</Text>
         </TouchableOpacity>
 
-        {/* BOUTON PROFIL — affiche la vraie photo comme Facebook */}
+        {/* BOUTON PROFIL */}
         <TouchableOpacity 
           onPress={() => router.push('/(tabs)/profile')}
-          className="flex-row items-center bg-gray-50 p-1 pr-4 rounded-full border border-gray-200"
+          style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', padding: 4, paddingRight: 16, borderRadius: 30, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}
         >
-          <View style={{ width: 36, height: 36, borderRadius: 18, overflow: 'hidden', backgroundColor: '#DBEAFE', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#BFDBFE' }}>
+          <View style={{ width: 36, height: 36, borderRadius: 18, overflow: 'hidden', backgroundColor: '#2563EB', alignItems: 'center', justifyContent: 'center' }}>
             {avatarUrl ? (
               <Image 
                 source={{ uri: avatarUrl }} 
@@ -96,10 +105,11 @@ export function DesktopHeader() {
                 resizeMode="cover"
               />
             ) : (
-              <Ionicons name="person" size={20} color="#2563EB" />
+              <Ionicons name="person" size={20} color="white" />
             )}
           </View>
-          <Ionicons name="chevron-down" size={16} color="#9CA3AF" style={{ marginLeft: 8 }} />
+          <Text style={{ color: 'white', fontWeight: '700', marginLeft: 12, fontSize: 14 }}>Profil</Text>
+          <Ionicons name="chevron-down" size={16} color="rgba(255,255,255,0.5)" style={{ marginLeft: 8 }} />
         </TouchableOpacity>
       </View>
     </View>
