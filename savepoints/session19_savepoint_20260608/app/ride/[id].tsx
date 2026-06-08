@@ -330,7 +330,7 @@ export default function RideDetailsScreen() {
         paddingBottom: isDesktop ? 90 : 80,
         paddingHorizontal: 24,
         alignItems: 'center',
-        zIndex: 1,
+        position: 'relative',
       }}>
         <View style={{ maxWidth: 1000, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <TouchableOpacity 
@@ -346,7 +346,7 @@ export default function RideDetailsScreen() {
         </View>
 
         <View style={{ maxWidth: 1000, width: '100%', marginTop: 8 }}>
-          <Text style={{ color: 'white', fontSize: isDesktop ? 28 : 24, fontWeight: '900', letterSpacing: -0.5, lineHeight: 34 }}>
+          <Text style={{ color: 'white', fontSize: isDesktop ? 30 : 24, fontWeight: '900', letterSpacing: -0.5 }} numberOfLines={1}>
             {ride.departure} → {ride.arrival}
           </Text>
           <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, fontWeight: '700', marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -356,7 +356,7 @@ export default function RideDetailsScreen() {
       </View>
 
       {/* MAIN CONTAINER */}
-      <ScrollView style={{ flex: 1, zIndex: 10 }} contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
         <View style={{
           maxWidth: 1000,
           width: '100%',
@@ -365,7 +365,6 @@ export default function RideDetailsScreen() {
           gap: 24,
           paddingHorizontal: 16,
           marginTop: -40,
-          zIndex: 10,
         }}>
           {/* COLUMN LEFT - RIDE INFO (65% on Desktop) */}
           <View style={{ flex: isDesktop ? 1.8 : 1, gap: 20 }}>

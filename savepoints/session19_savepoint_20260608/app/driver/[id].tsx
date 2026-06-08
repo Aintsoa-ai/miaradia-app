@@ -302,7 +302,6 @@ export default function DriverProfileScreen() {
         paddingBottom: isDesktop ? 90 : 80,
         paddingHorizontal: 24,
         alignItems: 'center',
-        zIndex: 1,
       }}>
         <View style={{ maxWidth: 1000, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <TouchableOpacity 
@@ -341,7 +340,7 @@ export default function DriverProfileScreen() {
       </View>
 
       {/* MAIN CONTAINER */}
-      <ScrollView style={{ flex: 1, zIndex: 10 }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
         <View style={{
           maxWidth: 1000,
           width: '100%',
@@ -350,7 +349,6 @@ export default function DriverProfileScreen() {
           gap: 24,
           paddingHorizontal: 16,
           marginTop: -30,
-          zIndex: 10,
         }}>
           {/* COLUMN LEFT */}
           <View style={{ flex: isDesktop ? 1.8 : 1, gap: 20 }}>
