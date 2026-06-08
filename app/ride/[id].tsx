@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CustomAlert } from '../../utils/alert';
-
-import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Image, Modal, Dimensions, Linking, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Image, Modal, Linking, useWindowDimensions, Switch } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
@@ -51,7 +50,6 @@ export default function RideDetailsScreen() {
   const fetchRideDetails = async () => {
     try {
       setLoading(true);
-      // 1. Récupérer le trajet
       const { data: rideData, error: rideError } = await supabase
         .from('rides')
         .select('*')
@@ -61,7 +59,6 @@ export default function RideDetailsScreen() {
       if (rideError) throw rideError;
       setRide(rideData);
 
-      // 1.5 Fetch reviews dynamically for Super Driver check
       const { data: reviewsData } = await supabase
         .from('reviews')
         .select('rating')
@@ -73,7 +70,6 @@ export default function RideDetailsScreen() {
         : "5.0";
       const isSuperDriver = reviews.length >= 5 && parseFloat(averageRating) >= 4.5;
 
-      // 2. Récupérer le profil du chauffeur
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -116,7 +112,7 @@ export default function RideDetailsScreen() {
         }
       }
     } catch (err) {
-      // Pas de booking trouvé, normal
+      // Pas de booking trouvé
     }
   };
 
@@ -135,7 +131,6 @@ export default function RideDetailsScreen() {
     checkAuthAndBooking();
   }, [id]);
 
-  // Écoute en temps réel via Supabase Realtime pour mettre à jour la page dès que le webhook valide le paiement
   useEffect(() => {
     let channel: any = null;
     
@@ -177,7 +172,6 @@ export default function RideDetailsScreen() {
       if (channel) supabase.removeChannel(channel);
     };
   }, [id, currentUserId]);
-
 
   const handleUpdateSeats = async (newSeats: number) => {
     try {
@@ -245,13 +239,9 @@ export default function RideDetailsScreen() {
       const fee = calculateUnlockFee(Number(ride.price || 0));
       const isManual = method === 'Kiosque';
 
-      // Simulation d'attente réseau
       await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // ✅ FIX : Nettoyer le numéro de téléphone (enlever les espaces) pour matcher le sender MVola du SMS
       const cleanReference = reference ? reference.replace(/\s/g, '') : null;
 
-      // Enregistrement dans la base de données
       const { error: bookingError } = await supabase
         .from('bookings')
         .insert([{
@@ -266,10 +256,7 @@ export default function RideDetailsScreen() {
           payment_reference: cleanReference
         }]);
 
-
       if (bookingError) throw bookingError;
-
-      // La mise à jour des places se fera automatiquement lors de la validation SMS/Admin.
 
       setIsPendingVerification(true);
       if (isManual) {
@@ -288,9 +275,9 @@ export default function RideDetailsScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F8FAFC' }}>
         <ActivityIndicator size="large" color="#2563EB" />
-        <Text className="mt-4 text-gray-500 font-medium">Chargement du trajet...</Text>
+        <Text style={{ marginTop: 16, color: '#64748B', fontWeight: '700' }}>Chargement du trajet...</Text>
       </View>
     );
   }
@@ -322,7 +309,6 @@ export default function RideDetailsScreen() {
     const durationText = ride.duration || routeInfo.duration;
     const distanceText = ride.distance || routeInfo.distance;
     
-    // Alert délai
     const currentDelay = ride.current_delay || 0;
     const delayAlert = currentDelay > 0 ? `Attention: ${currentDelay}m de retard réel détecté` : null;
 
@@ -330,856 +316,376 @@ export default function RideDetailsScreen() {
   };
 
   const { arrivalTime, duration, distance, delayAlert } = resolveRouteData();
-
   const stopovers = Array.isArray(ride.stopovers) ? ride.stopovers : [];
+  const fee = calculateUnlockFee(Number(ride.price || 0));
 
-  const renderDesktopView = () => {
-    const fee = calculateUnlockFee(Number(ride.price || 0));
-
-    return (
-      <View className="flex-1 bg-[#F6F6F6]">
-        <StatusBar style="dark" />
-        
-        {/* TOP BAR / NAVIGATION */}
-        <View className="bg-white border-b border-slate-200 py-4 px-12 z-10 shadow-sm">
-          <View className="max-w-5xl mx-auto w-full flex-row items-center justify-between">
-            <TouchableOpacity 
-              onPress={handleBack} 
-              className="flex-row items-center py-2 px-4 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors"
-            >
-              <Ionicons name="arrow-back" size={18} color="#054752" />
-              <Text className="text-[#054752] font-black text-sm ml-2">Retour aux résultats</Text>
-            </TouchableOpacity>
-            
-            <View className="bg-blue-50 border border-blue-100 px-4 py-1.5 rounded-full">
-              <Text className="text-[#00AFF5] font-black text-xs uppercase tracking-wider">{ride.date}</Text>
-            </View>
+  return (
+    <View style={{ flex: 1, backgroundColor: '#F1F5F9' }}>
+      <StatusBar style="light" />
+      
+      {/* HERO / DARK HEADER */}
+      <View style={{
+        backgroundColor: '#1E3A5F',
+        paddingTop: isDesktop ? 50 : 60,
+        paddingBottom: isDesktop ? 90 : 80,
+        paddingHorizontal: 24,
+        alignItems: 'center',
+        position: 'relative',
+      }}>
+        <View style={{ maxWidth: 1000, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <TouchableOpacity 
+            onPress={handleBack} 
+            style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 }}
+          >
+            <Ionicons name="arrow-back" size={16} color="white" />
+            <Text style={{ color: 'white', fontWeight: '800', fontSize: 13, marginLeft: 6 }}>Retour</Text>
+          </TouchableOpacity>
+          <View style={{ backgroundColor: '#2563EB', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
+            <Text style={{ color: 'white', fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5 }}>{ride.date?.split(' à ')[0]}</Text>
           </View>
         </View>
 
-        <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 80 }} showsVerticalScrollIndicator={false}>
-          <View className="max-w-5xl mx-auto w-full flex-row gap-8 px-8 py-10">
+        <View style={{ maxWidth: 1000, width: '100%', marginTop: 8 }}>
+          <Text style={{ color: 'white', fontSize: isDesktop ? 30 : 24, fontWeight: '900', letterSpacing: -0.5 }} numberOfLines={1}>
+            {ride.departure} → {ride.arrival}
+          </Text>
+          <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, fontWeight: '700', marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            Détails de l'itinéraire & réservation
+          </Text>
+        </View>
+      </View>
+
+      {/* MAIN CONTAINER */}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
+        <View style={{
+          maxWidth: 1000,
+          width: '100%',
+          alignSelf: 'center',
+          flexDirection: isDesktop ? 'row' : 'column',
+          gap: 24,
+          paddingHorizontal: 16,
+          marginTop: -40,
+        }}>
+          {/* COLUMN LEFT - RIDE INFO (65% on Desktop) */}
+          <View style={{ flex: isDesktop ? 1.8 : 1, gap: 20 }}>
             
-            {/* COLONNE GAUCHE (65%) */}
-            <View className="flex-[1.8] space-y-6">
+            {/* ITINERARY CARD */}
+            <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 2 }}>
+              <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A', marginBottom: 20 }}>Détails du trajet</Text>
               
-              {/* ITINÉRAIRE & TIMELINE */}
-              <View className="bg-white rounded-[16px] p-8 border border-slate-200 shadow-sm">
-                <Text className="text-[#054752] font-black text-2xl tracking-tight mb-8">Détails du trajet</Text>
-                
-                {delayAlert && (
-                  <View className="bg-red-50 p-4 rounded-[12px] mb-6 flex-row items-center border border-red-100">
-                    <Ionicons name="warning" size={18} color="#EF4444" style={{ marginRight: 8 }} />
-                    <Text className="text-red-700 font-bold text-xs">{delayAlert}</Text>
-                  </View>
-                )}
+              {delayAlert && (
+                <View style={{ backgroundColor: '#FEF2F2', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16, marginBottom: 20, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#FEE2E2' }}>
+                  <Ionicons name="warning" size={18} color="#EF4444" style={{ marginRight: 8 }} />
+                  <Text style={{ color: '#991B1B', fontWeight: '800', fontSize: 12 }}>{delayAlert}</Text>
+                </View>
+              )}
 
-                {/* ALERT BAC / FERRY */}
-                {(ride.departure.includes('(Bac)') || ride.arrival.includes('(Bac)') || stopovers.some((s: any) => s.city.includes('(Bac)'))) && (
-                  <View className="bg-orange-50 p-4 rounded-[12px] mb-6 flex-row items-center border border-orange-100">
-                    <View className="w-10 h-10 bg-orange-100 rounded-full items-center justify-center mr-3">
-                      <MaterialCommunityIcons name="ferry" size={22} color="#F59E0B" />
-                    </View>
-                    <View className="flex-1">
-                      <Text className="text-orange-900 font-extrabold text-sm">Traversée par Bac</Text>
-                      <Text className="text-orange-600 text-xs mt-0.5">Ce trajet inclut un passage sur transbordeur.</Text>
-                    </View>
-                  </View>
-                )}
-
-                <View className="flex-row items-stretch">
-                  {/* Timeline Indicators */}
-                  <View className="items-center justify-between mr-8 py-2 w-16">
-                    <Text className="text-lg font-black text-[#054752]">{ride.date?.split(' à ')[1] || '08:00'}</Text>
-                    
-                    <View className="w-[2px] flex-1 bg-slate-200 my-3 relative min-h-[100px]">
-                      <View className="absolute -top-1 -left-[3px] w-2 h-2 rounded-full bg-[#00AFF5]" />
-                      <View className="absolute top-1/2 -translate-y-1/2 -left-16 w-32 items-center">
-                        <View className="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
-                          <Text className="text-[10px] text-[#707070] font-black">
-                            {duration}
-                          </Text>
-                        </View>
-                        <Text className="text-[9px] text-[#707070] font-bold mt-1">
-                          {distance}
-                        </Text>
+              {/* ROUTE INFO */}
+              <View style={{ flexDirection: 'row', alignItems: 'stretch' }}>
+                <View style={{ alignItems: 'center', marginRight: 16, width: 56 }}>
+                  <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>{ride.date?.split(' à ')[1] || '08:00'}</Text>
+                  <View style={{ width: 2, flex: 1, backgroundColor: '#E2E8F0', marginVertical: 8, position: 'relative', minHeight: 80 }}>
+                    <View style={{ position: 'absolute', top: -3, left: -3, width: 8, height: 8, borderRadius: 4, backgroundColor: '#2563EB', borderWidth: 1.5, borderColor: 'white' }} />
+                    <View style={{ position: 'absolute', top: '50%', transform: [{ translateY: -10 }] as any, left: -40, width: 80, alignItems: 'center' }}>
+                      <View style={{ backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                        <Text style={{ fontSize: 9, color: '#64748B', fontWeight: '800' }}>{duration}</Text>
                       </View>
-                      <View className="absolute -bottom-1 -left-[3px] w-2 h-2 rounded-full bg-red-500" />
                     </View>
+                    <View style={{ position: 'absolute', bottom: -3, left: -3, width: 8, height: 8, borderRadius: 4, backgroundColor: '#EF4444', borderWidth: 1.5, borderColor: 'white' }} />
+                  </View>
+                  <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>{arrivalTime}</Text>
+                </View>
 
-                    <Text className="text-lg font-black text-[#054752]">{arrivalTime}</Text>
+                <View style={{ flex: 1, justifyContent: 'space-between', paddingVertical: 2 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <View style={{ flex: 1, marginRight: 8 }}>
+                      <Text style={{ fontSize: 16, fontWeight: '800', color: '#0F172A' }}>{ride.departure}</Text>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>Départ</Text>
+                    </View>
+                    <TouchableOpacity 
+                      onPress={() => Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ride.departure)}`)}
+                      style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#EFF6FF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14 }}
+                    >
+                      <Ionicons name="navigate-outline" size={13} color="#2563EB" />
+                      <Text style={{ color: '#2563EB', fontWeight: '800', fontSize: 11, marginLeft: 4 }}>Itinéraire</Text>
+                    </TouchableOpacity>
                   </View>
 
-                  {/* Cities & Stops */}
-                  <View className="flex-1 justify-between py-2">
-                    <View className="flex-row justify-between items-start">
-                      <View>
-                        <Text className="text-[20px] font-black text-[#054752]">{ride.departure}</Text>
-                        <Text className="text-[#707070] text-xs font-bold uppercase tracking-wider mt-0.5">Départ</Text>
-                      </View>
-                      <TouchableOpacity 
-                        onPress={() => Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ride.departure)}`)}
-                        className="bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-full flex-row items-center hover:bg-slate-100 transition-colors"
-                      >
-                        <Ionicons name="navigate-outline" size={14} color="#054752" />
-                        <Text className="text-[#054752] font-black text-xs ml-1.5">Itinéraire</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {/* Escales */}
-                    {stopovers.length > 0 && (
-                      <View className="my-6 pl-2 border-l-2 border-dashed border-slate-200 space-y-3">
-                        <Text className="text-[#707070] text-[10px] font-extrabold uppercase tracking-widest mb-1">Arrêts intermédiaires</Text>
-                        {stopovers.map((stop: any, idx: number) => (
-                          <View key={idx} className="flex-row items-center justify-between bg-emerald-50/60 p-3 rounded-[12px] border border-emerald-100 max-w-md">
-                            <View className="flex-row items-center">
-                              <Ionicons name="location" size={14} color="#10B981" style={{ marginRight: 8 }} />
-                              <Text className="text-[#054752] font-bold text-sm">{stop.city}</Text>
-                            </View>
-                            <Text className="text-emerald-700 font-extrabold text-sm">{stop.price ? `${formatPrice(stop.price)} Ar` : 'Pas de tarif'}</Text>
+                  {/* STOPOVERS */}
+                  {stopovers.length > 0 && (
+                    <View style={{ marginVertical: 16, paddingLeft: 12, borderLeftWidth: 2, borderStyle: 'dashed', borderColor: '#E2E8F0', gap: 8 }}>
+                      <Text style={{ fontSize: 10, fontWeight: '800', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Arrêts intermédiaires</Text>
+                      {stopovers.map((stop: any, idx: number) => (
+                        <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F8FAFC', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Ionicons name="location" size={12} color="#10B981" style={{ marginRight: 6 }} />
+                            <Text style={{ fontSize: 13, fontWeight: '700', color: '#334155' }}>{stop.city}</Text>
                           </View>
-                        ))}
-                      </View>
-                    )}
+                          <Text style={{ fontSize: 13, fontWeight: '800', color: '#10B981' }}>{stop.price ? `${formatPrice(stop.price)} Ar` : 'Pas de tarif'}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
 
-                    <View className="mt-4">
-                      <Text className="text-[20px] font-black text-[#054752]">{ride.arrival}</Text>
-                      <Text className="text-[#707070] text-xs font-bold uppercase tracking-wider mt-0.5">Arrivée</Text>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: stopovers.length > 0 ? 0 : 20 }}>
+                    <View style={{ flex: 1, marginRight: 8 }}>
+                      <Text style={{ fontSize: 16, fontWeight: '800', color: '#0F172A' }}>{ride.arrival}</Text>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>Arrivée</Text>
                     </View>
                   </View>
                 </View>
               </View>
+            </View>
 
-              {/* CONDUCTEUR BIO BOX */}
-              <View className="bg-white rounded-[16px] p-8 border border-slate-200 shadow-sm">
-                <Text className="text-[#707070] font-bold uppercase tracking-widest text-[10px] mb-6">Votre Conducteur</Text>
-                
-                <TouchableOpacity 
-                  onPress={() => router.push(`/driver/${ride.driver_id || 'e534ec44-538e-4abc-b296-74afb216bf90'}?price=${ride.price}&ride_id=${ride.id}`)}
-                  className="flex-row items-center justify-between bg-slate-50/50 border border-slate-100 p-5 rounded-[12px] hover:bg-slate-50 transition-colors"
-                >
-                  <View className="flex-row items-center">
-                    <View className="w-16 h-16 rounded-full border border-slate-200 bg-white p-0.5 mr-4 relative shadow-sm">
-                      <Image 
-                        source={{ uri: ride.driver_avatar || 'https://ui-avatars.com/api/?name=' + ride.driver_name }} 
-                        className="w-full h-full rounded-full" 
-                      />
-                      <View className="absolute bottom-0.5 right-0.5 w-4.5 h-4.5 bg-green-500 rounded-full border-2 border-white shadow-xs" />
+            {/* DRIVER CARD */}
+            <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 2 }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>Votre Conducteur</Text>
+              
+              <TouchableOpacity 
+                onPress={() => router.push(`/driver/${ride.driver_id || 'e534ec44-538e-4abc-b296-74afb216bf90'}?price=${ride.price}&ride_id=${ride.id}`)}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0' }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ width: 56, height: 56, borderRadius: 28, overflow: 'hidden', marginRight: 16, borderWidth: 2, borderColor: '#DBEAFE', position: 'relative' }}>
+                    <Image 
+                      source={{ uri: ride.driver_avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(ride.driver_name) }} 
+                      style={{ width: '100%', height: '100%' } as any} 
+                    />
+                    <View style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: 6, backgroundColor: '#10B981', borderWidth: 2, borderColor: 'white' }} />
+                  </View>
+                  <View>
+                    <Text style={{ fontSize: 17, fontWeight: '900', color: '#0F172A' }}>{ride.driver_name}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                      <Ionicons name="star" size={14} color="#F59E0B" />
+                      <Text style={{ color: '#0F172A', fontSize: 13, fontWeight: '800', marginLeft: 4 }}>{driverProfile?.rating || '5.0'}</Text>
+                      <Text style={{ color: '#94A3B8', fontSize: 11, fontWeight: '700', marginLeft: 2 }}>/ 5</Text>
                       {driverProfile?.is_super_driver && (
-                        <View className="absolute -top-1 -right-1 bg-[#00AFF5] rounded-full p-1 border border-white">
-                          <Ionicons name="star" size={8} color="white" />
+                        <View style={{ backgroundColor: '#EFF6FF', borderWidth: 1, borderColor: '#DBEAFE', paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6, marginLeft: 8 }}>
+                          <Text style={{ color: '#2563EB', fontSize: 8, fontWeight: '900', textTransform: 'uppercase' }}>Super Driver</Text>
                         </View>
                       )}
                     </View>
-                    <View>
-                      <Text className="text-xl font-black text-[#054752]">{ride.driver_name}</Text>
-                      <View className="flex-row items-center mt-1">
-                        <Ionicons name="star" size={14} color="#F59E0B" />
-                        <Text className="text-[#054752] font-bold ml-1 text-sm">{driverProfile?.rating || '5.0'}</Text>
-                        <Text className="text-[#707070] ml-1 text-xs font-bold">/ 5</Text>
-                        {driverProfile?.is_super_driver && (
-                          <View className="bg-blue-50 border border-blue-100 px-2 py-0.5 rounded ml-3">
-                            <Text className="text-[#00AFF5] text-[9px] font-black uppercase tracking-wider">
-                              Super Driver
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                    </View>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
-                </TouchableOpacity>
-
-                {driverProfile?.bio && (
-                  <View className="bg-slate-50 border border-slate-100 p-5 rounded-[12px] mt-6">
-                    <Text className="text-[#054752] leading-relaxed text-[15px] italic">"{driverProfile.bio}"</Text>
-                  </View>
-                )}
-              </View>
-
-              {/* VÉHICULE & ÉQUIPEMENTS */}
-              <View className="bg-white rounded-[16px] p-8 border border-slate-200 shadow-sm">
-                <Text className="text-[#707070] font-bold uppercase tracking-widest text-[10px] mb-6">Le Véhicule & Équipements</Text>
-                
-                <View className="flex-row items-center mb-6">
-                  <View className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-[12px] items-center justify-center mr-4 shadow-xs">
-                    <Ionicons name={ride.is_moto ? "bicycle" : "car"} size={22} color="#00AFF5" />
-                  </View>
-                  <View>
-                    <Text className="text-lg font-black text-[#054752]">{ride.vehicle_brand || ride.vehicle_type}</Text>
-                    <Text className="text-[#707070] font-bold text-xs uppercase tracking-wider mt-0.5">{ride.vehicle_type}</Text>
                   </View>
                 </View>
-
-                {ride.vehicle_photo && (
-                  <TouchableOpacity onPress={() => setIsPhotoVisible(true)} className="w-full h-64 rounded-[16px] overflow-hidden mb-6 border border-slate-200 relative group">
-                    <Image source={{ uri: ride.vehicle_photo }} className="w-full h-full group-hover:scale-105 transition-transform duration-300" resizeMode="cover" />
-                    <View className="absolute bottom-4 right-4 bg-black/60 px-4 py-2 rounded-full flex-row items-center shadow-md">
-                      <Ionicons name="expand" size={14} color="white" />
-                      <Text className="text-white text-[10px] font-black uppercase tracking-wider ml-1.5">Agrandir la photo</Text>
-                    </View>
-                  </TouchableOpacity>
-                )}
-
-                <View className="flex-row flex-wrap mt-2 gap-2.5">
-                  {/* Fumeur */}
-                  {ride.allows_smoking ? (
-                    <View className="bg-emerald-50 px-3.5 py-2 rounded-full flex-row items-center border border-emerald-100">
-                      <Ionicons name="logo-no-smoking" size={14} color="#10B981" />
-                      <Text className="text-emerald-700 text-xs font-bold ml-2">Fumeur OK</Text>
-                    </View>
-                  ) : (
-                    <View className="bg-rose-50 px-3.5 py-2 rounded-full flex-row items-center border border-rose-100">
-                      <Ionicons name="logo-no-smoking" size={14} color="#EF4444" />
-                      <Text className="text-rose-700 text-xs font-bold ml-2">Non-fumeur</Text>
-                    </View>
-                  )}
-
-                  {/* Animaux */}
-                  {ride.allows_pets && (
-                    <View className="bg-amber-50 px-3.5 py-2 rounded-full flex-row items-center border border-amber-100">
-                      <Ionicons name="paw" size={14} color="#F97316" />
-                      <Text className="text-amber-700 text-xs font-bold ml-2">Animaux bienvenus</Text>
-                    </View>
-                  )}
-
-                  {/* Climatisation */}
-                  {ride.air_conditioning && (
-                    <View className="bg-sky-50 px-3.5 py-2 rounded-full flex-row items-center border border-sky-100">
-                      <Ionicons name="snow" size={14} color="#00AFF5" />
-                      <Text className="text-sky-700 text-xs font-bold ml-2">Climatisé</Text>
-                    </View>
-                  )}
-
-                  {/* Max 2 à l'arrière */}
-                  {ride.max_2_back && (
-                    <View className="bg-purple-50 px-3.5 py-2 rounded-full flex-row items-center border border-purple-100">
-                      <Ionicons name="people" size={14} color="#8B5CF6" />
-                      <Text className="text-purple-700 text-xs font-bold ml-2">Max. 2 à l'arrière</Text>
-                    </View>
-                  )}
-
-                  {/* Sièges inclinables */}
-                  {ride.reclining_seats && (
-                    <View className="bg-indigo-50 px-3.5 py-2 rounded-full flex-row items-center border border-indigo-100">
-                      <Ionicons name="bed" size={14} color="#6366F1" />
-                      <Text className="text-indigo-700 text-xs font-bold ml-2">Sièges inclinables</Text>
-                    </View>
-                  )}
-
-                  {/* Prises électriques */}
-                  {ride.power_outlets && (
-                    <View className="bg-yellow-50 px-3.5 py-2 rounded-full flex-row items-center border border-yellow-100">
-                      <Ionicons name="power" size={14} color="#EAB308" />
-                      <Text className="text-yellow-700 text-xs font-bold ml-2">Prises électriques</Text>
-                    </View>
-                  )}
-
-                  {/* Toilettes */}
-                  {ride.toilet && (
-                    <View className="bg-cyan-50 px-3.5 py-2 rounded-full flex-row items-center border border-cyan-100">
-                      <Ionicons name="water" size={14} color="#06B6D4" />
-                      <Text className="text-cyan-700 text-xs font-bold ml-2">Toilettes à bord</Text>
-                    </View>
-                  )}
-
-                  {/* Réservation instantanée */}
-                  {ride.instant_booking && (
-                    <View className="bg-pink-50 px-3.5 py-2 rounded-full flex-row items-center border border-pink-100">
-                      <Ionicons name="flash" size={14} color="#EC4899" />
-                      <Text className="text-pink-700 text-xs font-bold ml-2">Instantané</Text>
-                    </View>
-                  )}
-
-                  {/* Bagages */}
-                  <View className="bg-blue-600 px-3.5 py-2 rounded-full flex-row items-center shadow-xs">
-                    <Ionicons name="briefcase" size={14} color="white" />
-                    <Text className="text-white text-xs font-black ml-2 uppercase">Bagages: {ride.baggage_size || 'Moyen'}</Text>
-                  </View>
-
-                  {/* Galerie */}
-                  {ride.has_roof_rack && (
-                    <View className="bg-blue-50 px-3.5 py-2 rounded-full flex-row items-center border border-blue-100">
-                      <Ionicons name="layers" size={15} color="#2563EB" />
-                      <Text className="text-blue-700 text-xs font-bold ml-2">Galerie de toit</Text>
-                    </View>
-                  )}
-                </View>
-              </View>
-
-            </View>
-
-            {/* COLONNE DROITE (35% - STICKY RESERVATION CARD) */}
-            <View className="flex-[1] min-w-[340px]">
-              <View className="bg-white rounded-[16px] p-7 border border-slate-200 shadow-sm sticky top-24 self-start space-y-6">
-                
-                {/* Driver management tools */}
-                {currentUserId === ride.driver_id ? (
-                  <View className="space-y-4">
-                    <Text className="text-[#054752] font-black text-xl tracking-tight">Votre Annonce</Text>
-                    
-                    <View className="bg-slate-50 border border-slate-200 rounded-[12px] p-4">
-                      <Text className="text-[#707070] font-bold text-xs uppercase mb-3 text-center">Ajuster les places restantes</Text>
-                      <View className="flex-row justify-center items-center gap-4 bg-white p-2 rounded-[8px] border border-slate-200">
-                        <TouchableOpacity 
-                          onPress={() => handleUpdateSeats(Math.max(0, ride.seats - 1))}
-                          disabled={ride.seats <= 0}
-                          className={`w-10 h-10 rounded-full items-center justify-center transition-colors ${ride.seats <= 0 ? 'bg-slate-100' : 'bg-rose-50 hover:bg-rose-100'}`}
-                        >
-                          <Ionicons name="remove" size={18} color={ride.seats <= 0 ? '#9CA3AF' : '#EF4444'} />
-                        </TouchableOpacity>
-                        <Text className="text-xl font-black text-[#054752] w-12 text-center">{ride.seats}</Text>
-                        <TouchableOpacity 
-                          onPress={() => handleUpdateSeats(ride.seats + 1)}
-                          className="w-10 h-10 rounded-full bg-emerald-50 hover:bg-emerald-100 items-center justify-center transition-colors"
-                        >
-                          <Ionicons name="add" size={18} color="#10B981" />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-
-                    <TouchableOpacity 
-                      onPress={handleDeleteRide} 
-                      className="w-full bg-rose-50 border border-rose-200 py-3.5 rounded-full flex-row items-center justify-center hover:bg-rose-100 transition-colors"
-                    >
-                      <Ionicons name="trash-outline" size={18} color="#DC2626" />
-                      <Text className="text-rose-600 font-extrabold text-sm ml-2">Supprimer le trajet</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  // Passenger flow
-                  <View className="space-y-6">
-                    <View className="flex-row justify-between items-center">
-                      <View>
-                        <Text className="text-[#707070] font-bold text-xs uppercase">Prix du trajet</Text>
-                        <Text className="text-[32px] font-black text-[#054752]">{formatPrice(ride.price)} Ar</Text>
-                      </View>
-                      <View className={`px-3 py-1.5 rounded-full ${ride.seats <= 0 ? 'bg-rose-50 border border-rose-100' : 'bg-blue-50 border border-blue-100'}`}>
-                        <Text className={`text-[10px] font-extrabold uppercase tracking-wider ${ride.seats <= 0 ? 'text-rose-600' : 'text-[#00AFF5]'}`}>
-                          {ride.seats <= 0 ? 'Complet' : `${ride.seats} places dispo`}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <View className="h-[1px] bg-slate-100" />
-
-                    {isUnlocked ? (
-                      <View className="space-y-4">
-                        <View className="bg-emerald-50 border border-emerald-100 rounded-[12px] p-5">
-                          <Text className="text-emerald-800 font-black text-center text-sm uppercase tracking-wider mb-2">Contact Chauffeur déverrouillé</Text>
-                          <Text className="text-emerald-900 font-black text-center text-2xl tracking-tight selection:bg-emerald-200">{driverProfile?.phone || 'Non dispo'}</Text>
-                          <Text className="text-emerald-600 text-[11px] font-bold text-center mt-2 leading-relaxed">Paiement Mobile Money validé ! Vous pouvez le contacter directement.</Text>
-                        </View>
-
-                        <View className="flex-row gap-3">
-                          <TouchableOpacity 
-                            className="flex-1 bg-emerald-500 hover:bg-emerald-600 py-3.5 rounded-full items-center justify-center flex-row shadow-sm transition-colors"
-                            onPress={() => Linking.openURL(`tel:${driverProfile?.phone}`)}
-                          >
-                            <Ionicons name="call" size={16} color="white" />
-                            <Text className="text-white font-extrabold text-xs uppercase tracking-wider ml-2">Appeler</Text>
-                          </TouchableOpacity>
-                          
-                          <TouchableOpacity 
-                            className="flex-1 bg-[#00AFF5] hover:bg-[#0096D1] py-3.5 rounded-full items-center justify-center flex-row shadow-sm transition-colors"
-                            onPress={() => Linking.openURL(`sms:${driverProfile?.phone}`)}
-                          >
-                            <Ionicons name="chatbubble-ellipses" size={16} color="white" />
-                            <Text className="text-white font-extrabold text-xs uppercase tracking-wider ml-2">Envoyer SMS</Text>
-                          </TouchableOpacity>
-                        </View>
-
-                        <TouchableOpacity 
-                          onPress={() => router.push({
-                            pathname: "/chat/[id]",
-                            params: { id: ride.id, other_id: ride.driver_id, other_name: driverProfile?.full_name || 'Conducteur' }
-                          } as any)}
-                          className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 py-3 rounded-full flex-row items-center justify-center transition-colors"
-                        >
-                          <Ionicons name="chatbubbles" size={16} color="#054752" />
-                          <Text className="text-[#054752] font-black text-xs ml-2 uppercase tracking-wider">Chat direct Miara-Dia</Text>
-                        </TouchableOpacity>
-                      </View>
-                    ) : isPendingVerification ? (
-                      <View className="bg-amber-50 border border-amber-100 rounded-[12px] p-5 space-y-3">
-                        <View className="flex-row items-center justify-center">
-                          <Ionicons name="time" size={20} color="#F97316" />
-                          <Text className="text-amber-800 font-extrabold text-sm ml-2 uppercase tracking-wider">Vérification en cours</Text>
-                        </View>
-                        <Text className="text-amber-600 text-xs text-center leading-relaxed font-bold">
-                          L'administrateur confirme actuellement votre dépôt. Vous recevrez un SMS de validation sous peu.
-                        </Text>
-                      </View>
-                    ) : (
-                      <View className="space-y-4">
-                        <View className="bg-slate-50 border border-slate-100 rounded-[12px] p-4 flex-row items-start">
-                          <Ionicons name="shield-checkmark" size={16} color="#00AFF5" style={{ marginTop: 2, marginRight: 10 }} />
-                          <Text className="text-slate-500 text-xs leading-relaxed font-bold flex-1">
-                            Coordonnées protégées. Un dépôt de <Text className="text-[#054752] font-extrabold">{formatPrice(fee)} Ar</Text> (10% de frais de mise en relation) est requis pour déverrouiller le contact.
-                          </Text>
-                        </View>
-
-                        <TouchableOpacity 
-                          className={`w-full py-4 rounded-full flex-row items-center justify-center transition-colors shadow-xs ${
-                            ride.seats <= 0 
-                              ? 'bg-slate-200 border border-slate-300' 
-                              : 'bg-[#00AFF5] hover:bg-[#0096D1]'
-                          }`}
-                          onPress={handleBooking}
-                          disabled={ride.seats <= 0}
-                        >
-                          <Ionicons name={ride.seats <= 0 ? "close-circle" : "lock-open-outline"} size={16} color="white" />
-                          <Text className="text-white font-extrabold text-xs uppercase tracking-widest ml-2">
-                            {ride.seats <= 0 ? 'Trajet Complet' : `Réserver & déverrouiller`}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    )}
-
-                  </View>
-                )}
-
-              </View>
-            </View>
-
-          </View>
-        </ScrollView>
-
-        {/* payment and full image modals (same props as mobile) */}
-        <PaymentModal
-          isVisible={isPaymentModalVisible}
-          onClose={() => setIsPaymentModalVisible(false)}
-          onSelectMethod={handleConfirmPayment}
-          amount={calculateUnlockFee(ride.price)}
-          loading={paymentLoading}
-        />
-
-        <Modal visible={isPhotoVisible} transparent animationType="fade">
-          <View className="flex-1 bg-black/95 items-center justify-center">
-            <TouchableOpacity 
-              onPress={() => setIsPhotoVisible(false)}
-              className="absolute top-12 right-6 w-12 h-12 bg-white/10 rounded-full items-center justify-center z-10"
-            >
-              <Ionicons name="close" size={30} color="white" />
-            </TouchableOpacity>
-            <Image source={{ uri: ride.vehicle_photo }} className="w-3/4 h-3/4" resizeMode="contain" />
-          </View>
-        </Modal>
-      </View>
-    );
-  };
-
-  if (isDesktop) {
-    return renderDesktopView();
-  }
-
-  return (
-    <View className="flex-1 bg-gray-50 pt-14">
-      <StatusBar style="dark" />
-      
-      {/* Header */}
-      <View className="flex-row items-center px-6 pb-4 pt-2 bg-white border-b border-gray-100 z-10">
-        <TouchableOpacity onPress={handleBack} className="w-10 h-10 items-center justify-center mr-2 -ml-2">
-          <Ionicons name="arrow-back" size={28} color="#2563EB" />
-        </TouchableOpacity>
-        <Text className="text-xl font-bold text-gray-900 ml-2">{ride.date?.split(' à ')[0] || ride.date || 'Date inconnue'}</Text>
-      </View>
-
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        
-        {/* EN-TÊTE : DEPART ET ARRIVÉE */}
-        <View className="bg-white px-6 py-8 border-b border-gray-100 shadow-sm z-10">
-          <View className="flex-row items-center justify-between mb-8 mt-4">
-            <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center">
-              <Ionicons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
-            <View className="bg-blue-50 px-4 py-1.5 rounded-full">
-              <Text className="text-blue-600 font-black text-xs uppercase">{ride.date}</Text>
-            </View>
-          </View>
-
-          {/* Siège Gestion Chauffeur */}
-          {currentUserId === ride.driver_id && (
-            <View className="bg-gray-50 rounded-[24px] p-5 mb-6 border border-gray-100">
-              <Text className="text-gray-900 font-bold mb-4">Gestion de votre annonce</Text>
-              <View className="flex-row justify-between items-center bg-white p-2 rounded-2xl shadow-sm mb-3">
-                <Text className="text-gray-600 font-bold px-3">Places disponibles</Text>
-                <View className="flex-row items-center">
-                  <TouchableOpacity 
-                    onPress={() => handleUpdateSeats(Math.max(0, ride.seats - 1))}
-                    disabled={ride.seats <= 0}
-                    className={`w-10 h-10 rounded-full items-center justify-center ${ride.seats <= 0 ? 'bg-gray-100' : 'bg-red-50'}`}
-                  >
-                    <Ionicons name="remove" size={20} color={ride.seats <= 0 ? '#9CA3AF' : '#EF4444'} />
-                  </TouchableOpacity>
-                  <Text className="text-xl font-black w-10 text-center">{ride.seats}</Text>
-                  <TouchableOpacity 
-                    onPress={() => handleUpdateSeats(ride.seats + 1)}
-                    className="w-10 h-10 rounded-full bg-green-50 items-center justify-center"
-                  >
-                    <Ionicons name="add" size={20} color="#10B981" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <TouchableOpacity onPress={handleDeleteRide} className="flex-row items-center justify-center bg-red-100 py-3 rounded-2xl">
-                <Ionicons name="trash-outline" size={18} color="#DC2626" />
-                <Text className="text-red-600 font-bold ml-2">Supprimer le trajet</Text>
+                <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
               </TouchableOpacity>
-            </View>
-          )}
 
-          {/* Itinéraire complet */}
-          {delayAlert && (
-            <View className="bg-red-50 p-3 rounded-xl mb-6 flex-row items-center border border-red-100">
-              <Ionicons name="warning" size={20} color="#EF4444" style={{ marginRight: 8 }} />
-              <Text className="text-red-700 font-bold text-xs">{delayAlert}</Text>
-            </View>
-          )}
-
-          {/* ALERT BAC / FERRY */}
-          {(ride.departure.includes('(Bac)') || ride.arrival.includes('(Bac)') || stopovers.some((s: any) => s.city.includes('(Bac)'))) && (
-            <View className="bg-orange-50 p-4 rounded-[24px] mb-6 flex-row items-center border border-orange-100">
-              <View className="w-10 h-10 bg-orange-100 rounded-full items-center justify-center mr-3">
-                <MaterialCommunityIcons name="ferry" size={24} color="#F59E0B" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-orange-900 font-bold">Traversée par Bac</Text>
-                <Text className="text-orange-600 text-xs">Ce trajet inclut un passage sur transbordeur.</Text>
-              </View>
-            </View>
-          )}
-          <View className="flex-row">
-            {/* Barre de temps et ligne */}
-            <View className="items-center mr-4 w-12">
-              <Text className="font-black text-gray-900">{ride.date?.split(' à ')[1] || '08:00'}</Text>
-              <View className="w-[2px] flex-1 bg-blue-100 my-2 relative">
-                <View className="absolute top-0 -left-1 w-3 h-3 rounded-full bg-blue-600 border-2 border-white" />
-                <View className="absolute top-1/2 -left-16 w-32 items-center">
-                   <View className="bg-green-100 px-2 py-0.5 rounded-full border border-green-200">
-                      <Text className="text-[9px] text-green-700 font-black">{duration} • {distance}</Text>
-                   </View>
-                </View>
-                <View className="absolute bottom-0 -left-1 w-3 h-3 rounded-full bg-red-600 border-2 border-white" />
-              </View>
-              <Text className="font-black text-gray-900">{arrivalTime}</Text>
-            </View>
-
-            {/* Villes et Escales */}
-            <View className="flex-1">
-              <View className="mb-6 flex-row items-center justify-between">
-                <View>
-                  <Text className="text-xl font-black text-gray-900">{ride.departure}</Text>
-                  <Text className="text-gray-400 text-xs">Point de départ</Text>
-                </View>
-                <TouchableOpacity 
-                  onPress={() => {
-                    const url = `https://www.google.com/maps/dir/?api=1&destination=${ride.departure}`;
-                    Linking.openURL(url);
-                  }}
-                  className="bg-blue-50 px-4 py-2 rounded-full flex-row items-center border border-blue-100"
-                >
-                  <Ionicons name="navigate" size={16} color="#2563EB" />
-                  <Text className="text-blue-600 font-bold text-xs ml-2">Itinéraire</Text>
-                </TouchableOpacity>
-              </View>
-
-              {stopovers.map((stop: any, idx: number) => (
-                <View key={idx} className="mb-6 flex-row items-center justify-between bg-green-50/50 p-3 rounded-xl border border-green-100">
-                  <View className="flex-row items-center">
-                    <Ionicons name="location" size={16} color="#10B981" style={{ marginRight: 8 }} />
-                    <Text className="text-gray-900 font-bold">{stop.city}</Text>
-                  </View>
-                  <Text className="text-green-600 font-black">{stop.price ? `${formatPrice(stop.price)} Ar` : 'Pas de tarif'}</Text>
-                </View>
-              ))}
-
-              <View>
-                <Text className="text-xl font-black text-gray-900">{ride.arrival}</Text>
-                <Text className="text-gray-400 text-xs">Destination finale</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* Prix Total */}
-        <View className="bg-white px-6 py-6 flex-row justify-between items-center mb-2 border-t border-gray-50">
-          <Text className="text-gray-500 font-bold text-lg">Trajet complet</Text>
-          <Text className="text-3xl font-black text-blue-600">{formatPrice(ride.price || 0)} Ar</Text>
-        </View>
-
-        {/* Chauffeur */}
-        <View className="bg-white px-6 py-6 mb-2">
-          <Text className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-4">Votre Conducteur</Text>
-          <TouchableOpacity 
-            onPress={() => router.push(`/driver/${ride.driver_id || 'e534ec44-538e-4abc-b296-74afb216bf90'}?price=${ride.price}&ride_id=${ride.id}`)}
-            className="flex-row items-center"
-          >
-            <View className="w-16 h-16 rounded-full border-2 border-blue-500 p-0.5 mr-4 relative">
-              <Image 
-                source={{ uri: ride.driver_avatar || 'https://ui-avatars.com/api/?name=' + ride.driver_name }} 
-                className="w-full h-full rounded-full" 
-              />
-              {/* Point vert 'En ligne' */}
-              <View className="absolute bottom-0.5 right-0.5 w-4.5 h-4.5 bg-green-500 rounded-full border-2 border-white shadow-sm" />
-              {driverProfile?.is_super_driver && (
-                <View className="absolute -top-1 -right-1 bg-blue-600 rounded-full p-1 border-2 border-white">
-                  <Ionicons name="star" size={10} color="white" />
+              {driverProfile?.bio && (
+                <View style={{ backgroundColor: '#F8FAFC', padding: 16, borderRadius: 16, marginTop: 16, borderWidth: 1, borderColor: '#E2E8F0', borderStyle: 'italic' } as any}>
+                  <Text style={{ color: '#475569', fontSize: 14, fontStyle: 'italic', lineHeight: 20 }}>"{driverProfile.bio}"</Text>
                 </View>
               )}
             </View>
-            <View className="flex-1">
-              <Text className="text-xl font-black text-gray-900">{ride.driver_name}</Text>
-              <View className="flex-row items-center mt-1">
-                <Ionicons name="star" size={16} color="#F59E0B" />
-                <Text className="text-gray-900 font-bold ml-1">{driverProfile?.rating || '5.0'}</Text>
-                <Text className="text-gray-400 ml-1 font-medium">/ 5</Text>
+
+            {/* VEHICLE & EQUIPMENTS CARD */}
+            <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 2 }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>Le Véhicule & Équipements</Text>
+              
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                  <Ionicons name={ride.is_moto ? "bicycle" : "car"} size={22} color="#2563EB" />
+                </View>
+                <View>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#0F172A' }}>{ride.vehicle_brand || ride.vehicle_type}</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#94A3B8', textTransform: 'uppercase', marginTop: 2 }}>{ride.vehicle_type}</Text>
+                </View>
+              </View>
+
+              {ride.vehicle_photo && (
+                <TouchableOpacity onPress={() => setIsPhotoVisible(true)} style={{ width: '100%', height: 200, borderRadius: 16, overflow: 'hidden', marginBottom: 16, borderWidth: 1, borderColor: '#E2E8F0', position: 'relative' }}>
+                  <Image source={{ uri: ride.vehicle_photo }} style={{ width: '100%', height: '100%' } as any} resizeMode="cover" />
+                  <View style={{ position: 'absolute', bottom: 12, right: 12, backgroundColor: 'rgba(0,0,0,0.7)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, flexDirection: 'row', alignItems: 'center' }}>
+                    <Ionicons name="expand" size={12} color="white" />
+                    <Text style={{ color: 'white', fontSize: 10, fontWeight: '900', textTransform: 'uppercase', marginLeft: 6 }}>Agrandir</Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {ride.allows_smoking ? (
+                  <View style={{ backgroundColor: '#ECFDF5', px: 12, py: 6, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#A7F3D0', paddingHorizontal: 12, paddingVertical: 6 } as any}>
+                    <Ionicons name="logo-no-smoking" size={13} color="#059669" />
+                    <Text style={{ color: '#047857', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>Fumeur OK</Text>
+                  </View>
+                ) : (
+                  <View style={{ backgroundColor: '#FEF2F2', px: 12, py: 6, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#FCA5A5', paddingHorizontal: 12, paddingVertical: 6 } as any}>
+                    <Ionicons name="logo-no-smoking" size={13} color="#DC2626" />
+                    <Text style={{ color: '#B91C1C', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>Non-fumeur</Text>
+                  </View>
+                )}
+
+                {ride.allows_pets && (
+                  <View style={{ backgroundColor: '#FFFBEB', px: 12, py: 6, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#FDE68A', paddingHorizontal: 12, paddingVertical: 6 } as any}>
+                    <Ionicons name="paw" size={13} color="#D97706" />
+                    <Text style={{ color: '#B45309', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>Animaux acceptés</Text>
+                  </View>
+                )}
+
+                {ride.air_conditioning && (
+                  <View style={{ backgroundColor: '#EFF6FF', px: 12, py: 6, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#BFDBFE', paddingHorizontal: 12, paddingVertical: 6 } as any}>
+                    <Ionicons name="snow" size={13} color="#2563EB" />
+                    <Text style={{ color: '#1D4ED8', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>Climatisé</Text>
+                  </View>
+                )}
+
+                {ride.max_2_back && (
+                  <View style={{ backgroundColor: '#F5F3FF', px: 12, py: 6, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#DDD6FE', paddingHorizontal: 12, paddingVertical: 6 } as any}>
+                    <Ionicons name="people" size={13} color="#7C3AED" />
+                    <Text style={{ color: '#6D28D9', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>Max. 2 à l'arrière</Text>
+                  </View>
+                )}
+
+                {ride.reclining_seats && (
+                  <View style={{ backgroundColor: '#EEF2F6', px: 12, py: 6, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#E2E8F0', paddingHorizontal: 12, paddingVertical: 6 } as any}>
+                    <Ionicons name="bed" size={13} color="#475569" />
+                    <Text style={{ color: '#334155', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>Sièges inclinables</Text>
+                  </View>
+                )}
+
+                {ride.power_outlets && (
+                  <View style={{ backgroundColor: '#FFFDF2', px: 12, py: 6, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#FEF08A', paddingHorizontal: 12, paddingVertical: 6 } as any}>
+                    <Ionicons name="power" size={13} color="#CA8A04" />
+                    <Text style={{ color: '#A16207', fontSize: 12, fontWeight: '800', marginLeft: 6 }}>Prises électriques</Text>
+                  </View>
+                )}
+
+                <View style={{ backgroundColor: '#2563EB', px: 12, py: 6, borderRadius: 16, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6 } as any}>
+                  <Ionicons name="briefcase" size={13} color="white" />
+                  <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', marginLeft: 6, textTransform: 'uppercase' }}>Bagages: {ride.baggage_size || 'Moyen'}</Text>
+                </View>
               </View>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#D1D5DB" />
-          </TouchableOpacity>
-          
-          {/* Section Contact Verrouillée / Déverrouillée */}
-          <View className="mt-6">
-            {!isUnlocked ? (
-              <View className={`border rounded-3xl p-6 items-center ${isPendingVerification ? 'bg-orange-50 border-orange-100' : 'bg-blue-50/50 border-blue-100'}`}>
-                <View className={`w-12 h-12 rounded-full items-center justify-center mb-3 ${isPendingVerification ? 'bg-orange-100' : 'bg-blue-100'}`}>
-                  <Ionicons name={isPendingVerification ? "time" : "lock-closed"} size={24} color={isPendingVerification ? "#F59E0B" : "#2563EB"} />
-                </View>
-                <Text className={`font-bold text-center mb-2 ${isPendingVerification ? 'text-orange-900' : 'text-blue-900'}`}>
-                  {isPendingVerification ? "Vérification en cours" : "Coordonnées masquées"}
-                </Text>
-                <Text className={`text-xs text-center px-4 ${isPendingVerification ? 'text-orange-600/70' : 'text-blue-600/70'}`}>
-                  {isPendingVerification 
-                    ? "L'administrateur vérifie votre dépôt au kiosque. Cela prend généralement quelques minutes." 
-                    : "Déverrouillez le contact pour appeler le chauffeur et confirmer votre départ."}
-                </Text>
-              </View>
-            ) : (
-              <View className="bg-green-50 border border-green-100 rounded-3xl p-6">
-                <View className="flex-row items-center justify-between mb-4">
-                  <View>
-                    <Text className="text-green-800 font-black text-xl">{driverProfile?.phone || 'Numéro indisponible'}</Text>
-                    <Text className="text-green-600 text-xs font-bold">Contact déverrouillé</Text>
+
+          </View>
+
+          {/* COLUMN RIGHT - BOOKING ACTIONS (35% on Desktop) */}
+          <View style={{ flex: 1, minWidth: isDesktop ? 320 : '100%' }}>
+            <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 2, gap: 20 }}>
+              
+              {currentUserId === ride.driver_id ? (
+                // DRIVER CONTROLS
+                <View style={{ gap: 16 }}>
+                  <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Votre Annonce</Text>
+                  
+                  <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                    <Text style={{ color: '#64748B', fontWeight: '800', fontSize: 11, uppercase: true, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'center', marginBottom: 12 } as any}>Places restantes</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16, backgroundColor: 'white', padding: 8, borderRadius: 12, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                      <TouchableOpacity 
+                        onPress={() => handleUpdateSeats(Math.max(0, ride.seats - 1))}
+                        disabled={ride.seats <= 0}
+                        style={{ width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: ride.seats <= 0 ? '#F1F5F9' : '#FEF2F2' }}
+                      >
+                        <Ionicons name="remove" size={18} color={ride.seats <= 0 ? '#94A3B8' : '#EF4444'} />
+                      </TouchableOpacity>
+                      <Text style={{ fontSize: 20, fontWeight: '900', color: '#0F172A', width: 40, textAlign: 'center' }}>{ride.seats}</Text>
+                      <TouchableOpacity 
+                        onPress={() => handleUpdateSeats(ride.seats + 1)}
+                        style={{ width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: '#ECFDF5' }}
+                      >
+                        <Ionicons name="add" size={18} color="#10B981" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
+
                   <TouchableOpacity 
-                    className="w-12 h-12 bg-green-500 rounded-full items-center justify-center shadow-lg shadow-green-200"
-                    onPress={() => CustomAlert.alert("Appel", `Appel vers ${driverProfile?.phone}...`)}
+                    onPress={handleDeleteRide}
+                    style={{ width: '100%', backgroundColor: '#FEF2F2', borderWidth: 1, borderColor: '#FEE2E2', paddingVertical: 14, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <Ionicons name="call" size={24} color="white" />
+                    <Ionicons name="trash-outline" size={16} color="#EF4444" />
+                    <Text style={{ color: '#EF4444', fontWeight: '800', fontSize: 13, marginLeft: 8, textTransform: 'uppercase' }}>Supprimer le trajet</Text>
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity 
-                  className="flex-row items-center justify-center bg-white py-3 rounded-2xl border border-green-100"
-                  onPress={() => CustomAlert.alert("SMS", `Ouverture de la messagerie...`)}
-                >
-                  <Ionicons name="chatbubble-ellipses" size={20} color="#10B981" />
-                  <Text className="text-green-600 font-bold ml-2">Envoyer un SMS</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-          
-          {driverProfile?.bio && (
-            <View className="bg-gray-50 p-4 rounded-2xl mt-4">
-              <Text className="text-gray-600 italic">"{driverProfile.bio}"</Text>
-            </View>
-          )}
-        </View>
+              ) : (
+                // PASSENGER ACTIONS
+                <View style={{ gap: 20 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View>
+                      <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 11, textTransform: 'uppercase' }}>Tarif Trajet</Text>
+                      <Text style={{ fontSize: 26, fontWeight: '900', color: '#0F172A', marginTop: 2 }}>{formatPrice(ride.price)} Ar</Text>
+                    </View>
+                    <View style={{ backgroundColor: ride.seats <= 0 ? '#FEF2F2' : '#EFF6FF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 }}>
+                      <Text style={{ fontSize: 10, fontWeight: '900', textTransform: 'uppercase', color: ride.seats <= 0 ? '#EF4444' : '#2563EB' }}>
+                        {ride.seats <= 0 ? 'Complet' : `${ride.seats} dispo`}
+                      </Text>
+                    </View>
+                  </View>
 
-        {/* Véhicule */}
-        <View className="bg-white px-6 py-6 mb-2">
-          <Text className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-4">Le Véhicule</Text>
-          <View className="flex-row items-center mb-4">
-            <View className="w-12 h-12 bg-blue-50 rounded-2xl items-center justify-center mr-4">
-              <Ionicons name={ride.is_moto ? "bicycle" : "car"} size={24} color="#2563EB" />
-            </View>
-            <View>
-              <Text className="text-lg font-bold text-gray-900">{ride.vehicle_brand || ride.vehicle_type}</Text>
-              <Text className="text-gray-500">{ride.vehicle_type}</Text>
-            </View>
-          </View>
+                  <View style={{ height: 1, backgroundColor: '#F1F5F9' }} />
 
-          {ride.vehicle_photo && (
-            <TouchableOpacity onPress={() => setIsPhotoVisible(true)} className="w-full h-48 rounded-3xl overflow-hidden mb-4">
-              <Image source={{ uri: ride.vehicle_photo }} className="w-full h-full" resizeMode="cover" />
-              <View className="absolute bottom-3 right-3 bg-black/50 px-3 py-1 rounded-full flex-row items-center">
-                <Ionicons name="expand" size={14} color="white" />
-                <Text className="text-white text-[10px] font-bold ml-1">Agrandir</Text>
-              </View>
-            </TouchableOpacity>
-          )}
+                  {isUnlocked ? (
+                    <View style={{ gap: 12 }}>
+                      <View style={{ backgroundColor: '#ECFDF5', borderWidth: 1, borderColor: '#A7F3D0', borderRadius: 16, padding: 16 }}>
+                        <Text style={{ color: '#047857', fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'center', marginBottom: 6 }}>Contact Déverrouillé</Text>
+                        <Text style={{ color: '#065F46', fontWeight: '900', fontSize: 20, textAlign: 'center', letterSpacing: 0.5 }}>{driverProfile?.phone || 'Non disponible'}</Text>
+                        <Text style={{ color: '#047857', fontSize: 10, fontWeight: '700', textAlign: 'center', marginTop: 8, lineHeight: 14 }}>Réservation validée ! Vous pouvez appeler ou envoyer un SMS.</Text>
+                      </View>
 
-          <View className="flex-row flex-wrap mt-2">
-            
-            {/* Fumeur */}
-            {ride.allows_smoking ? (
-              <View className="bg-green-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-green-100">
-                <Ionicons name="logo-no-smoking" size={14} color="#10B981" />
-                <Text className="text-green-700 text-xs font-bold ml-2">Fumeur OK</Text>
-              </View>
-            ) : (
-              <View className="bg-red-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-red-100">
-                <Ionicons name="logo-no-smoking" size={14} color="#EF4444" />
-                <Text className="text-red-700 text-xs font-bold ml-2">Non-fumeur</Text>
-              </View>
-            )}
+                      <View style={{ flexDirection: 'row', gap: 10 }}>
+                        <TouchableOpacity 
+                          onPress={() => Linking.openURL(`tel:${driverProfile?.phone}`)}
+                          style={{ flex: 1, backgroundColor: '#10B981', paddingVertical: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <Ionicons name="call" size={14} color="white" />
+                          <Text style={{ color: 'white', fontWeight: '800', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>Appeler</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          onPress={() => Linking.openURL(`sms:${driverProfile?.phone}`)}
+                          style={{ flex: 1, backgroundColor: '#2563EB', paddingVertical: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <Ionicons name="chatbubble-ellipses" size={14} color="white" />
+                          <Text style={{ color: 'white', fontWeight: '800', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>SMS</Text>
+                        </TouchableOpacity>
+                      </View>
 
-            {/* Animaux */}
-            {ride.allows_pets && (
-              <View className="bg-orange-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-orange-100">
-                <Ionicons name="paw" size={14} color="#F97316" />
-                <Text className="text-orange-700 text-xs font-bold ml-2">Animaux bienvenus</Text>
-              </View>
-            )}
+                      <TouchableOpacity 
+                        onPress={() => router.push({
+                          pathname: "/chat/[id]",
+                          params: { id: ride.id, other_id: ride.driver_id, other_name: driverProfile?.full_name || 'Conducteur' }
+                        } as any)}
+                        style={{ width: '100%', backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', paddingVertical: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Ionicons name="chatbubbles" size={16} color="#0F172A" />
+                        <Text style={{ color: '#0F172A', fontWeight: '800', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>Messagerie interne</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : isPendingVerification ? (
+                    <View style={{ backgroundColor: '#FFFBEB', borderWidth: 1, borderColor: '#FDE68A', borderRadius: 16, padding: 16, gap: 8 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <Ionicons name="time" size={16} color="#D97706" />
+                        <Text style={{ color: '#B45309', fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>Vérification en cours</Text>
+                      </View>
+                      <Text style={{ color: '#B45309', fontSize: 11, fontWeight: '700', textAlign: 'center', lineHeight: 16 }}>
+                        Le dépôt de votre frais de réservation est en cours de validation par notre équipe. Le numéro sera visible dès validation.
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={{ gap: 16 }}>
+                      <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'flex-start', borderWidth: 1, borderColor: '#E2E8F0' }}>
+                        <Ionicons name="shield-checkmark-outline" size={16} color="#2563EB" style={{ marginRight: 8, marginTop: 2 }} />
+                        <Text style={{ color: '#475569', fontSize: 11, fontWeight: '700', lineHeight: 16, flex: 1 }}>
+                          Contact protégé. Des frais de réservation de <Text style={{ color: '#0F172A', fontWeight: '900' }}>{formatPrice(fee)} Ar</Text> (10%) sont requis pour déverrouiller le trajet.
+                        </Text>
+                      </View>
 
-            {/* Climatisation */}
-            {ride.air_conditioning && (
-              <View className="bg-blue-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-blue-100">
-                <Ionicons name="snow" size={14} color="#3B82F6" />
-                <Text className="text-blue-700 text-xs font-bold ml-2">Climatisé</Text>
-              </View>
-            )}
+                      <TouchableOpacity 
+                        onPress={handleBooking}
+                        disabled={ride.seats <= 0}
+                        style={{ width: '100%', backgroundColor: ride.seats <= 0 ? '#E2E8F0' : '#2563EB', paddingVertical: 14, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Ionicons name="lock-open-outline" size={16} color="white" />
+                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, textTransform: 'uppercase', marginLeft: 8 }}>Réserver ce trajet</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              )}
 
-            {/* Max 2 à l'arrière */}
-            {ride.max_2_back && (
-              <View className="bg-purple-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-purple-100">
-                <Ionicons name="people" size={14} color="#8B5CF6" />
-                <Text className="text-purple-700 text-xs font-bold ml-2">Max. 2 à l'arrière</Text>
-              </View>
-            )}
-
-            {/* Sièges inclinables */}
-            {ride.reclining_seats && (
-              <View className="bg-indigo-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-indigo-100">
-                <Ionicons name="bed" size={14} color="#6366F1" />
-                <Text className="text-indigo-700 text-xs font-bold ml-2">Sièges inclinables</Text>
-              </View>
-            )}
-
-            {/* Prises électriques */}
-            {ride.power_outlets && (
-              <View className="bg-yellow-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-yellow-100">
-                <Ionicons name="power" size={14} color="#EAB308" />
-                <Text className="text-yellow-700 text-xs font-bold ml-2">Prises dispo</Text>
-              </View>
-            )}
-
-            {/* Toilettes */}
-            {ride.toilet && (
-              <View className="bg-cyan-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-cyan-100">
-                <Ionicons name="water" size={14} color="#06B6D4" />
-                <Text className="text-cyan-700 text-xs font-bold ml-2">Toilettes à bord</Text>
-              </View>
-            )}
-
-            {/* E-Ticket */}
-            {ride.e_ticket && (
-              <View className="bg-teal-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-teal-100">
-                <Ionicons name="ticket" size={14} color="#14B8A6" />
-                <Text className="text-teal-700 text-xs font-bold ml-2">E-Ticket</Text>
-              </View>
-            )}
-
-            {/* Réservation instantanée */}
-            {ride.instant_booking && (
-              <View className="bg-pink-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-pink-100">
-                <Ionicons name="flash" size={14} color="#EC4899" />
-                <Text className="text-pink-700 text-xs font-bold ml-2">Éclair</Text>
-              </View>
-            )}
-
-            {/* Bagages */}
-            <View className="bg-blue-600 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-blue-700 shadow-sm">
-              <Ionicons name="briefcase" size={14} color="white" />
-              <Text className="text-white text-xs font-black ml-2 uppercase">Bagages : {ride.baggage_size || 'Moyen'}</Text>
-            </View>
-
-            {/* Galerie */}
-            {ride.has_roof_rack && (
-              <View className="bg-blue-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-blue-100">
-                <Ionicons name="layers" size={16} color="#2563EB" />
-                <Text className="text-blue-700 text-xs font-bold ml-2">Galerie de toit</Text>
-              </View>
-            )}
-
-            <View className="bg-gray-50 px-3 py-2 rounded-xl mr-2 mb-2 flex-row items-center border border-gray-200">
-              <Ionicons name="musical-notes" size={14} color="#6B7280" />
-              <Text className="text-gray-700 text-xs font-bold ml-2">Musique</Text>
             </View>
           </View>
         </View>
-
       </ScrollView>
 
-      {/* Barre de Réservation */}
-      {currentUserId !== ride.driver_id && (
-        <View className="absolute bottom-0 w-full bg-white px-6 py-4 shadow-2xl border-t border-gray-100 pb-10">
-          <View className="flex-row justify-between items-center mb-4">
-            <View>
-              <Text className="text-gray-400 font-bold text-[10px] uppercase">Reste</Text>
-              <Text className={`font-black text-lg ${ride.seats <= 0 ? 'text-red-500' : 'text-gray-900'}`}>
-                {ride.seats <= 0 ? 'COMPLET' : `${ride.seats} places`}
-              </Text>
-            </View>
-            <View className="items-end">
-              <Text className="text-gray-400 font-bold text-[10px] uppercase">Par personne</Text>
-              <Text className={`text-2xl font-black ${ride.seats <= 0 ? 'text-gray-400' : 'text-blue-600'}`}>
-                {formatPrice(ride.price)} Ar
-              </Text>
-            </View>
-          </View>
-          
-          {isUnlocked ? (
-            <View>
-              <View className="flex-row mb-3">
-                <TouchableOpacity 
-                  className="flex-1 bg-green-500 py-4 rounded-2xl items-center shadow-lg shadow-green-300 mr-2 flex-row justify-center"
-                  onPress={() => Linking.openURL(`tel:${driverProfile?.phone}`)}
-                >
-                  <Ionicons name="call" size={20} color="white" />
-                  <Text className="text-white font-bold text-lg ml-2">Appeler</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  className="flex-1 bg-blue-500 py-4 rounded-2xl items-center shadow-lg shadow-blue-300 ml-2 flex-row justify-center"
-                  onPress={() => Linking.openURL(`sms:${driverProfile?.phone}`)}
-                >
-                  <Ionicons name="chatbubble" size={20} color="white" />
-                  <Text className="text-white font-bold text-lg ml-2">SMS</Text>
-                </TouchableOpacity>
-              </View>
-              
-              <TouchableOpacity 
-                onPress={() => router.push({
-                  pathname: "/chat/[id]",
-                  params: { id: ride.id, other_id: ride.driver_id, other_name: driverProfile?.full_name || 'Conducteur' }
-                } as any)}
-                className="py-3 rounded-2xl items-center flex-row justify-center border border-blue-100 bg-blue-50/50"
-              >
-                <Ionicons name="chatbubbles" size={18} color="#2563EB" />
-                <Text className="text-blue-600 font-bold ml-2">Chat interne Miara-Dia</Text>
-              </TouchableOpacity>
-            </View>
-          ) : isPendingVerification ? (
-            <View className="bg-orange-100 py-4 rounded-2xl items-center flex-row justify-center border border-orange-200">
-              <Ionicons name="time" size={20} color="#EA580C" />
-              <Text className="text-orange-600 font-bold text-lg ml-2">Vérification en cours...</Text>
-            </View>
-          ) : (
-            <TouchableOpacity 
-              className={`py-4 rounded-2xl items-center flex-row justify-center ${ride.seats <= 0 ? 'bg-gray-300 shadow-none' : 'bg-blue-600 shadow-lg shadow-blue-300'}`}
-              onPress={handleBooking}
-              disabled={ride.seats <= 0}
-            >
-              <Ionicons name={ride.seats <= 0 ? "close-circle" : "lock-open-outline"} size={20} color="white" />
-              <Text className="text-white font-bold text-lg ml-2">
-                {ride.seats <= 0 ? 'Annonce Complète' : `Déverrouiller (${formatPrice(calculateUnlockFee(Number(ride.price || 0)))} Ar)`}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
-
-      {/* Modal de Paiement */}
+      {/* Payment Modal */}
       <PaymentModal
         isVisible={isPaymentModalVisible}
         onClose={() => setIsPaymentModalVisible(false)}
@@ -1188,23 +694,20 @@ export default function RideDetailsScreen() {
         loading={paymentLoading}
       />
 
-      {/* Modal Photo Plein Écran */}
+      {/* Fullscreen Photo Modal */}
       <Modal visible={isPhotoVisible} transparent animationType="fade">
-        <View className="flex-1 bg-black/95 items-center justify-center">
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)', items: 'center', justifyContent: 'center', padding: 24 } as any}>
           <TouchableOpacity 
             onPress={() => setIsPhotoVisible(false)}
-            className="absolute top-12 right-6 w-12 h-12 bg-white/10 rounded-full items-center justify-center z-10"
+            style={{ position: 'absolute', top: 40, right: 20, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
           >
-            <Ionicons name="close" size={30} color="white" />
+            <Ionicons name="close" size={24} color="white" />
           </TouchableOpacity>
-          <Image source={{ uri: ride.vehicle_photo }} className="w-full h-3/4" resizeMode="contain" />
-          <View className="absolute bottom-12 px-10 items-center">
-            <Text className="text-white font-bold text-lg text-center">{ride.vehicle_brand}</Text>
-            <Text className="text-gray-400 text-center mt-2">Véhicule réel du conducteur</Text>
-          </View>
+          <Image source={{ uri: ride.vehicle_photo }} style={{ width: '100%', height: '70%' } as any} resizeMode="contain" />
+          <Text style={{ color: 'white', fontSize: 18, fontWeight: '900', marginTop: 20, textAlign: 'center' }}>{ride.vehicle_brand}</Text>
+          <Text style={{ color: '#94A3B8', fontSize: 12, fontWeight: '700', marginTop: 4, textTransform: 'uppercase', textAlign: 'center' }}>Véhicule réel du trajet</Text>
         </View>
       </Modal>
-
     </View>
   );
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import { CustomAlert } from '../../utils/alert';
-
-import { View, Text, TouchableOpacity, ScrollView, Image, SafeAreaView, Alert, Modal, TextInput, ActivityIndicator, Linking, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, SafeAreaView, Modal, TextInput, ActivityIndicator, Linking, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
@@ -14,6 +13,7 @@ export default function DriverProfileScreen() {
   const { id, price: ridePrice, ride_id: rideId } = useLocalSearchParams();
   const { width } = useWindowDimensions();
   const isDesktop = width > 768;
+  
   const [loading, setLoading] = React.useState(true);
   const [submittingReview, setSubmittingReview] = React.useState(false);
   const [showReviewModal, setShowReviewModal] = React.useState(false);
@@ -26,7 +26,6 @@ export default function DriverProfileScreen() {
   const [paymentLoading, setPaymentLoading] = React.useState(false);
   const [isWaitingForSms, setIsWaitingForSms] = React.useState(false);
 
-  // Calcul dynamique des frais (10% du prix, min 1000, max 5000)
   const getCleanPrice = () => {
     if (!ridePrice) return 0;
     const cleanPriceStr = String(ridePrice).replace(/\D/g, '');
@@ -36,9 +35,9 @@ export default function DriverProfileScreen() {
 
   const calculateUnlockFee = () => {
     const price = getCleanPrice();
-    if (!price) return 2000; // Prix par défaut si accès direct
+    if (!price) return 2000;
     
-    const fee = Math.round(price * 0.10 / 100) * 100; // Arrondi à la centaine
+    const fee = Math.round(price * 0.10 / 100) * 100;
     return Math.min(5000, Math.max(1000, fee));
   };
 
@@ -52,7 +51,6 @@ export default function DriverProfileScreen() {
     }
   }, [id]);
 
-  // ✅ Realtime listener : met à jour l'UI dès que le webhook SMS valide le paiement
   React.useEffect(() => {
     let channel: any = null;
     const setupRealtimeListener = async () => {
@@ -135,7 +133,7 @@ export default function DriverProfileScreen() {
         
         profile = {
           full_name: rideData?.driver_name || 'Chauffeur',
-          avatar_url: rideData?.driver_avatar || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000&auto=format&fit=crop',
+          avatar_url: rideData?.driver_avatar || 'https://ui-avatars.com/api/?name=Chauffeur',
           bio: "Ce conducteur n'a pas encore rédigé de bio.",
           vehicle_model: 'Véhicule standard',
           vehicle_type: 'Berline',
@@ -236,10 +234,6 @@ export default function DriverProfileScreen() {
       const user = authData?.user;
       if (!user) throw new Error("Veuillez vous connecter.");
 
-      const isManual = method === 'Kiosque';
-      
-      // ✅ FIX: Toujours créer en 'pending' — le webhook SMS valide automatiquement
-      // Le numéro de téléphone est nettoyé pour matcher le sender du SMS MVola
       const cleanReference = reference ? reference.replace(/\s/g, '') : null;
 
       const { error } = await supabase
@@ -252,7 +246,7 @@ export default function DriverProfileScreen() {
           amount_fee: dynamicFee, 
           amount_total: cleanRidePrice + dynamicFee,
           payment_method: method,
-          payment_status: 'pending',   // Toujours pending, webhook SMS valide automatiquement
+          payment_status: 'pending',
           payment_reference: cleanReference
         }]);
 
@@ -262,7 +256,7 @@ export default function DriverProfileScreen() {
       setIsPaymentModalVisible(false);
       CustomAlert.alert(
         '📱 Vérification en cours...',
-        `Votre demande est enregistrée. Effectuez maintenant le transfert MVola/Orange/Airtel.\n\nLe contact sera déverrouillé automatiquement dès réception du SMS de confirmation.`
+        `Votre demande est enregistrée. Effectuez maintenant le transfert Mobile Money.\n\nLe contact sera déverrouillé automatiquement dès réception du SMS de confirmation.`
       );
     } catch (error: any) {
       CustomAlert.alert("Erreur", error.message);
@@ -273,19 +267,19 @@ export default function DriverProfileScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F8FAFC' }}>
         <ActivityIndicator size="large" color="#2563EB" />
-        <Text className="text-gray-500 mt-4">Chargement du profil...</Text>
+        <Text style={{ color: '#64748B', fontWeight: '700', marginTop: 16 }}>Chargement du profil...</Text>
       </View>
     );
   }
 
   if (!driver) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-gray-500">Conducteur non trouvé.</Text>
-        <TouchableOpacity onPress={() => router.back()} className="mt-4">
-          <Text className="text-blue-600">Retour</Text>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F8FAFC' }}>
+        <Text style={{ color: '#64748B', fontWeight: '700' }}>Conducteur non trouvé.</Text>
+        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 16 }}>
+          <Text style={{ color: '#2563EB', fontWeight: '800' }}>Retour</Text>
         </TouchableOpacity>
       </View>
     );
@@ -296,318 +290,206 @@ export default function DriverProfileScreen() {
     : "5.0";
   const likesCount = reviews.filter(r => r?.rating >= 4).length;
   const isSuperDriver = reviews.length >= 5 && parseFloat(averageRating) >= 4.5;
-  const renderDesktopView = () => {
-    return (
-      <View className="flex-1 bg-[#F6F6F6]">
-        <StatusBar style="dark" />
-        
-        {/* TOP BAR / NAVIGATION */}
-        <View className="bg-white border-b border-slate-200 py-4 px-12 z-10 shadow-sm">
-          <View className="max-w-5xl mx-auto w-full flex-row items-center justify-between">
-            <TouchableOpacity 
-              onPress={() => router.back()} 
-              className="flex-row items-center py-2 px-4 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors"
-            >
-              <Ionicons name="arrow-back" size={18} color="#054752" />
-              <Text className="text-[#054752] font-black text-sm ml-2">Retour</Text>
-            </TouchableOpacity>
-            
-            {isSuperDriver && (
-              <View className="bg-blue-50 border border-blue-100 px-4 py-1.5 rounded-full">
-                <Text className="text-[#00AFF5] font-black text-xs uppercase tracking-wider">Super Driver de Confiance</Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 80 }} showsVerticalScrollIndicator={false}>
-          <View className="max-w-5xl mx-auto w-full flex-row gap-8 px-8 py-10">
-            
-            {/* COLONNE GAUCHE (65%) */}
-            <View className="flex-[1.8] space-y-6">
-              
-              {/* DESCRIPTION & BIO */}
-              <View className="bg-white rounded-[16px] p-8 border border-slate-200 shadow-sm">
-                <Text className="text-[#054752] font-black text-2xl tracking-tight mb-6">À propos de {driver?.full_name}</Text>
-                
-                <Text className="text-[#054752] leading-relaxed text-[16px] italic">
-                  "{driver?.bio || "Ce conducteur n'a pas encore rédigé de bio."}"
-                </Text>
-              </View>
-
-              {/* MON VÉHICULE */}
-              <View className="bg-white rounded-[16px] p-8 border border-slate-200 shadow-sm">
-                <Text className="text-[#707070] font-bold uppercase tracking-widest text-[10px] mb-6">Le Véhicule</Text>
-                
-                <View className="flex-row items-center mb-6">
-                  <View className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-[12px] items-center justify-center mr-4 shadow-xs">
-                    <Ionicons name="car" size={22} color="#00AFF5" />
-                  </View>
-                  <View>
-                    <Text className="text-lg font-black text-[#054752]">{driver?.vehicle_model || 'Véhicule standard'}</Text>
-                    <Text className="text-[#707070] font-bold text-xs uppercase tracking-wider mt-0.5">{driver?.vehicle_type || 'Inconnu'}</Text>
-                  </View>
-                </View>
-
-
-              </View>
-
-              {/* AVIS DES VOYAGEURS */}
-              <View className="bg-white rounded-[16px] p-8 border border-slate-200 shadow-sm">
-                <View className="flex-row items-center justify-between mb-8">
-                  <View>
-                    <Text className="text-[#054752] font-black text-2xl tracking-tight">Avis des voyageurs</Text>
-                    <Text className="text-[#707070] text-xs font-bold uppercase tracking-wider mt-1">{reviews.length} retours d'expérience</Text>
-                  </View>
-                  
-                  <TouchableOpacity 
-                    onPress={() => setShowReviewModal(true)} 
-                    className="bg-blue-50 border border-blue-100 px-4 py-2 rounded-full flex-row items-center hover:bg-blue-100 transition-colors"
-                  >
-                    <Ionicons name="star" size={14} color="#00AFF5" />
-                    <Text className="text-[#00AFF5] font-black text-xs ml-1.5">Laisser un avis</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {reviews.length > 0 ? (
-                  <View className="space-y-4">
-                    {reviews.map((review, idx) => review && (
-                      <View key={review?.id || idx} className="bg-slate-50/50 border border-slate-100 rounded-[12px] p-5">
-                        <View className="flex-row justify-between items-center mb-3">
-                          <Text className="font-extrabold text-[#054752] text-sm">{review?.passenger_name || 'Voyageur'}</Text>
-                          <View className="flex-row">
-                            {[...Array(review?.rating || 0)].map((_, i) => (
-                              <Ionicons key={i} name="star" size={14} color="#F59E0B" style={{ marginHorizontal: 2 }} />
-                            ))}
-                          </View>
-                        </View>
-                        <Text className="text-[#054752] text-sm italic">"{review?.comment}"</Text>
-                      </View>
-                    ))}
-                  </View>
-                ) : (
-                  <View className="py-10 items-center justify-center bg-slate-50/50 border border-slate-100 border-dashed rounded-[12px]">
-                    <Ionicons name="chatbox-ellipses-outline" size={32} color="#94A3B8" />
-                    <Text className="text-slate-400 font-bold text-xs mt-2">Aucun avis rédigé pour le moment.</Text>
-                  </View>
-                )}
-              </View>
-
-            </View>
-
-            {/* COLONNE DROITE (35% - STICKY DRIVER SUMMARY) */}
-            <View className="flex-[1] min-w-[340px]">
-              <View className="bg-white rounded-[16px] p-7 border border-slate-200 shadow-sm sticky top-24 self-start space-y-6">
-                
-                {/* PHOTO & RATING SUM */}
-                <View className="items-center">
-                  <View className="w-24 h-24 rounded-full border-2 border-slate-200 p-0.5 mb-4 relative shadow-sm">
-                    <Image 
-                      source={{ uri: driver.avatar_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000&auto=format&fit=crop' }} 
-                      className="w-full h-full rounded-full" 
-                    />
-                    <View className="absolute bottom-0.5 right-0.5 w-6 h-6 bg-green-500 rounded-full border-4 border-white" />
-                  </View>
-                  
-                  <Text className="text-2xl font-black text-[#054752] tracking-tight">{driver?.full_name}</Text>
-                  
-                  <View className="flex-row items-center mt-2 bg-slate-50 border border-slate-100 px-3.5 py-1.5 rounded-full">
-                    <Ionicons name="star" size={16} color="#F59E0B" />
-                    <Text className="text-[#054752] font-black text-sm ml-1.5">{averageRating}</Text>
-                    <Text className="text-[#707070] text-xs font-bold ml-1">/ 5</Text>
-                  </View>
-                </View>
-
-                <View className="h-[1px] bg-slate-100" />
-
-                <View className="space-y-4">
-                  <View className="flex-row items-center justify-between">
-                    <Text className="text-[#707070] text-xs font-bold uppercase">Recommandations</Text>
-                    <Text className="text-[#054752] font-black text-sm">{likesCount} votes</Text>
-                  </View>
-
-                  <View className="flex-row items-center justify-between">
-                    <Text className="text-[#707070] text-xs font-bold uppercase">Avis reçus</Text>
-                    <Text className="text-[#054752] font-black text-sm">{reviews.length} avis</Text>
-                  </View>
-                </View>
-
-                <View className="h-[1px] bg-slate-100" />
-
-                {isUnlocked ? (
-                  <View className="space-y-4">
-                    <View className="bg-emerald-50 border border-emerald-100 rounded-[12px] p-5">
-                      <Text className="text-emerald-800 font-black text-center text-sm uppercase tracking-wider mb-2">Numéro déverrouillé</Text>
-                      <Text className="text-emerald-900 font-black text-center text-2xl tracking-tight selection:bg-emerald-200">{driver?.phone || 'Non dispo'}</Text>
-                    </View>
-
-                    <TouchableOpacity 
-                      className="w-full bg-emerald-500 hover:bg-emerald-600 py-3.5 rounded-full items-center justify-center flex-row shadow-sm transition-colors"
-                      onPress={() => Linking.openURL(`tel:${driver?.phone}`)}
-                    >
-                      <Ionicons name="call" size={16} color="white" />
-                      <Text className="text-white font-extrabold text-xs uppercase tracking-wider ml-2">Appeler Chauffeur</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View className="space-y-4">
-                    <View className="bg-slate-50 border border-slate-100 rounded-[12px] p-4 flex-row items-start">
-                      <Ionicons name="shield-checkmark" size={16} color="#00AFF5" style={{ marginTop: 2, marginRight: 10 }} />
-                      <Text className="text-slate-500 text-xs leading-relaxed font-bold flex-1">
-                        Pour déverrouiller le contact direct de ce chauffeur, des frais de mise en relation de <Text className="text-[#054752] font-extrabold">{formatPrice(dynamicFee)} Ar</Text> sont requis.
-                      </Text>
-                    </View>
-
-                    <TouchableOpacity 
-                      className="w-full bg-[#00AFF5] hover:bg-[#0096D1] py-4 rounded-full flex-row items-center justify-center transition-colors shadow-xs"
-                      onPress={handleContact}
-                    >
-                      <Ionicons name="lock-open-outline" size={16} color="white" />
-                      <Text className="text-white font-extrabold text-xs uppercase tracking-widest ml-2">
-                        Déverrouiller le contact
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-              </View>
-            </View>
-
-          </View>
-        </ScrollView>
-
-        <PaymentModal
-          isVisible={isPaymentModalVisible}
-          onClose={() => setIsPaymentModalVisible(false)}
-          onSelectMethod={handleConfirmPayment}
-          amount={dynamicFee}
-          loading={paymentLoading}
-        />
-      </View>
-    );
-  };
-
-  if (isDesktop) {
-    return renderDesktopView();
-  }
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={{ flex: 1, backgroundColor: '#F1F5F9' }}>
       <StatusBar style="light" />
       
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-        
-        {/* Header avec Photo */}
-        <View className="relative h-80 bg-blue-600">
-          <Image 
-            source={{ uri: driver.avatar_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000&auto=format&fit=crop' }} 
-            className="w-full h-full"
-            style={{ opacity: 0.9 }}
-          />
-          <SafeAreaView className="absolute top-0 w-full">
-            <View className="flex-row justify-between px-6 pt-4">
-              <TouchableOpacity 
-                onPress={() => router.back()} 
-                className="w-10 h-10 bg-black/30 rounded-full items-center justify-center"
-              >
-                <Ionicons name="arrow-back" size={24} color="white" />
-              </TouchableOpacity>
-              <TouchableOpacity className="w-10 h-10 bg-black/30 rounded-full items-center justify-center">
-                <Ionicons name="share-outline" size={24} color="white" />
-              </TouchableOpacity>
+      {/* HERO / DARK HEADER */}
+      <View style={{
+        backgroundColor: '#1E3A5F',
+        paddingTop: isDesktop ? 50 : 60,
+        paddingBottom: isDesktop ? 90 : 80,
+        paddingHorizontal: 24,
+        alignItems: 'center',
+      }}>
+        <View style={{ maxWidth: 1000, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <TouchableOpacity 
+            onPress={() => router.back()} 
+            style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 }}
+          >
+            <Ionicons name="arrow-back" size={16} color="white" />
+            <Text style={{ color: 'white', fontWeight: '800', fontSize: 13, marginLeft: 6 }}>Retour</Text>
+          </TouchableOpacity>
+          
+          {isSuperDriver && (
+            <View style={{ backgroundColor: '#2563EB', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
+              <Text style={{ color: 'white', fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5 }}>Super Driver de Confiance</Text>
             </View>
-          </SafeAreaView>
+          )}
+        </View>
 
-          <View className="absolute bottom-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent">
-            <View className="flex-row items-end">
-              <View className="flex-1">
-                <View className="flex-row items-center">
-                  <Text className="text-3xl font-black text-white">{driver?.full_name}</Text>
-                  {isSuperDriver && (
-                    <View className="ml-3 bg-blue-500 px-2 py-1 rounded-full">
-                      <Text className="text-white text-[10px] font-black uppercase">Super Driver</Text>
-                    </View>
-                  )}
-                </View>
-                <View className="flex-row items-center mt-1">
-                  <Ionicons name="star" size={16} color="#F59E0B" />
-                  <Text className="text-white font-bold ml-1">{averageRating}</Text>
-                  <Text className="text-gray-300 ml-2">•</Text>
-                  <Ionicons name="thumbs-up" size={16} color="#3B82F6" style={{ marginLeft: 8 }} />
-                  <Text className="text-white font-bold ml-1">{likesCount}</Text>
-                  <Text className="text-gray-300 ml-1">recommandations</Text>
-                </View>
-              </View>
+        <View style={{ maxWidth: 1000, width: '100%', marginTop: 8, alignItems: isDesktop ? 'flex-start' : 'center', flexDirection: isDesktop ? 'row' : 'column', gap: 24 }}>
+          <View style={{ width: 88, height: 88, borderRadius: 44, overflow: 'hidden', borderWidth: 3, borderColor: 'white', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 4 }}>
+            <Image 
+              source={{ uri: driver.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(driver.full_name) }} 
+              style={{ width: '100%', height: '100%' } as any} 
+            />
+          </View>
+          <View style={{ alignItems: isDesktop ? 'flex-start' : 'center' }}>
+            <Text style={{ color: 'white', fontSize: isDesktop ? 30 : 24, fontWeight: '900', letterSpacing: -0.5 }}>
+              {driver.full_name}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
+              <Ionicons name="star" size={14} color="#F59E0B" />
+              <Text style={{ color: 'white', fontSize: 13, fontWeight: '800', marginLeft: 4 }}>{averageRating}</Text>
+              <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: '700', marginLeft: 2 }}>/ 5</Text>
             </View>
           </View>
         </View>
+      </View>
 
-        {/* Contenu */}
-        <View className="px-6 -mt-4 bg-white rounded-t-[32px] pt-8">
-          <View className="mb-8">
-            <Text className="text-xl font-bold text-gray-900 mb-3">À propos de {driver?.full_name}</Text>
-            <Text className="text-gray-600 text-base leading-6">{driver?.bio || "Pas de biographie disponible."}</Text>
-          </View>
-
-          <View className="mb-8">
-            <Text className="text-xl font-bold text-gray-900 mb-4">Mon Véhicule</Text>
-            <View className="bg-gray-50 rounded-3xl overflow-hidden border border-gray-100">
-              <View className="w-full h-48 bg-gray-200 items-center justify-center">
-                <Ionicons name="car-outline" size={60} color="#9CA3AF" />
-              </View>
-              <View className="p-4">
-                <Text className="text-lg font-bold text-gray-900">{driver?.vehicle_model || 'Véhicule standard'}</Text>
-                <Text className="text-blue-600 font-medium mb-3">{driver?.vehicle_type || 'Inconnu'}</Text>
-              </View>
+      {/* MAIN CONTAINER */}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+        <View style={{
+          maxWidth: 1000,
+          width: '100%',
+          alignSelf: 'center',
+          flexDirection: isDesktop ? 'row' : 'column',
+          gap: 24,
+          paddingHorizontal: 16,
+          marginTop: -30,
+        }}>
+          {/* COLUMN LEFT */}
+          <View style={{ flex: isDesktop ? 1.8 : 1, gap: 20 }}>
+            {/* BIO CARD */}
+            <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 2 }}>
+              <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A', marginBottom: 16 }}>À propos de {driver.full_name}</Text>
+              <Text style={{ fontSize: 15, color: '#475569', lineHeight: 24, fontStyle: 'italic' }}>
+                "{driver.bio || "Ce conducteur n'a pas encore rédigé de bio."}"
+              </Text>
             </View>
-          </View>
 
-          <View className="mb-8">
-            <View className="flex-row items-center justify-between mb-4">
-              <View>
-                <Text className="text-xl font-bold text-gray-900">Avis des voyageurs</Text>
-                <Text className="text-gray-500 text-xs">{reviews.length} retours d'expérience</Text>
-              </View>
-              <TouchableOpacity onPress={() => setShowReviewModal(true)} className="bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
-                <Text className="text-blue-600 font-bold text-sm">Noter</Text>
-              </TouchableOpacity>
-            </View>
-            {reviews.map((review, index) => review && (
-              <View key={review?.id || index} className="bg-white border border-gray-100 rounded-3xl p-5 mb-4 shadow-sm">
-                <View className="flex-row justify-between items-center mb-2">
-                  <Text className="font-bold text-gray-900">{review?.passenger_name || 'Voyageur'}</Text>
-                  <View className="flex-row">
-                    {[...Array(review?.rating || 0)].map((_, i) => <Ionicons key={i} name="star" size={14} color="#F59E0B" />)}
-                  </View>
+            {/* VEHICLE CARD */}
+            <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 2 }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>Véhicule du Chauffeur</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                  <Ionicons name="car" size={22} color="#2563EB" />
                 </View>
-                <Text className="text-gray-600 text-sm">"{review?.comment}"</Text>
+                <View>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#0F172A' }}>{driver.vehicle_model || 'Véhicule standard'}</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#94A3B8', textTransform: 'uppercase', marginTop: 2 }}>{driver.vehicle_type || 'Berline'}</Text>
+                </View>
               </View>
-            ))}
+
+              {driver.vehicle_photo && (
+                <View style={{ width: '100%', height: 220, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#E2E8F0' }}>
+                  <Image source={{ uri: driver.vehicle_photo }} style={{ width: '100%', height: '100%' } as any} resizeMode="cover" />
+                </View>
+              )}
+            </View>
+
+            {/* REVIEWS CARD */}
+            <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 2 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <View>
+                  <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Avis des voyageurs</Text>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 4 }}>{reviews.length} retours d'expérience</Text>
+                </View>
+                <TouchableOpacity 
+                  onPress={() => setShowReviewModal(true)}
+                  style={{ backgroundColor: '#EFF6FF', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14, flexDirection: 'row', alignItems: 'center' }}
+                >
+                  <Ionicons name="create-outline" size={14} color="#2563EB" />
+                  <Text style={{ color: '#2563EB', fontWeight: '800', fontSize: 12, marginLeft: 6 }}>Noter</Text>
+                </TouchableOpacity>
+              </View>
+
+              {reviews.length > 0 ? (
+                <View style={{ gap: 12 }}>
+                  {reviews.map((review, idx) => review && (
+                    <View key={review.id || idx} style={{ backgroundColor: '#F8FAFC', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <Text style={{ fontWeight: '800', color: '#0F172A', fontSize: 14 }}>{review.passenger_name || 'Voyageur'}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                          {[...Array(review.rating || 0)].map((_, i) => (
+                            <Ionicons key={i} name="star" size={12} color="#F59E0B" style={{ marginLeft: 2 }} />
+                          ))}
+                        </View>
+                      </View>
+                      <Text style={{ color: '#475569', fontSize: 13, fontStyle: 'italic', lineHeight: 18 }}>"{review.comment}"</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <View style={{ py: 32, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#E2E8F0', borderStyle: 'dashed', borderRadius: 16, paddingVertical: 32 } as any}>
+                  <Ionicons name="chatbubble-ellipses-outline" size={28} color="#94A3B8" />
+                  <Text style={{ color: '#94A3B8', fontSize: 12, fontWeight: '700', marginTop: 8 }}>Aucun avis pour le moment.</Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* COLUMN RIGHT */}
+          <View style={{ flex: 1, minWidth: isDesktop ? 320 : '100%' }}>
+            <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 2, gap: 16 }}>
+              
+              <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Contact & Confiance</Text>
+              
+              <View style={{ gap: 12 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 11, textTransform: 'uppercase' }}>Recommandations</Text>
+                  <Text style={{ fontWeight: '800', color: '#0F172A', fontSize: 13 }}>{likesCount} votes positifs</Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 11, textTransform: 'uppercase' }}>Avis reçus</Text>
+                  <Text style={{ fontWeight: '800', color: '#0F172A', fontSize: 13 }}>{reviews.length} avis</Text>
+                </View>
+              </View>
+
+              <View style={{ height: 1, backgroundColor: '#F1F5F9' }} />
+
+              {isUnlocked ? (
+                <View style={{ gap: 12 }}>
+                  <View style={{ backgroundColor: '#ECFDF5', borderWidth: 1, borderColor: '#A7F3D0', borderRadius: 16, padding: 16 }}>
+                    <Text style={{ color: '#047857', fontWeight: '900', fontSize: 11, textTransform: 'uppercase', textAlign: 'center', marginBottom: 6 }}>Numéro Déverrouillé</Text>
+                    <Text style={{ color: '#065F46', fontWeight: '900', fontSize: 20, textAlign: 'center' }}>{driver.phone || 'Non disponible'}</Text>
+                  </View>
+
+                  <TouchableOpacity 
+                    onPress={() => Linking.openURL(`tel:${driver.phone}`)}
+                    style={{ backgroundColor: '#10B981', paddingVertical: 14, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <Ionicons name="call" size={16} color="white" />
+                    <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, textTransform: 'uppercase', marginLeft: 8 }}>Appeler le chauffeur</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : isWaitingForSms ? (
+                <View style={{ backgroundColor: '#FFFBEB', borderWidth: 1, borderColor: '#FDE68A', borderRadius: 16, padding: 16, gap: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <ActivityIndicator size="small" color="#D97706" />
+                    <Text style={{ color: '#B45309', fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 8 }}>Vérification Mobile Money</Text>
+                  </View>
+                  <Text style={{ color: '#B45309', fontSize: 11, fontWeight: '700', textAlign: 'center', lineHeight: 16 }}>
+                    En attente de la réception du SMS de confirmation de transfert. Le numéro s'affichera immédiatement après.
+                  </Text>
+                </View>
+              ) : (
+                <View style={{ gap: 16 }}>
+                  <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'flex-start', borderWidth: 1, borderColor: '#E2E8F0' }}>
+                    <Ionicons name="shield-checkmark-outline" size={16} color="#2563EB" style={{ marginRight: 8, marginTop: 2 }} />
+                    <Text style={{ color: '#475569', fontSize: 11, fontWeight: '700', lineHeight: 16, flex: 1 }}>
+                      Coordonnées directes masquées. Des frais de mise en relation de <Text style={{ color: '#0F172A', fontWeight: '900' }}>{formatPrice(dynamicFee)} Ar</Text> sont requis pour déverrouiller ce contact.
+                    </Text>
+                  </View>
+
+                  <TouchableOpacity 
+                    onPress={handleContact}
+                    style={{ backgroundColor: '#2563EB', paddingVertical: 14, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <Ionicons name="lock-open-outline" size={16} color="white" />
+                    <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, textTransform: 'uppercase', marginLeft: 8 }}>Déverrouiller le contact</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+            </View>
           </View>
         </View>
       </ScrollView>
 
-      <SafeAreaView className="absolute bottom-0 w-full p-6 bg-white/80">
-        {isWaitingForSms ? (
-          <View className="w-full py-4 rounded-2xl items-center bg-amber-500 shadow-lg flex-row justify-center">
-            <ActivityIndicator color="white" size="small" />
-            <Text className="text-white font-bold text-base ml-3">
-              Vérification en cours...
-            </Text>
-          </View>
-        ) : (
-          <TouchableOpacity 
-            onPress={handleContact}
-            className={`w-full py-4 rounded-2xl items-center shadow-lg ${isUnlocked ? 'bg-green-600 shadow-green-300' : 'bg-blue-600 shadow-blue-300'}`}
-          >
-            <Text className="text-white font-bold text-lg">
-              {isUnlocked ? `Appeler ${driver?.full_name}` : `Déverrouiller le contact (${formatPrice(dynamicFee)} Ar)`}
-            </Text>
-          </TouchableOpacity>
-        )}
-      </SafeAreaView>
-
-
+      {/* Payment Modal */}
       <PaymentModal 
         isVisible={isPaymentModalVisible}
         onClose={() => setIsPaymentModalVisible(false)}
@@ -616,29 +498,47 @@ export default function DriverProfileScreen() {
         loading={paymentLoading}
       />
 
+      {/* Review Modal */}
       <Modal visible={showReviewModal} animationType="slide" transparent={true}>
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-white rounded-t-[40px] p-8 pb-12">
-            <View className="flex-row justify-between items-center mb-6">
-              <Text className="text-2xl font-black text-gray-900">Votre Avis</Text>
-              <TouchableOpacity onPress={() => setShowReviewModal(false)}><Ionicons name="close-circle" size={32} color="#D1D5DB" /></TouchableOpacity>
+        <View style={{ flex: 1, justifyContent: 'end', backgroundColor: 'rgba(0,0,0,0.5)' } as any}>
+          <View style={{ backgroundColor: 'white', borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 40 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <Text style={{ fontSize: 20, fontWeight: '900', color: '#0F172A' }}>Votre Avis</Text>
+              <TouchableOpacity onPress={() => setShowReviewModal(false)}>
+                <Ionicons name="close-circle" size={28} color="#D1D5DB" />
+              </TouchableOpacity>
             </View>
-            <View className="flex-row justify-center mb-8">
+            
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 24 }}>
               {[1, 2, 3, 4, 5].map((star) => (
-                <TouchableOpacity key={star} onPress={() => setNewRating(star)} className="mx-1">
-                  <Ionicons name={star <= newRating ? "star" : "star-outline"} size={40} color={star <= newRating ? "#F59E0B" : "#D1D5DB"} />
+                <TouchableOpacity key={star} onPress={() => setNewRating(star)} style={{ marginHorizontal: 4 }}>
+                  <Ionicons name={star <= newRating ? "star" : "star-outline"} size={36} color={star <= newRating ? "#F59E0B" : "#D1D5DB"} />
                 </TouchableOpacity>
               ))}
             </View>
-            <View className="bg-gray-50 rounded-3xl p-4 border border-gray-100 mb-6">
-              <TextInput multiline numberOfLines={4} className="text-base text-gray-800" style={{ minHeight: 100, textAlignVertical: 'top' }} placeholder="Décrivez votre expérience..." value={newComment} onChangeText={setNewComment} />
+
+            <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 12, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 20 }}>
+              <TextInput 
+                multiline 
+                numberOfLines={4} 
+                style={{ height: 100, textAlignVertical: 'top', fontSize: 14, color: '#0F172A' }} 
+                placeholder="Décrivez votre expérience avec ce conducteur..." 
+                value={newComment} 
+                onChangeText={setNewComment} 
+              />
             </View>
-            <TouchableOpacity onPress={handlePostReview} disabled={submittingReview} className={`w-full py-4 rounded-2xl items-center ${submittingReview ? 'bg-gray-400' : 'bg-blue-600'}`}>
-              {submittingReview ? <ActivityIndicator color="white" /> : <Text className="text-white font-bold text-lg">Publier mon avis</Text>}
+
+            <TouchableOpacity 
+              onPress={handlePostReview} 
+              disabled={submittingReview} 
+              style={{ backgroundColor: submittingReview ? '#94A3B8' : '#2563EB', paddingVertical: 14, borderRadius: 16, items: 'center', justifyContent: 'center', flexDirection: 'row' } as any}
+            >
+              {submittingReview ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, textTransform: 'uppercase' }}>Publier mon avis</Text>}
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
+
     </View>
   );
 }
