@@ -17,6 +17,7 @@ export default function AdminDashboard() {
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [stats, setStats] = useState({ drivers: 0, clients: 0, online: 0 });
   const [recentSmsLogs, setRecentSmsLogs] = useState<any[]>([]);
+  const [storageUsed, setStorageUsed] = useState(0); // en Mo
 
   useEffect(() => {
     checkAdmin();
@@ -128,6 +129,18 @@ export default function AdminDashboard() {
         
       if (!smsError && smsLogs) {
         setRecentSmsLogs(smsLogs);
+      }
+
+      // 5. Fetch Storage size (Approximation based on 'avatars' bucket)
+      try {
+        const { data: files, error: storageError } = await supabase.storage.from('avatars').list();
+        if (!storageError && files) {
+          const totalBytes = files.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+          const totalMB = totalBytes / (1024 * 1024);
+          setStorageUsed(Number(totalMB.toFixed(2)));
+        }
+      } catch (err) {
+        console.log("Could not fetch storage size:", err);
       }
 
     } catch (error: any) {
@@ -322,6 +335,23 @@ export default function AdminDashboard() {
             </View>
           ))
         )}
+
+        {/* WIDGET : STOCKAGE SUPABASE */}
+        <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 20, marginTop: 8, borderWidth: 1, borderColor: '#F3F4F6', flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
+            <Ionicons name="cloud" size={22} color="#2563EB" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: '#111827', fontWeight: '900', fontSize: 14 }}>Stockage Base de Données</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, marginBottom: 4 }}>
+              <Text style={{ fontSize: 12, color: '#6B7280', fontWeight: '600' }}>{storageUsed} Mo / 500 Mo</Text>
+              <Text style={{ fontSize: 12, color: '#2563EB', fontWeight: '800' }}>{((storageUsed / 500) * 100).toFixed(1)}%</Text>
+            </View>
+            <View style={{ height: 6, backgroundColor: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
+              <View style={{ width: `${(storageUsed / 500) * 100}%`, height: '100%', backgroundColor: '#2563EB', borderRadius: 3 }} />
+            </View>
+          </View>
+        </View>
 
         {/* WIDGET : DERNIERS SMS REÇUS */}
         <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 20, marginTop: 8, borderWidth: 1, borderColor: '#F3F4F6' }}>

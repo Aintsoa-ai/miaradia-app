@@ -84,8 +84,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **🟡 MODÉRÉ — Souscriptions WebSocket Multiples :** Chaque écran crée ses propres souscriptions Supabase Realtime sans centralisation. Risque de fuite mémoire sur des sessions longues. *Solution : Créer un Context React global pour gérer un seul canal Realtime partagé.*
 - [ ] **🟡 MODÉRÉ — Pas de Support Malagasy :** L'application est 100% en français. La majorité des utilisateurs potentiels (chauffeurs de brousse) parle malagasy. *Solution future : i18n avec les chaînes en malagasy officiel.*
 - [ ] **🟢 MINEUR — Surveillance Continue Responsive :** Après la réduction de la bande bleue timeline (S21), surveiller l'affichage sur d'autres tailles d'écran (Galaxy Fold, tablettes). *Solution : Tests visuels réguliers.*
-- [ ] **🟢 MINEUR — Widget Stockage Supabase :** Pas de visibilité sur l'espace de stockage restant pour les photos de profil dans le tableau de bord admin. *Solution : Widget intégré à la page Kiosque.*
-
+- [x] **🟢 MINEUR — Widget Stockage Supabase (RÉSOLU) :** Pas de visibilité sur l'espace de stockage restant pour les photos de profil dans le tableau de bord admin. *Solution : Widget intégré à la page Kiosque.*
 ### 🗺️ Géographie & Itinéraires
 - [ ] **Détection d'embouteillages (Tana)** : Intégrer une alerte ou une estimation de temps supplémentaire pour les axes saturés (ex: Anosizato, 67ha).
 - [ ] **Axe Fluvial** : Ajouter la possibilité de publier des trajets en bateau (ex: Canal des Pangalanes ou traversées vers Sainte-Marie / Nosy Be).
