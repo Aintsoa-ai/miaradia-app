@@ -30,7 +30,8 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Recherche Multi-Termes Tolérante *(NOUVEAU - SESSION 13)* :** Résolution définitive du bug de non-correspondance des requêtes de recherche ("sur ordinateur et sur téléphone ça n'arrive pas à trouver de trajet") provoqué par la différence entre les noms de quartiers/districts ultra-détaillés issus de l'autocomplétion (ex: "Antananarivo-Renivohitra (District)" ou "Analakely (Antananarivo I)") et les noms plus généraux enregistrés en base de données (ex: "Antananarivo"). Implémentation d'un extracteur de termes intelligent (`extractCleanSearchTerms`) qui décompose et nettoie les chaînes complexes en sous-termes (commune, district, quartier, numéro de route), et interroge Supabase avec des clauses `OR` multi-termes très tolérantes pour garantir 100% de trajets trouvés.
 - **Recherche de Passages *(NOUVEAU)* :** Les voyageurs peuvent trouver des trajets même si leur destination est une **ville de passage (escale)** et non la destination finale du chauffeur.
 - **Filtres de Véhicules :** Barre de filtres (Tout / Voiture / Minibus / Moto) avec compteurs dynamiques.
-- **Filtres Avancés (Équipements) *(NOUVEAU)*:** Modale complète permettant de filtrer par tri (prix, heure, durée), par statut vérifié, et par de nombreux équipements (Max. 2 à l'arrière, Réservation instantanée, Climatisation, Animaux acceptés, etc.).
+- **Filtres Avancés (Équipements) *(AMÉLIORÉ)*:** Modale complète permettant de filtrer par tri (prix, heure, durée), par statut vérifié, et par de nombreux équipements (Max. 2 à l'arrière, Réservation instantanée, Climatisation, Animaux acceptés, etc.).
+- **Expiration des Trajets Passés *(NOUVEAU - SESSION 21)* :** Intégration du filtre `isRideExpired()` excluant automatiquement tous les trajets expirés (date de départ dépassée) des résultats de recherche.
 - **Carte Interactive :** Bouton "Afficher sur la carte" qui ouvre Google Maps avec le trajet.
 - **Escales & Tarifs :** Affichage des villes de passage et prix associés.
 - **Sélecteur de Date Adaptatif (Web & Mobile) *(NOUVEAU - SESSION 13)* :** Remplacement du libellé par défaut "Aujourd'hui" par "Départ" en couleur grise de placeholder. Sur téléphone (application native), ouverture du calendrier système natif. Sur ordinateur/web de bureau et mobile web, superposition d'un input date HTML standard (`<input type="date">`) transparent dans un conteneur `<div>` avec déclenchement `.showPicker()`, assurant le fonctionnement fiable du calendrier du navigateur lors du clic sur le conteneur.
@@ -71,6 +72,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Détails Véhicule :** Choix (Voiture, 4x4, Minibus, Moto) et champ pour la marque.
 - **Préférences et Équipements *(NOUVEAU)* :** Ajout de multiples options à cocher (Climatisation, Sièges Inclinables, Prises, etc.) qui s'enregistrent en base et pré-remplissent automatiquement chaque nouvelle annonce.
 - **Gestion des Annonces *(NOUVEAU)* :** Sur la page de détail de *son propre trajet*, le chauffeur dispose d'un panneau pour ajuster les places en temps réel (boutons `+` et `-`) ou supprimer totalement l'annonce.
+- **Historique & Trajets Expirés *(NOUVEAU - SESSION 21)* :** Les trajets terminés/passés dans l'onglet "Je conduis" sont automatiquement détectés, grisés (opacité `0.7`, fond gris), marqués d'un badge `"Trajet terminé"` et triés en bas de liste. L'historique du chauffeur est préservé tout en libérant l'espace supérieur pour les trajets actifs.
 
 ### 8. Système de Paiement Mobile Money *(STABLE - SESSION 19)*
 - **Gating de Contact :** Le numéro du conducteur est masqué jusqu'au paiement.
@@ -78,7 +80,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Frais dynamiques :** 10% du prix du trajet (min 1 000, max 5 000 Ar).
 - **Validation Automatique SMS *(S14/S16/S19)* :** Système de validation automatique des paiements Mobile Money via détection et parsing des SMS entrants (MVola/Orange/Airtel). L'app SMS Gateway sur le téléphone de l'admin intercepte les SMS, avec des parseurs regex adaptés au **format réel malgache** (gestion des espaces dans les montants et formats de références multiples).
 - **Intégration Realtime Instantanée *(S19)* :** Grâce à l'activation du Supabase Realtime sur la table `bookings`, l'écran du passager passe instantanément de "Vérification en cours..." à "Contact Déverrouillé" sans aucune actualisation manuelle de sa part dès que le SMS est traité.
-- **Notifications Push Expo *(NOUVEAU - S20)* :** Envoi d'une notification push silencieuse et immédiate sur le téléphone du passager dès que le webhook valide son paiement Mobile Money en arrière-plan.
+- **Notifications Push Expo *(AMÉLIORÉ - S21)* :** Envoi d'une notification push silencieuse et immédiate sur le téléphone du passager dès que le webhook valide son paiement Mobile Money en arrière-plan. Correction complète du `projectId` EAS officiel et liaison d'un écouteur global de tap redirigeant instantanément le passager vers le détail de son voyage (`/ride/[id]`).
 - **Table `sms_logs` :** Audit complet de tous les SMS Mobile Money reçus.
 - **Sécurisation Blindée :** Le numéro du chauffeur reste strictement verrouillé tant que la passerelle SMS n'a pas confirmé le paiement en base de données, empêchant tout contournement manuel.
 - **Chat de Confirmation Automatique :** Immédiatement après la validation du paiement, le système insère de manière asynchrone un message automatique dans le chat de la réservation.
@@ -183,4 +185,4 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 
 ---
 
-*Dernière mise à jour : **8 Juin 2026** — Session 20 : Refonte Premium UI et correction des chevauchements d'interface (z-index).*
+*Dernière mise à jour : **8 Juin 2026** — Session 21 : Correction de l'encombrement de la bande bleue timeline, augmentation du padding de scroll mobile, expiration des trajets passés et configuration des push notifications.*

@@ -94,8 +94,9 @@ miaradia-app/
 *   **Validation SMS Mobile Money *(RÉALISÉ - S16/S17)* :** Création d'une "Passerelle SMS" Native Android. L'application lit en arrière-plan les SMS MVola/Orange/Airtel entrants, compare avec les réservations en attente via une syntaxe RegExp ajustée au format malgache réel, et déverrouille automatiquement le contact chauffeur. Implémentation du système `PermissionsAndroid.request` (S17) et d'un double polling (Client & Admin) pour un rafraîchissement 100% sans contact.
 *   **Déploiement Web Vercel *(RÉALISÉ - S14)* :** Application en production sur https://miaradia-app.vercel.app avec CI/CD automatique (GitHub → Vercel) et gestion de l'historique de routage (S17).
 *   **Alertes Premium *(RÉALISÉ - S14)* :** Composant `CustomAlert` modal animé déployé sur toute l'application.
-*   **Notifications Push (Expo Notifications) *(RÉALISÉ - S20)* :** Intégration de `expo-notifications` pour alerter le passager instantanément sur son téléphone lorsque son paiement Mobile Money est validé en arrière-plan.
+*   **Notifications Push Expo *(AMÉLIORÉ - S21)* :** Intégration de `expo-notifications` (S20) + correction du `projectId` EAS officiel et ajout d'un écouteur global de clic sur notification (`addNotificationTapListener`) dans `_layout.tsx` redirigeant le passager vers le détail de son trajet validé.
 *   **Refonte UI Premium & Optimisations (S20) ✨ :** Déploiement transversal d'un système de "Dark Hero Header", design aéré des cartes (`borderRadius: 24`), ajustement drastique des densités sur écrans mobiles pour minimiser le scrolling, et compression extrême des avatars via `ImageManipulator` (300px, 40% JPEG).
+*   **Correctifs UI & Expiration Automatique des Trajets (S21) 🔧📅 :** Réduction de la timeline bleue verticale (`width: 56→44`) et augmentation du `paddingBottom` (`80→120`) pour corriger le contenu tronqué sur mobile. Filtre `isRideExpired()` dans les résultats de recherche + badge "Trajet terminé" + tri dynamique dans l'onglet conducteur.
 *   **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Obtenir un compte business Telma pour une validation encore plus fiable que la solution SMS Gateway.
 
 ### Phase 3 : Fiabilité & Mode Offline
@@ -120,4 +121,4 @@ miaradia-app/
 | **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
 | **SMS Gateway** | App Android sur téléphone admin | Gratuit |
 
-*Dernière mise à jour : **8 Juin 2026** - Session 20 (Refonte UI Premium)*
+*Dernière mise à jour : **8 Juin 2026** - Session 21 (Expiration + Correctifs UI + Push EAS)*
