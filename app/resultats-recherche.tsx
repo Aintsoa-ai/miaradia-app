@@ -283,200 +283,183 @@ export default function SearchResultsScreen() {
   const isDesktop = width > 768;
 
   const renderFilterSidebar = () => (
-    <View className="w-[310px] bg-white rounded-[16px] p-7 border border-slate-200 sticky top-24 self-start shadow-sm">
-      <View className="flex-row items-center justify-between mb-6">
-        <Text className="text-[#054752] font-black text-xl tracking-tight">Trier / Filtrer</Text>
+    <View style={{ width: 280, backgroundColor: 'white', borderRadius: 24, padding: 24, alignSelf: 'flex-start', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 16, elevation: 4 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+        <Text style={{ color: '#0F172A', fontWeight: '900', fontSize: 18 }}>Trier / Filtrer</Text>
         <TouchableOpacity onPress={() => { setSortBy('earliest'); setVerifiedOnly(false); setFilterAirConditioning(false); setFilterMax2Back(false); setFilterInstantBooking(false); }}>
-          <Text className="text-[#00AFF5] font-bold text-xs hover:underline">Tout effacer</Text>
+          <Text style={{ color: '#2563EB', fontWeight: '800', fontSize: 13 }}>Tout effacer</Text>
         </TouchableOpacity>
       </View>
       
-      <View className="space-y-6">
-        <View>
-          <Text className="text-[#707070] font-bold uppercase text-[10px] tracking-wider mb-3">Trier par</Text>
-          <View className="space-y-2">
-            {[
-              { id: 'earliest', label: 'Départ le plus tôt', icon: 'time-outline' },
-              { id: 'lowest_price', label: 'Prix le plus bas', icon: 'pricetag-outline' },
-              { id: 'shortest', label: 'Trajet le plus court', icon: 'hourglass-outline' }
-            ].map((opt: any) => (
-              <TouchableOpacity 
-                key={opt.id}
-                onPress={() => setSortBy(opt.id)}
-                className="flex-row items-center justify-between py-1.5"
-              >
-                <View className="flex-row items-center">
-                  <View className={`w-5 h-5 rounded-full border items-center justify-center mr-3 transition-colors ${sortBy === opt.id ? 'border-[#00AFF5]' : 'border-slate-300'}`}>
-                    {sortBy === opt.id && <View className="w-2.5 h-2.5 rounded-full bg-[#00AFF5]" />}
-                  </View>
-                  <Text className={`text-[14px] font-bold transition-colors ${sortBy === opt.id ? 'text-[#054752]' : 'text-slate-600'}`}>{opt.label}</Text>
-                </View>
-                <Ionicons name={opt.icon} size={16} color={sortBy === opt.id ? "#00AFF5" : "#94A3B8"} />
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View className="h-[1px] bg-slate-100" />
-
-        <View>
-          <Text className="text-[#707070] font-bold uppercase text-[10px] tracking-wider mb-3">Confiance et sécurité</Text>
-          <View className="space-y-3">
-            {[
-              { state: verifiedOnly, setter: setVerifiedOnly, label: 'Profil Vérifié', count: 10 },
-            ].map((f: any, i) => (
-              <TouchableOpacity key={i} onPress={() => f.setter(!f.state)} className="flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                  <View className={`w-5 h-5 rounded border items-center justify-center mr-3 transition-colors ${f.state ? 'bg-[#00AFF5] border-[#00AFF5]' : 'border-slate-300'}`}>
-                    {f.state && <Ionicons name="checkmark" size={13} color="white" />}
-                  </View>
-                  <Text className="text-slate-600 font-bold text-[14px]">{f.label}</Text>
-                </View>
-                <View className="flex-row items-center bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
-                  <Text className="text-[#00AFF5] text-[10px] font-extrabold">{f.count}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View className="h-[1px] bg-slate-100" />
-
-        <View>
-          <Text className="text-[#707070] font-bold uppercase text-[10px] tracking-wider mb-3">Équipements</Text>
-          <View className="space-y-3">
-            {[
-              { state: filterAirConditioning, setter: setFilterAirConditioning, label: 'Climatisation', icon: 'snow' },
-              { state: filterMax2Back, setter: setFilterMax2Back, label: 'Max. 2 à l\'arrière', icon: 'people' },
-              { state: filterInstantBooking, setter: setFilterInstantBooking, label: 'Réservation directe', icon: 'flash' },
-            ].map((f: any, i) => (
-              <TouchableOpacity key={i} onPress={() => f.setter(!f.state)} className="flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                  <View className={`w-5 h-5 rounded border items-center justify-center mr-3 transition-colors ${f.state ? 'bg-[#00AFF5] border-[#00AFF5]' : 'border-slate-300'}`}>
-                    {f.state && <Ionicons name="checkmark" size={13} color="white" />}
-                  </View>
-                  <Text className="text-slate-600 font-bold text-[14px]">{f.label}</Text>
-                </View>
-                <Ionicons name={f.icon as any} size={16} color={f.state ? "#00AFF5" : "#94A3B8"} />
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => {
-            const dep = Array.isArray(departure) ? departure[0] : departure;
-            const arr = Array.isArray(arrival) ? arrival[0] : arrival;
-            const url = `https://www.google.com/maps/dir/${encodeURIComponent(dep + ', Madagascar')}/${encodeURIComponent(arr + ', Madagascar')}`;
-            Linking.openURL(url);
-          }}
-          className="mt-6"
+      {/* TRIER PAR */}
+      <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Trier par</Text>
+      {[
+        { id: 'earliest', label: 'Départ le plus tôt', icon: 'time-outline' },
+        { id: 'lowest_price', label: 'Prix le plus bas', icon: 'pricetag-outline' },
+        { id: 'shortest', label: 'Trajet le plus court', icon: 'hourglass-outline' }
+      ].map((opt: any) => (
+        <TouchableOpacity 
+          key={opt.id}
+          onPress={() => setSortBy(opt.id)}
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10 }}
         >
-          <View className="h-28 bg-slate-50 rounded-[12px] overflow-hidden border border-slate-200 items-center justify-center hover:shadow transition-shadow">
-            <Image
-              source={{ uri: 'https://basemaps.cartocdn.com/rastertiles/voyager/5/20/17.png' }}
-              className="absolute w-full h-full opacity-60"
-            />
-            <View className="bg-white/95 px-4 py-2 rounded-full flex-row items-center border border-slate-200 shadow-sm">
-              <Ionicons name="map-outline" size={15} color="#054752" />
-              <Text className="text-[#054752] font-black text-xs ml-1.5">Voir sur la carte</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginRight: 12, borderColor: sortBy === opt.id ? '#2563EB' : '#CBD5E1' }}>
+              {sortBy === opt.id && <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#2563EB' }} />}
             </View>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: sortBy === opt.id ? '#0F172A' : '#475569' }}>{opt.label}</Text>
           </View>
+          <Ionicons name={opt.icon as any} size={16} color={sortBy === opt.id ? '#2563EB' : '#CBD5E1'} />
         </TouchableOpacity>
-      </View>
+      ))}
+
+      <View style={{ height: 1, backgroundColor: '#F1F5F9', marginVertical: 20 }} />
+
+      {/* CONFIANCE */}
+      <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Confiance et sécurité</Text>
+      <TouchableOpacity onPress={() => setVerifiedOnly(!verifiedOnly)} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ width: 20, height: 20, borderRadius: 4, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginRight: 12, backgroundColor: verifiedOnly ? '#2563EB' : 'white', borderColor: verifiedOnly ? '#2563EB' : '#CBD5E1' }}>
+            {verifiedOnly && <Ionicons name="checkmark" size={13} color="white" />}
+          </View>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: '#475569' }}>Profil Vérifié</Text>
+        </View>
+        <View style={{ backgroundColor: '#EFF6FF', borderWidth: 1, borderColor: '#DBEAFE', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 }}>
+          <Text style={{ color: '#2563EB', fontSize: 10, fontWeight: '900' }}>10</Text>
+        </View>
+      </TouchableOpacity>
+
+      <View style={{ height: 1, backgroundColor: '#F1F5F9', marginVertical: 20 }} />
+
+      {/* ÉQUIPEMENTS */}
+      <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Équipements</Text>
+      {[
+        { state: filterAirConditioning, setter: setFilterAirConditioning, label: 'Climatisation', icon: 'snow' },
+        { state: filterMax2Back, setter: setFilterMax2Back, label: 'Max. 2 à l\'arrière', icon: 'people' },
+        { state: filterInstantBooking, setter: setFilterInstantBooking, label: 'Réservation directe', icon: 'flash' },
+      ].map((f: any, i) => (
+        <TouchableOpacity key={i} onPress={() => f.setter(!f.state)} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ width: 20, height: 20, borderRadius: 4, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginRight: 12, backgroundColor: f.state ? '#2563EB' : 'white', borderColor: f.state ? '#2563EB' : '#CBD5E1' }}>
+              {f.state && <Ionicons name="checkmark" size={13} color="white" />}
+            </View>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: '#475569' }}>{f.label}</Text>
+          </View>
+          <Ionicons name={f.icon as any} size={16} color={f.state ? '#2563EB' : '#CBD5E1'} />
+        </TouchableOpacity>
+      ))}
+
+      {/* MAP BUTTON */}
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => {
+          const dep = Array.isArray(departure) ? departure[0] : departure;
+          const arr = Array.isArray(arrival) ? arrival[0] : arrival;
+          const url = `https://www.google.com/maps/dir/${encodeURIComponent(dep + ', Madagascar')}/${encodeURIComponent(arr + ', Madagascar')}`;
+          Linking.openURL(url);
+        }}
+        style={{ marginTop: 24, height: 100, backgroundColor: '#EFF6FF', borderRadius: 16, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#DBEAFE' }}
+      >
+        <Image source={{ uri: 'https://basemaps.cartocdn.com/rastertiles/voyager/5/20/17.png' }} style={{ position: 'absolute', width: '100%', height: '100%', opacity: 0.4 } as any} />
+        <View style={{ backgroundColor: 'white', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, flexDirection: 'row', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, elevation: 2 }}>
+          <Ionicons name="map-outline" size={15} color="#1E3A5F" />
+          <Text style={{ color: '#1E3A5F', fontWeight: '900', fontSize: 12, marginLeft: 8 }}>Voir sur la carte</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 
   return (
-    <View className="flex-1 bg-[#F6F6F6]">
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: '#F1F5F9' }}>
+      <StatusBar style="light" />
       
+      {/* MOBILE HEADER */}
       {!isDesktop && (
-        <View className="bg-white px-6 pt-16 pb-6 shadow-sm z-10">
-          <View className="flex-row items-center justify-between">
-            <TouchableOpacity onPress={handleBack} className="w-10 h-10 bg-gray-100 rounded-full items-center justify-center">
-              <Ionicons name="arrow-back" size={24} color="black" />
+        <View style={{ backgroundColor: '#1E3A5F', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <TouchableOpacity onPress={handleBack} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="arrow-back" size={20} color="white" />
             </TouchableOpacity>
-          <View className="items-center flex-1 mx-4">
-            <Text className="text-lg font-black text-[#054752]" numberOfLines={1}>{depStr} → {arrStr}</Text>
-            <Text className="text-[#707070] text-xs font-bold">{dateStr || 'Toutes dates'} • {filteredRides.length} {filteredRides.length > 1 ? 'annonces' : 'annonce'}</Text>
-          </View>
+            <View style={{ alignItems: 'center', flex: 1, marginHorizontal: 16 }}>
+              <Text style={{ fontSize: 17, fontWeight: '900', color: 'white' }} numberOfLines={1}>{depStr} → {arrStr}</Text>
+              <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: '600', marginTop: 2 }}>{filteredRides.length} trajet{filteredRides.length > 1 ? 's' : ''} disponible{filteredRides.length > 1 ? 's' : ''}</Text>
+            </View>
             <TouchableOpacity 
-              className="w-10 h-10 bg-blue-50 rounded-full items-center justify-center border border-blue-100"
+              style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}
               onPress={() => setShowFilterModal(true)}
             >
-              <Ionicons name="options-outline" size={24} color="#00AFF5" />
+              <Ionicons name="options-outline" size={20} color="white" />
             </TouchableOpacity>
           </View>
         </View>
       )}
 
       {isDesktop ? (
-        <ScrollView className="flex-1 bg-[#F6F6F6]" contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-          {/* BARRE DE RECHERCHE DESKTOP (STYLE BLABLACAR) */}
-          <View className="bg-white border-b border-slate-200 py-5 px-12 items-center mb-10 shadow-sm z-50">
-            <View className="bg-white rounded-[16px] border border-slate-200 flex-row items-center p-1.5 max-w-5xl w-full hover:border-[#00AFF5] hover:ring-2 hover:ring-[#00AFF5]/10 shadow-sm transition-all duration-200">
-              <View className="flex-[1.4] px-5 flex-row items-center border-r border-slate-100 h-12">
-                <Ionicons name="ellipse-outline" size={16} color="#707070" />
-                <Text className="ml-3 text-[16px] font-extrabold text-[#054752] truncate">{depStr}</Text>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+          {/* BARRE DE RECHERCHE DESKTOP */}
+          <View style={{ backgroundColor: '#1E3A5F', paddingVertical: 20, paddingHorizontal: 48, alignItems: 'center' }}>
+            <View style={{ backgroundColor: 'white', borderRadius: 20, flexDirection: 'row', alignItems: 'center', padding: 6, maxWidth: 960, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 8 }}>
+              <View style={{ flex: 2, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', borderRightWidth: 1, borderRightColor: '#F1F5F9', height: 48 }}>
+                <Ionicons name="ellipse-outline" size={16} color="#94A3B8" />
+                <Text style={{ marginLeft: 10, fontSize: 15, fontWeight: '800', color: '#0F172A' }} numberOfLines={1}>{depStr}</Text>
               </View>
-              <View className="flex-[1.4] px-5 flex-row items-center border-r border-slate-100 h-12">
-                <Ionicons name="location-outline" size={16} color="#707070" />
-                <Text className="ml-3 text-[16px] font-extrabold text-[#054752] truncate">{arrStr}</Text>
+              <View style={{ flex: 2, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', borderRightWidth: 1, borderRightColor: '#F1F5F9', height: 48 }}>
+                <Ionicons name="location-outline" size={16} color="#94A3B8" />
+                <Text style={{ marginLeft: 10, fontSize: 15, fontWeight: '800', color: '#0F172A' }} numberOfLines={1}>{arrStr}</Text>
               </View>
-              <View className="flex-1 px-5 flex-row items-center border-r border-slate-100 h-12">
-                <Ionicons name="calendar-outline" size={16} color="#707070" />
-                <Text className="ml-3 text-[16px] font-extrabold text-[#054752] truncate">{dateStr || "Aujourd'hui"}</Text>
+              <View style={{ flex: 1, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', borderRightWidth: 1, borderRightColor: '#F1F5F9', height: 48 }}>
+                <Ionicons name="calendar-outline" size={16} color="#94A3B8" />
+                <Text style={{ marginLeft: 10, fontSize: 14, fontWeight: '700', color: '#0F172A' }} numberOfLines={1}>{dateStr || "Aujourd'hui"}</Text>
               </View>
-              <View className="flex-1 px-5 flex-row items-center h-12">
-                <Ionicons name="person-outline" size={16} color="#707070" />
-                <Text className="ml-3 text-[16px] font-extrabold text-[#054752]">{passengers} {passengers > 1 ? 'passagers' : 'passager'}</Text>
+              <View style={{ flex: 1, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', height: 48 }}>
+                <Ionicons name="person-outline" size={16} color="#94A3B8" />
+                <Text style={{ marginLeft: 10, fontSize: 14, fontWeight: '700', color: '#0F172A' }}>{passengers} passager{passengers > 1 ? 's' : ''}</Text>
               </View>
               <TouchableOpacity 
                 onPress={() => router.push('/(tabs)')}
-                className="bg-[#00AFF5] px-6 h-10 rounded-full items-center justify-center ml-2 hover:bg-[#0096D1] transition-colors"
+                style={{ backgroundColor: '#2563EB', paddingHorizontal: 24, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginLeft: 8, shadowColor: '#2563EB', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 }}
               >
-                <Text className="text-white font-extrabold text-xs uppercase tracking-wider">Modifier</Text>
+                <Text style={{ color: 'white', fontWeight: '900', fontSize: 13 }}>Modifier</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <View className="max-w-5xl mx-auto w-full flex-row gap-8 px-8">
+          <View style={{ maxWidth: 1100, alignSelf: 'center', width: '100%', flexDirection: 'row', gap: 24, paddingHorizontal: 32, paddingTop: 32 }}>
             {/* SIDEBAR */}
             {renderFilterSidebar()}
 
             {/* LISTE DES TRAJETS */}
-            <View className="flex-1">
-              {/* TABS (STYLE BLABLACAR) */}
-              <View className="bg-white rounded-[12px] border border-slate-200 flex-row p-1 mb-8 h-12 shadow-sm">
-                 {['Tout', 'Covoiturage', 'Bus'].map((type: any) => (
-                    <TouchableOpacity 
-                     key={type}
-                     onPress={() => setFilterType(type)}
-                     className={`flex-1 rounded-[8px] items-center justify-center flex-row transition-colors ${filterType === type ? 'bg-[#F6F6F6] border border-slate-100 shadow-xs' : ''}`}
-                    >
-                      <Ionicons 
-                       name={type === 'Tout' ? 'list' : type === 'Covoiturage' ? 'car-sport' : 'bus'} 
-                       size={16} 
-                       color={filterType === type ? '#054752' : '#94A3B8'} 
-                      />
-                      <Text className={`ml-2 font-bold text-xs ${filterType === type ? 'text-[#054752]' : 'text-slate-500'}`}>{type} • {rides.length}</Text>
-                    </TouchableOpacity>
-                 ))}
+            <View style={{ flex: 1 }}>
+              {/* ONGLETS TYPE */}
+              <View style={{ backgroundColor: 'white', borderRadius: 20, flexDirection: 'row', padding: 6, marginBottom: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 12, elevation: 2 }}>
+                {['Tout', 'Covoiturage', 'Bus'].map((type: any) => (
+                  <TouchableOpacity 
+                    key={type}
+                    onPress={() => setFilterType(type)}
+                    style={{ flex: 1, borderRadius: 14, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', paddingVertical: 10, backgroundColor: filterType === type ? '#F8FAFC' : 'transparent' }}
+                  >
+                    <Ionicons name={type === 'Tout' ? 'list' : type === 'Covoiturage' ? 'car-sport' : 'bus'} size={16} color={filterType === type ? '#0F172A' : '#94A3B8'} />
+                    <Text style={{ marginLeft: 8, fontWeight: '800', fontSize: 13, color: filterType === type ? '#0F172A' : '#94A3B8' }}>{type} • {rides.length}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
 
-              <View className="flex-row items-center justify-between mb-6">
-                  <Text className="text-[#054752] font-black text-2xl tracking-tight">{dateStr ? `Trajets pour le ${dateStr}` : `Trajets disponibles`}</Text>
-                  <Text className="text-[#707070] text-xs font-bold bg-white border border-slate-200 px-3.5 py-1 rounded-full">{filteredRides.length} trajets</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <Text style={{ color: '#0F172A', fontWeight: '900', fontSize: 22 }}>{dateStr ? `Trajets pour le ${dateStr}` : 'Trajets disponibles'}</Text>
+                <View style={{ backgroundColor: 'white', borderWidth: 1, borderColor: '#E2E8F0', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20 }}>
+                  <Text style={{ color: '#475569', fontSize: 12, fontWeight: '800' }}>{filteredRides.length} trajet{filteredRides.length > 1 ? 's' : ''}</Text>
+                </View>
               </View>
 
               {loading ? (
-                <ActivityIndicator size="large" color="#2563EB" className="mt-20" />
+                <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 60 }} />
               ) : filteredRides.length === 0 ? (
-                <View className="items-center bg-white rounded-[40px] p-20 shadow-sm border border-gray-100">
-                  <Ionicons name="car-outline" size={100} color="#CBD5E1" />
-                  <Text className="text-gray-500 text-xl mt-6 font-bold">Aucun trajet pour cette destination</Text>
+                <View style={{ alignItems: 'center', backgroundColor: 'white', borderRadius: 28, padding: 60, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+                  <View style={{ width: 100, height: 100, backgroundColor: '#EFF6FF', borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+                    <Ionicons name="car-sport" size={40} color="#2563EB" />
+                  </View>
+                  <Text style={{ color: '#0F172A', fontSize: 20, fontWeight: '900', marginBottom: 12 }}>Aucun trajet trouvé</Text>
+                  <Text style={{ color: '#64748B', fontSize: 15, textAlign: 'center' }}>Aucune annonce ne correspond à votre recherche pour le moment.</Text>
                 </View>
               ) : (
                 filteredRides.map(ride => <RideCard key={ride.id} ride={ride} onPress={handleBooking} isDesktop />)
@@ -486,15 +469,15 @@ export default function SearchResultsScreen() {
         </ScrollView>
       ) : (
         <>
-          <View className="bg-white border-b border-gray-100 px-4 py-3">
+          <View style={{ backgroundColor: 'white', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' }}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {['Tout', 'Voiture', 'Minibus', 'Moto'].map((type: any) => (
                 <TouchableOpacity 
                   key={type}
                   onPress={() => setFilterType(type)}
-                  className={`flex-row items-center rounded-full px-4 py-2 ${filterType === type ? 'bg-blue-600' : 'border border-gray-200 bg-white'}`}
+                  style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8, backgroundColor: filterType === type ? '#2563EB' : 'white', borderWidth: 1, borderColor: filterType === type ? '#2563EB' : '#E2E8F0' }}
                 >
-                  <Text className={`font-black text-xs ${filterType === type ? 'text-white' : 'text-gray-700'}`}>{type}</Text>
+                  <Text style={{ fontWeight: '900', fontSize: 13, color: filterType === type ? 'white' : '#475569' }}>{type}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -508,25 +491,23 @@ export default function SearchResultsScreen() {
               const url = `https://www.google.com/maps/dir/${encodeURIComponent(dep + ', Madagascar')}/${encodeURIComponent(arr + ', Madagascar')}`;
               Linking.openURL(url);
             }}
-            className="mx-4 mt-3 mb-1 h-32 bg-blue-50 rounded-3xl overflow-hidden border border-blue-100 items-center justify-center"
+            style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 4, height: 110, backgroundColor: '#EFF6FF', borderRadius: 24, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#DBEAFE' }}
           >
-            <Image
-              source={{ uri: 'https://basemaps.cartocdn.com/rastertiles/voyager/5/20/17.png' }}
-              className="absolute w-full h-full opacity-60"
-            />
-            <View className="bg-blue-600 px-5 py-2.5 rounded-full flex-row items-center shadow-lg">
+            <Image source={{ uri: 'https://basemaps.cartocdn.com/rastertiles/voyager/5/20/17.png' }} style={{ position: 'absolute', width: '100%', height: '100%', opacity: 0.5 } as any} />
+            <View style={{ backgroundColor: '#2563EB', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, flexDirection: 'row', alignItems: 'center' }}>
               <Ionicons name="location" size={16} color="white" />
-              <Text className="text-white font-black ml-2">Afficher sur la carte</Text>
+              <Text style={{ color: 'white', fontWeight: '900', marginLeft: 8 }}>Afficher sur la carte</Text>
             </View>
           </TouchableOpacity>
 
-          <ScrollView className="flex-1 px-4 pt-3" showsVerticalScrollIndicator={false}>
+          <ScrollView style={{ flex: 1, paddingHorizontal: 16, paddingTop: 12 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
             {loading ? (
-              <ActivityIndicator size="large" color="#2563EB" className="mt-20" />
+              <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 60 }} />
             ) : filteredRides.length === 0 ? (
-              <View className="items-center mt-20">
-                <Ionicons name="car-outline" size={80} color="#CBD5E1" />
-                <Text className="text-gray-500 text-lg mt-4 font-bold">Aucun trajet trouvé</Text>
+              <View style={{ alignItems: 'center', marginTop: 40, backgroundColor: 'white', borderRadius: 24, padding: 40 }}>
+                <Ionicons name="car-outline" size={60} color="#CBD5E1" />
+                <Text style={{ color: '#0F172A', fontSize: 18, fontWeight: '900', marginTop: 16, marginBottom: 8 }}>Aucun trajet trouvé</Text>
+                <Text style={{ color: '#64748B', textAlign: 'center' }}>Aucune annonce ne correspond à votre recherche.</Text>
               </View>
             ) : (
               filteredRides.map((ride) => <RideCard key={ride.id} ride={ride} onPress={handleBooking} />)
@@ -536,39 +517,35 @@ export default function SearchResultsScreen() {
       )}
 
       <Modal visible={showFilterModal} animationType="slide" presentationStyle="pageSheet">
-        {/* EXISTING MOBILE FILTER MODAL */}
-        <View className="flex-1 bg-gray-50">
-          <View className="flex-row items-center justify-between p-4 bg-white border-b border-gray-100">
-            <TouchableOpacity onPress={() => setShowFilterModal(false)}><Ionicons name="close" size={24} /></TouchableOpacity>
-            <Text className="text-xl font-black">Filtres</Text>
-            <View className="w-10" />
+        <View style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#F1F5F9' }}>
+            <TouchableOpacity onPress={() => setShowFilterModal(false)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="close" size={20} color="#0F172A" />
+            </TouchableOpacity>
+            <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Filtres</Text>
+            <View style={{ width: 36 }} />
           </View>
-          <ScrollView className="p-4">
-            <Text className="text-gray-500 font-bold mb-4">TRIER PAR</Text>
-            <TouchableOpacity onPress={() => setSortBy('earliest')} className="bg-white p-4 rounded-2xl mb-2 flex-row justify-between items-center">
-              <Text className="font-bold">Départ le plus tôt</Text>
-              {sortBy === 'earliest' && <Ionicons name="checkmark" size={20} color="blue" />}
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setSortBy('lowest_price')} className="bg-white p-4 rounded-2xl mb-6 flex-row justify-between items-center">
-              <Text className="font-bold">Prix le plus bas</Text>
-              {sortBy === 'lowest_price' && <Ionicons name="checkmark" size={20} color="blue" />}
-            </TouchableOpacity>
-            
-            <Text className="text-gray-500 font-bold mb-4">ÉQUIPEMENTS</Text>
-            <View className="bg-white rounded-2xl p-2">
-              <View className="flex-row justify-between items-center p-3 border-b border-gray-50">
-                <Text>Climatisation</Text>
-                <Switch value={filterAirConditioning} onValueChange={setFilterAirConditioning} />
-              </View>
-              <View className="flex-row justify-between items-center p-3">
-                <Text>Max 2 à l'arrière</Text>
-                <Switch value={filterMax2Back} onValueChange={setFilterMax2Back} />
-              </View>
+          <ScrollView style={{ padding: 20 }}>
+            <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Trier par</Text>
+            {[{ id: 'earliest', label: 'Départ le plus tôt' }, { id: 'lowest_price', label: 'Prix le plus bas' }].map((opt: any) => (
+              <TouchableOpacity key={opt.id} onPress={() => setSortBy(opt.id)} style={{ backgroundColor: 'white', padding: 16, borderRadius: 16, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={{ fontWeight: '700', color: '#0F172A' }}>{opt.label}</Text>
+                {sortBy === opt.id && <Ionicons name="checkmark-circle" size={20} color="#2563EB" />}
+              </TouchableOpacity>
+            ))}
+            <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginTop: 20, marginBottom: 12 }}>Équipements</Text>
+            <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 8 }}>
+              {[{ state: filterAirConditioning, setter: setFilterAirConditioning, label: 'Climatisation' }, { state: filterMax2Back, setter: setFilterMax2Back, label: "Max 2 à l'arrière" }].map((f: any, i) => (
+                <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderBottomWidth: i === 0 ? 1 : 0, borderBottomColor: '#F1F5F9' }}>
+                  <Text style={{ fontWeight: '700', color: '#0F172A' }}>{f.label}</Text>
+                  <Switch value={f.state} onValueChange={f.setter} trackColor={{ true: '#2563EB' }} />
+                </View>
+              ))}
             </View>
           </ScrollView>
-          <View className="p-6">
-            <TouchableOpacity onPress={() => setShowFilterModal(false)} className="bg-blue-600 py-4 rounded-2xl items-center">
-              <Text className="text-white font-bold">Appliquer</Text>
+          <View style={{ padding: 20 }}>
+            <TouchableOpacity onPress={() => setShowFilterModal(false)} style={{ backgroundColor: '#2563EB', paddingVertical: 16, borderRadius: 20, alignItems: 'center', shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 16, elevation: 8 }}>
+              <Text style={{ color: 'white', fontWeight: '900', fontSize: 15 }}>Appliquer les filtres</Text>
             </TouchableOpacity>
           </View>
         </View>
