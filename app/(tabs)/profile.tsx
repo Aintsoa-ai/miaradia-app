@@ -443,60 +443,96 @@ export default function ProfileScreen() {
   const isDesktop = width > 768;
 
   return (
-    <View className="flex-1 bg-slate-50">
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: '#F1F5F9' }}>
+      <StatusBar style="light" />
       
-      <View className={`flex-1 ${isDesktop ? 'max-w-3xl mx-auto w-full py-10' : 'pt-16'}`}>
-        <View className={`${isDesktop ? 'bg-white rounded-[32px] shadow-sm border border-slate-200 flex-1 overflow-hidden' : 'flex-1'}`}>
-          <View className={`px-8 flex-row items-center ${isDesktop ? 'py-8 border-b border-slate-100' : 'mb-4'}`}>
-            <TouchableOpacity onPress={() => router.push('/(tabs)')} className="w-10 h-10 bg-slate-100 hover:bg-slate-200 transition-colors rounded-full items-center justify-center mr-4">
-              <Ionicons name="arrow-back" size={20} color="#0F172A" />
+      <KeyboardAwareScrollView 
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 60, alignItems: isDesktop ? 'center' : 'stretch' }} 
+        showsVerticalScrollIndicator={false}
+        enableOnAndroid={true}
+        extraScrollHeight={100}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* HERO HEADER */}
+        <View style={{
+          backgroundColor: '#1E3A5F',
+          paddingTop: isDesktop ? 60 : 80,
+          paddingBottom: 90,
+          paddingHorizontal: 32,
+          width: '100%',
+          alignItems: isDesktop ? 'center' : 'flex-start',
+        }}>
+          {!isDesktop && (
+            <TouchableOpacity onPress={() => router.push('/(tabs)')} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', marginBottom: 28 }}>
+              <Ionicons name="arrow-back" size={20} color="white" />
             </TouchableOpacity>
-            <View>
-              <Text className="text-3xl font-black text-slate-900 tracking-tight">Mon Profil</Text>
-              <Text className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Gérer vos informations</Text>
+          )}
+
+          <Text style={{ color: 'white', fontSize: isDesktop ? 36 : 32, fontWeight: '900', letterSpacing: -0.5, marginBottom: 8 }}>
+            Mon Profil
+          </Text>
+          <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15, fontWeight: '500', textTransform: 'uppercase', letterSpacing: 1 }}>
+            Gérer vos informations
+          </Text>
+        </View>
+
+        {/* MAIN CONTAINER */}
+        <View style={{
+          width: '100%',
+          maxWidth: isDesktop ? 700 : '100%',
+          alignItems: 'center',
+          marginTop: -60,
+          paddingHorizontal: isDesktop ? 40 : 20,
+        }}>
+
+          {/* FLOATING AVATAR HEADER */}
+          <View style={{
+            width: '100%',
+            backgroundColor: 'white',
+            borderRadius: 32,
+            padding: 24,
+            paddingTop: 0,
+            alignItems: 'center',
+            shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.08, shadowRadius: 24, elevation: 8,
+            marginBottom: 24
+          }}>
+            <TouchableOpacity 
+              onPress={pickImage}
+              style={{
+                width: 120, height: 120, borderRadius: 60,
+                backgroundColor: '#EFF6FF',
+                borderWidth: 6, borderColor: 'white',
+                marginTop: -60,
+                marginBottom: 16,
+                alignItems: 'center', justifyContent: 'center',
+                overflow: 'hidden',
+                shadowColor: '#2563EB', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 12, elevation: 6,
+              }}
+            >
+              {uploading ? (
+                <ActivityIndicator color="#2563EB" />
+              ) : profileImage ? (
+                <Image source={{ uri: profileImage }} style={{ width: '100%', height: '100%' }} />
+              ) : (
+                <Ionicons name="person" size={50} color="#2563EB" />
+              )}
+              <View style={{ position: 'absolute', bottom: 0, width: '100%', height: 30, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' }}>
+                 <Ionicons name="camera" size={16} color="white" />
+              </View>
+            </TouchableOpacity>
+
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#0F172A', marginBottom: 4 }}>{displayName}</Text>
+            
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+              <Ionicons name="shield-checkmark" size={14} color="#059669" />
+              <Text style={{ fontSize: 13, color: '#059669', fontWeight: '700', marginLeft: 4 }}>Profil vérifié</Text>
+            </View>
+
+            <View style={{ backgroundColor: '#EFF6FF', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="star" size={14} color="#2563EB" />
+              <Text style={{ color: '#1D4ED8', fontWeight: '900', fontSize: 13, marginLeft: 6 }}>Super Driver • 5.0</Text>
             </View>
           </View>
-
-          <KeyboardAwareScrollView 
-            contentContainerStyle={{ paddingHorizontal: isDesktop ? 32 : 24, paddingBottom: 60, paddingTop: isDesktop ? 32 : 0 }} 
-            showsVerticalScrollIndicator={false}
-            enableOnAndroid={true}
-            extraScrollHeight={100}
-            keyboardShouldPersistTaps="handled"
-            enableAutomaticScroll={true}
-            resetScrollToCoords={{ x: 0, y: 0 }}
-          >
-            
-            {/* En-tête Profil */}
-            <View className={`bg-white rounded-3xl p-6 mb-8 flex-row items-center ${!isDesktop ? 'shadow-sm shadow-slate-200 border border-slate-100' : 'border border-slate-200 bg-slate-50/50'}`}>
-              <TouchableOpacity 
-                className="w-24 h-24 bg-blue-50 rounded-full items-center justify-center border-4 border-white shadow-sm mr-6 relative overflow-hidden group hover:opacity-90 transition-opacity"
-                onPress={pickImage}
-              >
-                {uploading ? (
-                  <ActivityIndicator color="#2563EB" />
-                ) : profileImage ? (
-                  <Image source={{ uri: profileImage }} className="w-full h-full" />
-                ) : (
-                  <Ionicons name="person" size={40} color="#2563EB" />
-                )}
-                <View className="absolute bottom-0 w-full h-1/3 bg-black/30 items-center justify-center">
-                   <Ionicons name="camera" size={14} color="white" />
-                </View>
-              </TouchableOpacity>
-              <View className="flex-1">
-                <Text className="text-2xl font-black text-slate-900 tracking-tight">{displayName}</Text>
-                <View className="flex-row items-center mt-1 mb-2">
-                  <Ionicons name="camera-outline" size={14} color="#64748B" />
-                  <Text className="text-slate-500 font-bold ml-1 text-xs">Vrai visage uniquement</Text>
-                </View>
-                <View className="bg-blue-50 self-start px-3 py-1.5 rounded-full flex-row items-center">
-                  <Ionicons name="star" size={12} color="#2563EB" />
-                  <Text className="text-blue-700 font-black text-xs ml-1">Super Driver • 5.0</Text>
-                </View>
-              </View>
-            </View>
 
             {/* ALERTE PHOTO RÉELLE */}
             <View className="bg-red-50 border border-red-100 rounded-[24px] p-6 mb-8">
@@ -541,15 +577,20 @@ export default function ProfileScreen() {
             )}
 
             {/* Mes Informations */}
-            <View className={`bg-white rounded-[24px] p-6 mb-8 ${!isDesktop ? 'shadow-sm shadow-slate-200 border border-slate-100' : 'border border-slate-200 bg-slate-50/30'}`}>
-              <Text className="text-xl font-black text-slate-900 tracking-tight mb-6">Informations Personnelles</Text>
+            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, marginBottom: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                  <Ionicons name="person" size={16} color="#2563EB" />
+                </View>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Informations Personnelles</Text>
+              </View>
               
-              <View className="flex-row gap-4 mb-4">
-                <View className="flex-1">
-                  <Text className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-2 ml-1">Prénom</Text>
-                  <View className="bg-white rounded-2xl p-4 border border-slate-200">
+              <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: isDesktop ? 16 : 12, marginBottom: 16 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Prénom</Text>
+                  <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      className="text-base font-bold text-slate-900"
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
                       value={firstName}
                       onChangeText={setFirstName}
                       placeholder="Votre prénom"
@@ -558,11 +599,11 @@ export default function ProfileScreen() {
                   </View>
                 </View>
 
-                <View className="flex-1">
-                  <Text className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-2 ml-1">Nom</Text>
-                  <View className="bg-white rounded-2xl p-4 border border-slate-200">
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Nom</Text>
+                  <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      className="text-base font-bold text-slate-900"
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
                       value={lastName}
                       onChangeText={setLastName}
                       placeholder="Votre nom"
@@ -572,33 +613,35 @@ export default function ProfileScreen() {
                 </View>
               </View>
 
-              <Text className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-2 ml-1 mt-2">Numéro de téléphone</Text>
-              <View className={`bg-white rounded-2xl p-4 border ${phoneError ? 'border-red-300 bg-red-50' : 'border-slate-200'}`}>
-                <View className="flex-row items-center">
-                  <Ionicons name="call-outline" size={20} color={phoneError ? "#EF4444" : "#64748B"} />
-                  <TextInput
-                    className="text-base font-bold text-slate-900 ml-3 flex-1"
-                    value={phone}
-                    onChangeText={formatPhoneInput}
-                    placeholder="034 00 000 00"
-                    placeholderTextColor="#94A3B8"
-                    keyboardType="phone-pad"
-                    maxLength={13}
-                  />
-                </View>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Numéro de téléphone</Text>
+              <View style={{ backgroundColor: phoneError ? '#FEF2F2' : '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: phoneError ? '#FECACA' : '#E2E8F0', flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="call-outline" size={18} color={phoneError ? "#EF4444" : "#94A3B8"} style={{ marginRight: 10 }} />
+                <TextInput
+                  style={{ flex: 1, fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
+                  value={phone}
+                  onChangeText={formatPhoneInput}
+                  placeholder="034 00 000 00"
+                  placeholderTextColor="#94A3B8"
+                  keyboardType="phone-pad"
+                  maxLength={13}
+                />
               </View>
-              {phoneError ? <Text className="text-red-500 text-[10px] mt-1.5 font-bold ml-1">{phoneError}</Text> : null}
+              {phoneError ? <Text style={{ color: '#EF4444', fontSize: 11, fontWeight: '700', marginTop: 6, marginLeft: 4 }}>{phoneError}</Text> : null}
             </View>
 
             {/* Ma Bio */}
-            <View className={`bg-white rounded-[24px] p-6 mb-8 ${!isDesktop ? 'shadow-sm shadow-slate-200 border border-slate-100' : 'border border-slate-200 bg-slate-50/30'}`}>
-              <Text className="text-xl font-black text-slate-900 tracking-tight mb-6">À propos de moi</Text>
-              <View className="bg-white rounded-2xl p-4 border border-slate-200">
+            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, marginBottom: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                  <Ionicons name="chatbubble-ellipses" size={16} color="#2563EB" />
+                </View>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>À propos de moi</Text>
+              </View>
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#E2E8F0' }}>
                 <TextInput
                   multiline
                   numberOfLines={4}
-                  className="text-base text-slate-700 font-medium leading-relaxed"
-                  style={{ minHeight: 100, textAlignVertical: 'top' }}
+                  style={{ fontSize: 15, color: '#334155', fontWeight: '500', minHeight: 100, textAlignVertical: 'top', outlineStyle: 'none' } as any}
                   value={bio}
                   onChangeText={setBio}
                   placeholder="Décrivez-vous en quelques mots..."
@@ -608,74 +651,68 @@ export default function ProfileScreen() {
             </View>
 
             {/* Mon Véhicule */}
-            <View className={`bg-white rounded-[24px] p-6 mb-8 ${!isDesktop ? 'shadow-sm shadow-slate-200 border border-slate-100' : 'border border-slate-200 bg-slate-50/30'}`}>
-              <View className="flex-row justify-between items-center mb-6">
-                <Text className="text-xl font-black text-slate-900 tracking-tight">Mon Véhicule</Text>
+            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, marginBottom: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                  <Ionicons name="car-sport" size={16} color="#2563EB" />
+                </View>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Mon Véhicule</Text>
               </View>
               
-
-              
-              <Text className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-3 ml-1">Type de véhicule</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-6">
-                <View className="flex-row items-center gap-3">
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>Type de véhicule</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 24 }}>
+                <View style={{ flexDirection: 'row', gap: 12 }}>
                   {['Voiture', '4x4', 'Minibus', 'Moto'].map((type) => (
                   <TouchableOpacity 
                     key={type}
                     onPress={() => setVehicleType(type)}
-                    className={`items-center justify-center py-4 px-6 rounded-2xl border transition-all ${
-                      vehicleType === type ? 'bg-slate-900 border-slate-900' : 'bg-white border-slate-200'
-                    }`}
-                    style={{ minWidth: 100 }}
+                    style={{
+                      alignItems: 'center', justifyContent: 'center', paddingVertical: 16, paddingHorizontal: 20, borderRadius: 20,
+                      borderWidth: 2, borderColor: vehicleType === type ? '#2563EB' : '#E2E8F0',
+                      backgroundColor: vehicleType === type ? '#EFF6FF' : '#F8FAFC',
+                      minWidth: 100
+                    }}
                   >
                     {type === 'Moto' ? (
-                       <MaterialCommunityIcons name="motorbike" size={28} color={vehicleType === type ? "white" : "#64748B"} />
+                       <MaterialCommunityIcons name="motorbike" size={28} color={vehicleType === type ? "#2563EB" : "#94A3B8"} />
                     ) : type === '4x4' ? (
-                       <MaterialCommunityIcons name="jeepney" size={28} color={vehicleType === type ? "white" : "#64748B"} />
+                       <MaterialCommunityIcons name="jeepney" size={28} color={vehicleType === type ? "#2563EB" : "#94A3B8"} />
                     ) : type === 'Minibus' ? (
-                       <MaterialCommunityIcons name="van-passenger" size={28} color={vehicleType === type ? "white" : "#64748B"} />
+                       <MaterialCommunityIcons name="van-passenger" size={28} color={vehicleType === type ? "#2563EB" : "#94A3B8"} />
                     ) : (
-                      <Ionicons name="car" size={28} color={vehicleType === type ? "white" : "#64748B"} />
+                      <Ionicons name="car" size={28} color={vehicleType === type ? "#2563EB" : "#94A3B8"} />
                     )}
-                    <Text className={`font-bold mt-2 text-sm ${vehicleType === type ? 'text-white' : 'text-slate-500'}`}>{type}</Text>
+                    <Text style={{ fontWeight: '800', marginTop: 8, fontSize: 13, color: vehicleType === type ? '#2563EB' : '#64748B' }}>{type}</Text>
                   </TouchableOpacity>
                 ))}
                 </View>
               </ScrollView>
 
               {/* Guide des catégories de véhicules */}
-              <View className="bg-slate-50 rounded-2xl p-5 mb-8 border border-slate-200">
-                <View className="flex-row items-center mb-4">
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 20, padding: 20, marginBottom: 24, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
                   <Ionicons name="information-circle" size={20} color="#64748B" />
-                  <Text className="text-slate-700 font-black ml-2">Guide des catégories</Text>
+                  <Text style={{ color: '#334155', fontWeight: '900', marginLeft: 8, fontSize: 14 }}>Guide des catégories</Text>
                 </View>
                 
-                <Text className="font-black text-slate-900 mt-2">1 à 2 Places</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Voiturettes / Micro-citadines :</Text> Très petites voitures de ville, parfois sans permis.</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Coupés/Roadsters :</Text> Sportive à deux portes, souvent 2 places.</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Petits Utilitaires :</Text> Transport de marchandises, 2-3 places (conducteur + passager).</Text>
+                <Text style={{ fontWeight: '900', color: '#0F172A', marginTop: 4, fontSize: 13 }}>1 à 2 Places</Text>
+                <Text style={{ fontSize: 12, color: '#64748B', marginBottom: 4, lineHeight: 18 }}><Text style={{ fontWeight: '700' }}>Voiturettes :</Text> Très petites voitures de ville.</Text>
+                <Text style={{ fontSize: 12, color: '#64748B', marginBottom: 4, lineHeight: 18 }}><Text style={{ fontWeight: '700' }}>Coupés :</Text> Sportive à deux portes.</Text>
                 
-                <Text className="font-black text-slate-900 mt-4">4 à 5 Places (Classique)</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Citadines polyvalentes :</Text> Compactes ville et trajets courts (ex: Clio, 208).</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Berlines / Compactes :</Text> Idéales pour le confort sur longs trajets.</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">SUV / Crossovers :</Text> Très populaires, position de conduite haute.</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Breaks :</Text> Dérivés de berlines avec un coffre plus volumineux.</Text>
+                <Text style={{ fontWeight: '900', color: '#0F172A', marginTop: 12, fontSize: 13 }}>4 à 5 Places (Classique)</Text>
+                <Text style={{ fontSize: 12, color: '#64748B', marginBottom: 4, lineHeight: 18 }}><Text style={{ fontWeight: '700' }}>Citadines / Berlines :</Text> Idéales pour le confort.</Text>
+                <Text style={{ fontSize: 12, color: '#64748B', marginBottom: 4, lineHeight: 18 }}><Text style={{ fontWeight: '700' }}>SUV / Crossovers :</Text> Position de conduite haute.</Text>
 
-                <Text className="font-black text-slate-900 mt-4">5 à 7 Places</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Monospaces (MPV) / SUV :</Text> Intègrent des sièges rétractables (ex: Peugeot 5008).</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Grands SUV/Break :</Text> Proposent jusqu'à 7 places (ex: Audi Q7).</Text>
-
-                <Text className="font-black text-slate-900 mt-4">8 à 9 Places</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Ludospaces / Vans / Minibus :</Text> Conçus pour les familles ou groupes.</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Van (8 places) :</Text> 2 places avant et 2 banquettes arrière.</Text>
-                <Text className="text-xs text-slate-600 mb-1 leading-relaxed"><Text className="font-bold">Minibus (9 places) :</Text> Configuration classique 3+3+3.</Text>
+                <Text style={{ fontWeight: '900', color: '#0F172A', marginTop: 12, fontSize: 13 }}>5 à 9 Places</Text>
+                <Text style={{ fontSize: 12, color: '#64748B', marginBottom: 4, lineHeight: 18 }}><Text style={{ fontWeight: '700' }}>Monospaces / Vans :</Text> Conçus pour les groupes.</Text>
               </View>
 
-              <View className="flex-row gap-4 mb-4">
-                <View className="flex-1">
-                  <Text className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-2 ml-1">Carrosserie</Text>
-                  <View className="bg-white rounded-2xl p-4 border border-slate-200">
+              <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 16, marginBottom: 8 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Carrosserie</Text>
+                  <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      className="text-base font-bold text-slate-900"
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
                       value={vehicleSpecificType}
                       onChangeText={setVehicleSpecificType}
                       placeholder="Ex: SUV, Berline..."
@@ -684,11 +721,11 @@ export default function ProfileScreen() {
                   </View>
                 </View>
 
-                <View className="flex-[1.5]">
-                  <Text className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-2 ml-1">Modèle & Couleur</Text>
-                  <View className="bg-white rounded-2xl p-4 border border-slate-200">
+                <View style={{ flex: 1.5 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Modèle & Couleur</Text>
+                  <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      className="text-base font-bold text-slate-900"
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
                       value={vehicleModel}
                       onChangeText={setVehicleModel}
                       placeholder="Ex: Renault Duster - Blanc"
@@ -700,10 +737,15 @@ export default function ProfileScreen() {
             </View>
 
             {/* Mes Préférences */}
-            <View className={`bg-white rounded-[24px] p-6 mb-10 ${!isDesktop ? 'shadow-sm shadow-slate-200 border border-slate-100' : 'border border-slate-200 bg-slate-50/30'}`}>
-              <Text className="text-xl font-black text-slate-900 tracking-tight mb-6">Équipements & Règles</Text>
+            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, marginBottom: 32, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                  <Ionicons name="options" size={16} color="#2563EB" />
+                </View>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Équipements & Règles</Text>
+              </View>
               
-              <View className="space-y-1">
+              <View style={{ gap: 4 }}>
                 {[
                   { state: smokeAllowed, setter: setSmokeAllowed, label: 'Fumeurs acceptés', icon: 'logo-no-smoking' },
                   { state: petsAllowed, setter: setPetsAllowed, label: 'Animaux acceptés', icon: 'paw' },
@@ -715,12 +757,12 @@ export default function ProfileScreen() {
                   { state: toilet, setter: setToilet, label: 'Toilettes', icon: 'water' },
                   { state: musicAllowed, setter: setMusicAllowed, label: 'Musique en voyage', icon: 'musical-notes' },
                 ].map((item, index) => (
-                  <View key={index} className="flex-row items-center justify-between py-4 border-b border-slate-100 last:border-0">
-                    <View className="flex-row items-center">
-                      <View className="w-10 h-10 rounded-full bg-slate-50 items-center justify-center border border-slate-100 mr-4">
-                        <Ionicons name={item.icon as any} size={18} color="#64748B" />
+                  <View key={index} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#F8FAFC', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                        <Ionicons name={item.icon as any} size={16} color="#64748B" />
                       </View>
-                      <Text className="text-[15px] font-bold text-slate-700">{item.label}</Text>
+                      <Text style={{ fontSize: 15, fontWeight: '700', color: '#334155' }}>{item.label}</Text>
                     </View>
                     <Switch
                       trackColor={{ false: "#E2E8F0", true: "#93C5FD" }}
@@ -733,17 +775,17 @@ export default function ProfileScreen() {
               </View>
 
               {/* Préférences Personnalisées */}
-              <View className="mt-8 border-t border-slate-200 pt-8">
-                <Text className="text-lg font-black text-slate-900 mb-6">Notes supplémentaires</Text>
+              <View style={{ marginTop: 24, paddingTop: 24, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
+                <Text style={{ fontSize: 16, fontWeight: '900', color: '#0F172A', marginBottom: 16 }}>Notes supplémentaires</Text>
                 
-                <View className="space-y-3 mb-6">
+                <View style={{ gap: 12, marginBottom: 16 }}>
                   {customPreferences.map((pref, index) => (
-                    <View key={index} className="flex-row items-center justify-between bg-white rounded-2xl p-4 border border-slate-200">
-                      <View className="flex-row items-center flex-1 pr-4">
-                        <Ionicons name="information-circle" size={20} color="#2563EB" />
-                        <Text className="text-[15px] font-semibold text-slate-700 ml-3">{pref}</Text>
+                    <View key={index} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, paddingRight: 16 }}>
+                        <Ionicons name="information-circle" size={18} color="#2563EB" />
+                        <Text style={{ fontSize: 14, fontWeight: '600', color: '#334155', marginLeft: 10 }}>{pref}</Text>
                       </View>
-                      <TouchableOpacity onPress={() => handleRemovePreference(index)} className="p-2 bg-red-50 rounded-full transition-colors">
+                      <TouchableOpacity onPress={() => handleRemovePreference(index)} style={{ padding: 6, backgroundColor: '#FEF2F2', borderRadius: 20 }}>
                         <Ionicons name="trash" size={16} color="#EF4444" />
                       </TouchableOpacity>
                     </View>
@@ -751,10 +793,10 @@ export default function ProfileScreen() {
                 </View>
 
                 {/* Ajouter une préférence */}
-                <View className="flex-row items-center">
-                  <View className="flex-1 bg-white rounded-2xl p-4 border border-slate-200 mr-3">
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ flex: 1, backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', marginRight: 12 }}>
                     <TextInput
-                      className="text-[15px] font-semibold text-slate-900"
+                      style={{ fontSize: 14, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
                       placeholder="Ex: Arrêt pipi toutes les 2h..."
                       placeholderTextColor="#94A3B8"
                       value={newPreference}
@@ -763,7 +805,7 @@ export default function ProfileScreen() {
                   </View>
                   <TouchableOpacity 
                     onPress={handleAddPreference}
-                    className="bg-slate-900 w-14 h-14 rounded-2xl items-center justify-center hover:bg-slate-800 transition-colors"
+                    style={{ backgroundColor: '#0F172A', width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Ionicons name="add" size={24} color="white" />
                   </TouchableOpacity>
@@ -771,36 +813,41 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            {/* Save, Déconnexion & Suppression */}
-            <View className="space-y-4 mb-10">
+            {/* Actions de fin */}
+            <View style={{ width: '100%', marginBottom: 40, gap: 16 }}>
               <TouchableOpacity 
                 onPress={handleSaveProfile}
-                className="w-full bg-blue-600 h-14 rounded-[24px] items-center justify-center hover:bg-blue-700 transition-colors"
+                style={{
+                  backgroundColor: '#2563EB',
+                  paddingVertical: 18, borderRadius: 20, alignItems: 'center',
+                  shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 10,
+                }}
               >
-                <Text className="text-white font-black text-sm uppercase tracking-widest">Enregistrer le profil</Text>
+                <Text style={{ color: 'white', fontWeight: '900', fontSize: 15, letterSpacing: 0.5 }}>Enregistrer le profil</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
                 onPress={handleSignOut}
-                className="w-full bg-white h-14 rounded-[24px] items-center justify-center border border-red-200 hover:bg-red-50 transition-colors"
+                style={{
+                  backgroundColor: 'white', paddingVertical: 18, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#FECACA',
+                }}
               >
-                <Text className="text-red-600 font-bold text-sm uppercase tracking-widest">Se déconnecter</Text>
+                <Text style={{ color: '#DC2626', fontWeight: '800', fontSize: 15 }}>Se déconnecter</Text>
               </TouchableOpacity>
 
-              {/* Ligne de séparation discrète */}
-              <View className="h-[1px] bg-slate-100 my-2" />
+              <View style={{ height: 1, backgroundColor: '#E2E8F0', marginVertical: 8 }} />
 
               <TouchableOpacity 
                 onPress={handleDeleteAccount}
-                className="w-full h-12 rounded-[24px] items-center justify-center flex-row"
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12 }}
               >
                 <Ionicons name="trash-outline" size={16} color="#94A3B8" />
-                <Text className="text-slate-400 font-semibold text-xs ml-2">Supprimer mon compte</Text>
+                <Text style={{ color: '#94A3B8', fontWeight: '700', fontSize: 13, marginLeft: 8 }}>Supprimer mon compte</Text>
               </TouchableOpacity>
             </View>
 
-          </KeyboardAwareScrollView>
-        </View>
+          </View>
+        </KeyboardAwareScrollView>
       </View>
     </View>
   );
