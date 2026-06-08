@@ -1,9 +1,38 @@
 // @ts-nocheck
+// =============================================================================
+// 🚫🚫🚫  ZONE INTOUCHABLE — NE PAS MODIFIER CE FICHIER  🚫🚫🚫
+// =============================================================================
+//
+//  Ce fichier est le CŒUR du système de monétisation de Miara-Dia.
+//  Il gère la validation automatique "zéro-clic" des paiements Mobile Money
+//  (MVola / Orange Money / Airtel Money) via interception de SMS.
+//
+//  ✅ STATUT : EN PRODUCTION — VALIDÉ — TESTÉ DE BOUT EN BOUT (Session 19)
+//
+//  ⛔ AVANT DE MODIFIER QUOI QUE CE SOIT ICI, VOUS DEVEZ :
+//     1. Demander explicitement l'autorisation au chef de projet
+//     2. Tester la modification dans un environnement de staging
+//     3. Valider un test de paiement de bout en bout avant déploiement
+//
+//  ⛔ NE PAS TOUCHER :
+//     - La fonction parseMobileMoneySMS() (parseurs Regex MVola/Orange/Airtel)
+//     - La logique de normalisation des numéros (normalize())
+//     - La logique de matching des bookings (filter + includes)
+//     - Le bloc de mise à jour du statut 'completed'
+//     - L'insertion dans sms_logs
+//     - L'envoi du message automatique au chauffeur
+//
+//  Toute modification non autorisée peut casser l'intégralité du flux de
+//  réservation et de paiement de l'application.
+//
+// =============================================================================
 // Supabase Edge Function : sms-webhook
 // Reçoit les SMS MVola/Orange/Airtel depuis l'app SMS Gateway
 // Compare avec les réservations en attente et valide automatiquement
+// =============================================================================
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;

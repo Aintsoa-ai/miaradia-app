@@ -147,6 +147,31 @@ export default function SearchResultsScreen() {
     ));
   };
 
+  /**
+   * Vérifie si un trajet est expiré.
+   * Règle : Un trajet du 8 juin disparaît à partir du 9 juin (minuit).
+   * Format de la date en base : "DD-MM-YYYY à HH:MM" (ex: "08-06-2026 à 07:00")
+   */
+  const isRideExpired = (rideDateStr: string): boolean => {
+    if (!rideDateStr) return false;
+    try {
+      // Extraire la partie date "DD-MM-YYYY"
+      const datePart = rideDateStr.split(' à ')[0].trim();
+      const parts = datePart.split('-');
+      if (parts.length !== 3) return false;
+      const [day, month, year] = parts;
+      // Construire la date de départ à minuit
+      const rideDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      // Obtenir aujourd'hui à minuit (heure locale)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      // Le trajet est expiré si sa date est STRICTEMENT AVANT aujourd'hui
+      return rideDate < today;
+    } catch (e) {
+      return false;
+    }
+  };
+
   const fetchRides = async () => {
     try {
       setLoading(true);
@@ -188,39 +213,44 @@ export default function SearchResultsScreen() {
       console.log("[SearchResults] Supabase raw count:", data ? data.length : 0);
 
       // Transformation pour l'UI avec vraies distances Madagascar
-      const formatted = (data || []).map(r => {
-        const routeInfo = getRouteInfo(r.departure || '', r.arrival || '');
-        const depTime = r.date?.split(' à ')[1] || '07:00';
-        const durMin = r.duration_min || routeInfo.durationMin || 0;
-        return {
-          id: r.id,
-          departure: r.departure,
-          arrival: r.arrival,
-          departureTime: depTime,
-          arrivalTime: r.arrival_time || calculateArrivalTime(depTime, durMin),
-          price: r.price,
-          seatsLeft: r.seats,
-          duration: r.duration || routeInfo.duration,
-          distance: r.distance || routeInfo.distance,
-          driverName: r.driver_name || 'Conducteur',
-          driver_avatar: r.driver_avatar,
-          driver_id: r.driver_id,
-          rating: r.rating || 4.8,
-          type: r.vehicle_type || 'Voiture',
-          stopovers: r.stopovers || [],
-          max2Back: r.max_2_back || false,
-          instantBooking: r.instant_booking || false,
-          allowsSmoking: r.allows_smoking || false,
-          allowsPets: r.allows_pets || false,
-          recliningSeats: r.reclining_seats || false,
-          powerOutlets: r.power_outlets || false,
-          toilet: r.toilet || false,
-          airConditioning: r.air_conditioning || false,
-          baggageSize: r.baggage_size || 'Moyen',
-          hasRoofRack: r.has_roof_rack || false
-        };
-      });
+      const formatted = (data || [])
+        // 🗓️ FILTRE EXPIRATION : Exclure les trajets dont la date est passée
+        .filter(r => !isRideExpired(r.date || ''))
+        .map(r => {
+          const routeInfo = getRouteInfo(r.departure || '', r.arrival || '');
+          const depTime = r.date?.split(' à ')[1] || '07:00';
+          const durMin = r.duration_min || routeInfo.durationMin || 0;
+          return {
+            id: r.id,
+            departure: r.departure,
+            arrival: r.arrival,
+            date: r.date,
+            departureTime: depTime,
+            arrivalTime: r.arrival_time || calculateArrivalTime(depTime, durMin),
+            price: r.price,
+            seatsLeft: r.seats,
+            duration: r.duration || routeInfo.duration,
+            distance: r.distance || routeInfo.distance,
+            driverName: r.driver_name || 'Conducteur',
+            driver_avatar: r.driver_avatar,
+            driver_id: r.driver_id,
+            rating: r.rating || 4.8,
+            type: r.vehicle_type || 'Voiture',
+            stopovers: r.stopovers || [],
+            max2Back: r.max_2_back || false,
+            instantBooking: r.instant_booking || false,
+            allowsSmoking: r.allows_smoking || false,
+            allowsPets: r.allows_pets || false,
+            recliningSeats: r.reclining_seats || false,
+            powerOutlets: r.power_outlets || false,
+            toilet: r.toilet || false,
+            airConditioning: r.air_conditioning || false,
+            baggageSize: r.baggage_size || 'Moyen',
+            hasRoofRack: r.has_roof_rack || false
+          };
+        });
 
+      console.log("[SearchResults] After expiry filter:", formatted.length, "rides");
       setRides(formatted);
     } catch (e: any) {
       CustomAlert.alert("Erreur", e.message);

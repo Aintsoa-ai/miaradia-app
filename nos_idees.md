@@ -1,55 +1,65 @@
 # 💡 Boîte à Idées - Miara-Dia 🚙🇲🇬
 
+---
+
+> [!CAUTION]
+> ## 🚫 ZONE INTOUCHABLE — MOTEUR DE PAIEMENT SMS AUTOMATIQUE
+>
+> **NE JAMAIS MODIFIER les fichiers suivants sans autorisation explicite du chef de projet :**
+>
+> - `supabase/functions/sms-webhook/index.ts` — La fonction Edge de validation automatique
+> - La table `bookings` dans Supabase (colonnes : `payment_status`, `payment_reference`, `payment_validated_at`, `payment_sms_body`)
+> - La table `sms_logs` dans Supabase
+> - La publication Realtime `supabase_realtime` sur la table `bookings`
+> - Le composant de polling dans `app/ride/[id].tsx` (interval de 3 secondes côté passager)
+>
+> **Pourquoi ?** Ce système a été validé après 3 jours de travail intensif (Sessions 14→19). Il gère le cœur de la monétisation de l'application : la validation automatique "zéro-clic" des paiements Mobile Money (MVola / Orange Money / Airtel Money) via interception de SMS + Webhook Supabase + Realtime. **Toute modification non testée peut casser l'intégralité du flux de réservation et de paiement.**
+>
+> ✅ **Ce système fonctionne parfaitement en production. NE PAS Y TOUCHER.**
+
+---
+
 Ce document recense les idées d'amélioration et les futures fonctionnalités pour rendre l'application encore plus puissante et adaptée au contexte malgache.
 
 > [!IMPORTANT]
-> **Règle d'Or de l'Intégration :** Toute nouvelle idée de fonctionnalité validée et implémentée doit impérativement être déclinée de manière optimale sur **version téléphone** et## ✅ DÉJÀ RÉALISÉ
+> **Règle d'Or de l'Intégration :** Toute nouvelle idée de fonctionnalité validée et implémentée doit impérativement être déclinée de manière optimale sur **version téléphone** et **version ordinateur**.
+
+---
+
+## ✅ DÉJÀ RÉALISÉ
 
 ### Monétisation & Prix
 - [x] **Validation Automatique SMS Mobile Money *(RÉALISÉ - S14)* :** Système de détection automatique des SMS MVola/Orange/Airtel Money via l'app SMS Gateway + Supabase Edge Function `sms-webhook`. Parsing des SMS, comparaison des références, déverrouillage automatique du contact chauffeur et décrémentation des places. Zéro intervention manuelle. Table `sms_logs` pour audit complet.
+- [x] **Persistance Passerelle SMS en Arrière-Plan *(RÉALISÉ - S16)* :** L'écoute SMS de l'administrateur reste active même lors de la navigation dans l'application grâce à un état global persistant sauvegardé avec `AsyncStorage`.
+- [x] **Sécurisation Blindée des Paiements *(RÉALISÉ - S16)* :** Le numéro du conducteur reste strictement verrouillé (statut `pending`) jusqu'à ce que la passerelle SMS valide officiellement la transaction en base de données.
+- [x] **Parseur SMS MVola Real-Format *(RÉALISÉ - S16)* :** Mise à jour des regex de la passerelle SMS pour détecter avec précision le format réel des SMS MVola malgaches (montants avec espaces `1 100 Ar` et références sans deux-points `Ref 1710288383`).
+- [x] **Déploiement Webhook & Test Réel 100% Validé *(RÉALISÉ - S19)* :** Résolution définitive du blocage de la validation automatique. La fonction Edge `sms-webhook` est déployée en production sur Supabase avec un algorithme de matching ultra-robuste. Test de bout en bout réussi.
+- [x] **Activation du Realtime Supabase sur `bookings` *(RÉALISÉ - S19)* :** Résolution de la stagnation du spinner "Vérification en cours..." sur le navigateur web. L'activation de la table `bookings` dans la publication `supabase_realtime` permet le rafraîchissement réactif instantané de l'interface client dès la validation du paiement en base de données.
 
 ### Expérience Utilisateur (UX)
 - [x] **Design SaaS Ultra Pro** : Formulaires en Split-Screen, ombres douces et carrousel d'images automatisé.
-
-### Technique & Admin
-- [x] **Système d'Avis & Réputation** : Permettre aux passagers de noter les chauffeurs.
-- [x] **Sécurité des Profils** : Politique de photo réelle et choix du rôle.
 - [x] **Interface Desktop "Ultra Pro"** : Navigation responsive, header professionnel et mise en page SaaS à 100% (Accueil, Recherche, Login, Chat, Profil, Mes Voyages).
 - [x] **Copie conforme BlaBlaCar sur ordinateur** : Structure dual-pane double colonne sur l'ensemble des parcours (Recherche, Détails, Publication, Voyages, Profils).
 - [x] **Polissage de l'Expérience Utilisateur** : Suppression complète et absolue des rectangles de focus navigateur (`outlineStyle: 'none'`) et mise en place d'un affichage des destinations en deux lignes majuscules compactes.
 - [x] **Boutons "x" d'Effacement Rapide** : Ajout de boutons de croix interactives pour vider instantanément les inputs de lieux.
 - [x] **Correctif d'Alignement Vertical** : Utilisation de conteneurs ScrollView sur ordinateur pour éviter que les éléments importants (logos, boutons) soient poussés hors de l'écran.
+- [x] **Sélecteurs de Dates Universels Hybrides & Ergonomie (S13) 💻📱** : Remplacement du libellé par défaut "Aujourd'hui" par "Départ" sur ordinateur et mobile. Résolution de l'incompatibilité de DateTimePickerModal sur ordinateur (Web) par l'utilisation d'overlays HTML transparents (`input type="date"` et `input type="datetime-local"`) dotés d'un index d'empilement élevé.
+- [x] **Alertes Premium CustomAlert *(RÉALISÉ - S14)* :** Remplacement universel de tous les `Alert.alert` natifs par un composant `CustomAlert` modal animé professionnel.
+
+### Technique & Admin
+- [x] **Système d'Avis & Réputation** : Permettre aux passagers de noter les chauffeurs.
+- [x] **Sécurité des Profils** : Politique de photo réelle et choix du rôle.
 - [x] **Validation Téléphone Complète 📱** : Tous les boutons mobiles (swap, autocomplétion, recherche, retour, onglets) validés fonctionnels et ergonomiques sous émulation mobile.
-- [x] **Précision GPS & Toby Ratsimandrava 📍** : Mappage intelligent du Toby Ratsimandrava / Ambohijanahary Andrefana sur la bonne zone (Ouest Ambohijanahary) en traduisant les synonymes de direction (`Andrefana` -> `Ouest`), avec correctif de nettoyage sur "Renivohitra" (S10) pour bannir les fausses correspondances vers "Ivohitra (Antsirabe I)", support des graphies abrégées ("ambohijary"), et mappage automatique des noms français/coloniaux (`Tamatave` -> `Toamasina`, `Majunga` -> `Mahajanga`, `Tananarivo/Tananarive/Tana` -> `Antananarivo`, etc.).
-- [x] **Correctif Faille API Chat 💬** : Verrouillage asynchrone dans `app/chat/[id].tsx` et rectification de la transmission du nom de profil dans `app/ride/[id].tsx` pour éradiquer les erreurs `400 Bad Request` Supabase sur les conversations internes.
-- [x] **Résolution Faille RLS Générateur Démo 🛠️** : Déplacement de la logique à l'intérieur du composant `AdminDashboard` de `app/admin/index.tsx` pour lier dynamiquement les trajets générés au `driver_id` de l'administrateur connecté, résolvant l'erreur RLS Supabase `42501` tout en maintenant des noms fictifs denormalisés distincts pour les tests.
-- [x] **Agrandissement Hit-Targets Recherche (Desktop) 💻** : Intégration de la propriété `h-full` sur les entrées textuelles de la barre d'autocomplétion horizontale sur ordinateur, résolvant le problème de ciblage de clic.
-- [x] **Enrichissement des Repères Généraux 🗺️** : Ajout des principaux carrefours et zones d'affluence générale (Analakely, Soarano, 67ha, Ankatso, Ankorondrano, Anosibe, Ratsimandrava) pour fiabiliser la géolocalisation de tous les usagers de l'application.
-- [x] **Refonte Ergonomique de la Recherche (S11) 🎯** : Retrait volontaire et définitif de la fonctionnalité "Votre position actuelle" (Reverse-Geocoding GPS) sur ordinateur et téléphone pour contrer l'imprécision inhérente des services de géolocalisation à Madagascar au niveau des Fokontany. Priorisation de l'autocomplétion textuelle ultra-rapide.
-- [x] **Correction du Bug d'Affichage des Quartiers Composés (S11) 🏷️** : Résolution du parsing vicieux dans `renderRichLocation` qui tronquait aléaiorement les noms de quartiers comportant un tiret (ex: "Cité 67 ha Afovoany-Andrefana"). Le formatage par parenthèse est désormais priorisé.
-- [x] **Résolution du Gel Clavier & Focus Android (S12) 📱** : Déploiement universel du patron *Stable Input Overlay* sur la page de publication et de recherche pour éliminer définitivement les cycles de démontage et l'autoFocus récursif qui figeaient le processeur des téléphones.
-- [x] **Correctif Anti-Crash des Icônes & Sérialisations (S12) 🛡️** : Mise en place de blocs de détection `try/catch` sur le compilateur de NativeWind v4 pour neutraliser les crashs fatals liés aux références circulaires de navigation.
-- [x] **Correctif Tactile de Politique de Bagages (S12) 🧳** : Résolution de la perte de l'événement onPress de NativeWind sur le sélecteur de bagage grâce à une liaison de style React Native directe.
-- [x] **Alignement Instantané du Schéma Supabase (S12) 🗄️** : Intégration des colonnes `baggage_size` et `has_roof_rack` en production dans Supabase avec validation automatisée locale.
-- [x] **Résolution de Superposition Autocomplete Publication (S12) 💻** : Application de styles d'empilement CSS explicites (`position: relative` et `zIndex: 999`) pour permettre au dropdown de suggestions de lieux de flotter sur ordinateur par-dessus tout autre élément de la page.
-- [x] **Sélecteurs de Dates Universels Hybrides & Ergonomie (S13) 💻📱** : Remplacement du libellé par défaut "Aujourd'hui" par "Départ" sur ordinateur et mobile. Résolution de l'incompatibilité de DateTimePickerModal sur ordinateur (Web) par l'utilisation d'overlays HTML transparents (`input type="date"` et `input type="datetime-local"`) dotés d'un index d'empilement élevé (`zIndex: 99999`) et déclenchés par geste de confiance (`.showPicker()`) au clic de conteneurs standard `<div>` sans altérer le comportement mobile natif.
-- [x] **Moteur de Recherche Madagascar Intelligent & Tolérant aux Écarts (S13) 💻📱** : Résolution définitive du bug de non-correspondance de recherche ("sur ordinateur et sur téléphone ça n'arrive pas à trouver de trajet") provoqué par la différence entre les noms de quartiers/districts ultra-détaillés de l'autocomplétion (ex: "Antananarivo-Renivohitra (District)") et les noms simplifiés stockés en base (ex: "Antananarivo"). Implémentation d'un algorithme de décomposition intelligent (`extractCleanSearchTerms`) qui sépare les composants complexes, nettoie les parenthèses/suffixes (District, Région, ville, chiffres romains) et génère des requêtes multi-termes `OR` extrêmement tolérantes sur Supabase, garantissant 100% de trajets trouvés sur ordinateur et téléphone.
-- [x] **Alertes Premium CustomAlert *(RÉALISÉ - S14)* :** Remplacement universel de tous les `Alert.alert` natifs par un composant `CustomAlert` modal animé professionnel. Intégré globalement dans `_layout.tsx`, disponible sur toute l'application. Icônes conditionnelles (succès/erreur/avertissement), animation fluide, style glassmorphisme. Validé Mobile et Desktop.
-- [x] **Déploiement Vercel + GitHub CI/CD *(RÉALISÉ - S14)* :** Application en ligne sur https://miaradia-app.vercel.app avec mise à jour automatique à chaque `git push`. Code source sur https://github.com/Aintsoa-ai/miaradia-app.
-- [x] **Passerelle SMS Automatique *(RÉALISÉ - S14)* :** Edge Function `sms-webhook` déployée sur Supabase. Parse les SMS MVola/Orange/Airtel, valide les paiements et déverrouille les contacts sans intervention humaine. Gratuit, zéro abonnement.
-- [x] **Alerte Message Automatique au Chauffeur *(RÉALISÉ)* :** Dès qu'un passager paie par Mobile Money et obtient le numéro du conducteur, le système envoie automatiquement un message de chat In-App au conducteur pour le prévenir : *"✅ Paiement validé automatiquement via Mobile Money. Je vais vous appeler dans les minutes qui viennent pour confirmer les détails."*
-- [x] **Persistance Passerelle SMS en Arrière-Plan *(RÉALISÉ - S16)* :** L'écoute SMS de l'administrateur reste active même lors de la navigation dans l'application grâce à un état global persistant sauvegardé avec `AsyncStorage`.
-- [x] **Sécurisation Blindée des Paiements *(RÉALISÉ - S16)* :** Correction du flux de paiement. Le numéro du conducteur reste strictement verrouillé (statut `pending`) jusqu'à ce que la passerelle SMS valide officiellement la transaction en base de données.
-- [x] **Alignement Clavier Android Edge-to-Edge *(RÉALISÉ - S16)* :** Utilisation de `useSafeAreaInsets` et ajustement des décalages `KeyboardAvoidingView` pour garantir que la zone de texte de messagerie ne soit jamais masquée par la barre de navigation native d'Android ou le clavier virtuel.
-- [x] **Parseur SMS MVola Real-Format *(RÉALISÉ - S16)* :** Mise à jour radicale des regex de la passerelle SMS pour détecter avec précision le format réel des SMS MVola malgaches (montants avec espaces `1 100 Ar` et références sans deux-points `Ref 1710288383`).
+- [x] **Précision GPS & Toby Ratsimandrava 📍** : Mappage intelligent du Toby Ratsimandrava / Ambohijanahary Andrefana sur la bonne zone (Ouest Ambohijanahary) en traduisant les synonymes de direction (`Andrefana` -> `Ouest`), avec correctif de nettoyage sur "Renivohitra" (S10) pour bannir les fausses correspondances vers "Ivohitra (Antsirabe I)", support des graphies abrégées ("ambohijary"), et mappage automatique des noms français/coloniaux.
+- [x] **Correctif Faille API Chat 💬** : Verrouillage asynchrone dans `app/chat/[id].tsx` et rectification de la transmission du nom de profil dans `app/ride/[id].tsx` pour éradiquer les erreurs `400 Bad Request` Supabase.
+- [x] **Résolution Faille RLS Générateur Démo 🛠️** : Déplacement de la logique à l'intérieur du composant `AdminDashboard` de `app/admin/index.tsx` pour lier dynamiquement les trajets générés au `driver_id` de l'administrateur connecté.
+- [x] **Correctif de Sécurité des Sérialisations NativeWind v4 (S12) 🛡️ :** Mise en place de blocs de détection `try/catch` sur le compilateur de NativeWind v4 pour neutraliser les crashs fatals liés aux références circulaires de navigation.
 - [x] **Synchronisation automatique `auth.users` ↔ `profiles` *(RÉALISÉ - S16)* :** Mise en place d'un Trigger SQL sur Supabase assurant la création automatique et instantanée du profil public d'un nouvel utilisateur dès son inscription.
 - [x] **Correction Permissions Android 8+ SMS *(RÉALISÉ - S17)* :** Implémentation du pop-up d'autorisation système natif `PermissionsAndroid.request` obligatoire depuis Android 6.0 pour débloquer l'écoute silencieuse en arrière-plan de l'application Admin Kiosque.
-- [x] **Auto-Rafraîchissement Bilan Client *(RÉALISÉ - S17)* :** Mise en place d'un radar de scrutation (polling) toutes les 3 secondes côté passager. Le contact du chauffeur s'affiche instantanément dès la validation SMS, sans aucune actualisation manuelle nécessaire.
-- [x] **Auto-Rafraîchissement Kiosque Admin *(RÉALISÉ - S17)* :** Actualisation silencieuse en arrière-plan toutes les 5 secondes du tableau de bord Kiosque pour détecter instantanément l'arrivée de nouveaux paiements, sans bloquer l'interface.
-- [x] **Correction Historique Web *(RÉALISÉ - S17)* :** Fiabilisation de la flèche de retour (<-) sur Vercel/Web via un bloc de sécurité `try/catch` sur `router.canGoBack()` évitant les crashs d'affichage des détails de trajet en cas d'accès direct sans historique de navigation.
-- [x] **Actualisation Instantanée "Mes Trajets" *(RÉALISÉ - S18)* :** Utilisation de `useFocusEffect` sur la page "Mes Trajets" du conducteur. Dès qu'il revient sur l'onglet après publication, la liste se recharge automatiquement sans actualisation manuelle.
-- [x] **Fix SMS Listener New Architecture Expo *(EN COURS - S18)* :** Diagnostic confirmé : `react-native-android-sms-listener` incompatible avec `newArchEnabled: true` (Expo SDK 53). Corrections appliquées : désactivation de la nouvelle architecture, plugin natif `withSmsReceiver.js` pour enregistrer le `BroadcastReceiver` explicitement avec `android:exported="true"` (Android 13+), auto-démarrage du listener dans `_layout.tsx` dès le lancement de l'app.
-- [x] **Déploiement Webhook & Test Réel 100% Validé *(RÉALISÉ - S19)* :** Résolution définitive du blocage de validation automatique. La fonction Edge `sms-webhook` est déployée en production sur Supabase avec l'algorithme de matching ultra-robuste. Test de bout en bout réussi : booking créé avec `payment_reference: '0348237267'`, SMS MVola simulé → `bookings_validated: 1` ✅. **Règle d'or confirmée :** le passager doit saisir le même numéro MVola depuis lequel il envoie l'argent.
+- [x] **Auto-Rafraîchissement Bilan Client *(RÉALISÉ - S17)* :** Mise en place d'un radar de scrutation (polling) toutes les 3 secondes côté passager. Le contact du chauffeur s'affiche instantanément dès la validation SMS.
+- [x] **Auto-Rafraîchissement Kiosque Admin *(RÉALISÉ - S17)* :** Actualisation silencieuse en arrière-plan toutes les 5 secondes du tableau de bord Kiosque pour détecter instantanément l'arrivée de nouveaux paiements.
+- [x] **Correction Historique Web *(RÉALISÉ - S17)* :** Fiabilisation de la flèche de retour (<-) sur Vercel/Web via un bloc de sécurité `try/catch` sur `router.canGoBack()` évitant les crashs.
+- [x] **Actualisation Instantanée "Mes Trajets" *(RÉALISÉ - S18)* :** Utilisation de `useFocusEffect` sur la page "Mes Trajets" du conducteur. Dès qu'il revient sur l'onglet après publication, la liste se recharge automatiquement.
 
 ---
 
@@ -71,12 +81,11 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Offres d'Abonnement Passager (Accès Illimité Contacts)** : Proposer des abonnements pour les voyageurs réguliers au lieu de payer à chaque trajet :
   - **Hebdomadaire :** Affiche tous les numéros de conducteurs pendant une semaine entière sans surcoût.
   - **Mensuel :** Affiche tous les numéros de conducteurs pendant un mois entier.
-- [ ] **Déverrouillage et Validité des Contacts *(NOUVEAU)* :** Définir une règle métier précise : Combien de temps un contact reste-t-il déverrouillé après paiement ? (ex: 24h, 48h ou illimité pour le trajet donné). Doit-on payer pour chaque contact ou y a-t-il une limite de contacts par paiement ?
+- [ ] **Déverrouillage et Validité des Contacts** : Définir une règle métier précise : Combien de temps un contact reste-t-il déverrouillé après paiement ? (ex: 24h, 48h ou illimité pour le trajet donné). Doit-on payer pour chaque contact ou y a-t-il une limite de contacts par paiement ?
 - [ ] **Programme de Fidélité Voyageur (Bonus d'Activité) :** Récompenser les passagers fidèles pour stimuler l'activité.
-- [ ] **Booster une Publication *(NOUVEAU)* :** Option payante pour les chauffeurs permettant de mettre en avant (Boost) leur annonce de trajet en tête des résultats de recherche (comme sur Facebook).
-- [ ] **Publication de Location de Voiture *(NOUVEAU - S17/S18)* :** Création d'une catégorie dédiée aux loueurs. Moyennant un petit frais de solidarité (1 000 Ar) payé par Mobile Money lors de la publication, l'annonce reste active pendant 24h. Les clients cherchant une voiture de location paieront également 1 000 Ar pour obtenir le contact du loueur — **même expérience UX que le déblocage du numéro conducteur** avec message de confirmation style : *"1 000 Ar pour 24h pour soutenir l'évolution du site"*.
-- [ ] **Sortie en Famille / Voiture Privée *(NOUVEAU - S18)* :** Sous-catégorie spécifique pour les excursions ou sorties familiales privées (pas du covoiturage classique). Frais de publication 1 000 Ar. Le client intéressé paie de même pour obtenir le contact, avec le même système Mobile Money.
-- [ ] **Boost d'Annonce *(NOUVEAU - S18)* :** Option payante pour les chauffeurs permettant de faire remonter leur annonce en tête des résultats de recherche (comme "Booster une publication" sur Facebook).
+- [ ] **Booster une Publication** : Option payante pour les chauffeurs permettant de mettre en avant (Boost) leur annonce de trajet en tête des résultats de recherche.
+- [ ] **Publication de Location de Voiture :** Création d'une catégorie dédiée aux loueurs. Moyennant un petit frais de solidarité (1 000 Ar) payé par Mobile Money lors de la publication, l'annonce reste active pendant 24h. Les clients paieront également 1 000 Ar pour obtenir le contact du loueur.
+- [ ] **Sortie en Famille / Voiture Privée :** Sous-catégorie spécifique pour les excursions ou sorties familiales privées (pas du covoiturage classique). Frais de publication 1 000 Ar. Le client intéressé paie de même pour obtenir le contact.
 
 ### 🤝 Communauté & Confiance
 - [ ] **Vérification d'Identité (KYC)** : Permettre aux utilisateurs d'uploader leur CIN pour obtenir un badge "Profil Vérifié par CIN".
@@ -93,11 +102,9 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Notifications Push** : Alerter le passager quand son trajet va bientôt partir ou quand un nouveau message arrive.
 - [ ] **Appels In-App (VoIP)** : Intégrer un bouton d'appel direct via l'app (type Messenger) après déblocage du contact.
 - [ ] **Dashboard Admin Mobile** : Une application simplifiée pour l'admin pour valider les paiements en déplacement.
-- [ ] **Surveillance de Stockage Supabase *(NOUVEAU - S17)* :** Intégrer un widget directement sur la page Kiosque de l'administrateur affichant l'espace de stockage libre restant de la base de données Supabase, afin d'anticiper les besoins d'évolution.
-- [ ] **Expiration Automatique des Trajets *(NOUVEAU - S18)* :** Un trajet ne doit plus apparaître dans les résultats de recherche dès que sa date de départ est passée. Exemple : trajet publié aujourd'hui → disparaît des résultats dès demain. Implémenter un filtre côté requête Supabase (`.gte('date', today)`).
-- [ ] **Règle de Validité du Contact Déverrouillé *(NOUVEAU - S18)* :** Définir la politique métier : chaque paiement déverrouille le contact d'**un seul** conducteur. Pour voir le contact d'un autre conducteur sur un autre trajet, un nouveau paiement est requis (pas d'accès illimité sur paiement unique, sauf abonnement).
-- [ ] **Message Automatique Post-Validation *(NOUVEAU - S18)* :** Après qu'un paiement est validé et que le contact du conducteur est affiché, envoyer automatiquement un message In-App du style : *"Une personne va vous appeler dans les minutes ou secondes qui viennent."* (en plus du message existant côté chauffeur).
-- [ ] **Trajet Intra-District / Taxi de Quartier *(NOUVEAU - S18)* :** Permettre aux conducteurs de publier des trajets courts (domicile ↔ travail). Le conducteur publie son retour du soir : des gens de son quartier peuvent réserver une place s'il passe près de chez eux.
+- [ ] **Surveillance de Stockage Supabase :** Intégrer un widget directement sur la page Kiosque de l'administrateur affichant l'espace de stockage libre restant de la base de données Supabase.
+- [ ] **Expiration Automatique des Trajets :** Un trajet ne doit plus apparaître dans les résultats de recherche dès que sa date de départ est passée.
+- [ ] **Message Automatique Post-Validation :** Après qu'un paiement est validé et que le contact du conducteur est affiché, envoyer automatiquement un message In-App du style : *"Une personne va vous appeler dans les minutes ou secondes qui viennent."*
 - [ ] **Optimisation Realtime** : Centraliser la gestion des WebSockets Supabase (via un Context global) pour éviter les souscriptions multiples et améliorer les performances.
 
 ---
@@ -110,4 +117,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 > - `plan.md` : Plan de conception et architecture technique
 > - **Règle :** Après chaque modification, vérifier l'impact sur mobile ET desktop, et synchroniser ces 4 documents.
 
-*Dernière mise à jour : 8 Juin 2026 - Session 19*
+*Dernière mise à jour : 8 Juin 2026 - Session 19 (Fin)*

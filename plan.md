@@ -1,5 +1,10 @@
 # 🗺️ Plan de Conception - Miara-Dia (BlaBla Car Gasy) 🚙🇲🇬
 
+> [!CAUTION]
+> ## 🚫 ZONE INTOUCHABLE — MOTEUR DE PAIEMENT SMS AUTOMATIQUE
+> **NE JAMAIS MODIFIER** : `supabase/functions/sms-webhook/index.ts`, les tables `bookings` / `sms_logs` dans Supabase, la publication Realtime `supabase_realtime`, et le polling dans `app/ride/[id].tsx`.
+> Ce système **fonctionne parfaitement en production**. ✅ **NE PAS Y TOUCHER.**
+
 Ce document décrit la structure architecturale, les choix technologiques et les étapes de conception de l'application **Miara-Dia** pour garantir sa cohérence fonctionnelle sur **version téléphone** et **version ordinateur**.
 
 ---
@@ -105,7 +110,7 @@ miaradia-app/
     *   *Sortie en Famille / Privatisation :* Utilisateurs cherchant une location de véhicule avec ou sans chauffeur.
     *   *Publication de Location :* Parc automobile de location payant 1 000 Ar / 24h.-
 
-## 🌐 5. Infrastructure de Déploiement *(SESSION 14)*
+## 🌐 5. Infrastructure de Déploiement
 
 | Service | Usage | URL |
 |---|---|---|
@@ -114,4 +119,4 @@ miaradia-app/
 | **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
 | **SMS Gateway** | App Android sur téléphone admin | Gratuit |
 
-*Dernière mise à jour : **6 Juin 2026** - Session 17*
+*Dernière mise à jour : **8 Juin 2026** - Session 19*
