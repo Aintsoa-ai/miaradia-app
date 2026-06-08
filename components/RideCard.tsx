@@ -103,22 +103,18 @@ export const RideCard: React.FC<RideCardProps> = ({ ride, onPress, isDesktop }) 
             {ride.airConditioning && <Ionicons name="snow" size={18} color="#64748B" />}
             {ride.max2Back && <Ionicons name="people" size={18} color="#64748B" />}
             {ride.instantBooking && <Ionicons name="flash" size={18} color="#2563EB" />}
-            
-            {/* Passagers à droite (détail rond rouge) */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 8 }}>
-              <Ionicons name="people" size={18} color="#64748B" />
-              <Text style={{ color: '#64748B', fontSize: 13, fontWeight: '800', marginLeft: 4 }}>{ride.seatsLeft}</Text>
+
+            {/* Badge places restantes */}
+            <View style={{ backgroundColor: isFull ? '#FEF2F2' : isLow ? '#FEF3C7' : '#EFF6FF', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 16, borderWidth: 1, borderColor: isFull ? '#FCA5A5' : isLow ? '#FDE68A' : '#DBEAFE' }}>
+              <Text style={{ fontSize: 12, fontWeight: '900', color: isFull ? '#DC2626' : isLow ? '#D97706' : '#2563EB' }}>
+                {isFull ? 'Complet' : `${ride.seatsLeft} place${ride.seatsLeft > 1 ? 's' : ''}`}
+              </Text>
             </View>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0' }}>
-              <Ionicons name="time-outline" size={14} color="#64748B" />
-              <Text style={{ color: '#475569', fontSize: 12, fontWeight: '700', marginLeft: 6 }}>{ride.duration}</Text>
-            </View>
             <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#F8FAFC', alignItems: 'center', justifyContent: 'center' }}>
               <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
             </View>
           </View>
-        </View>
       </TouchableOpacity>
     );
   }
@@ -194,8 +190,11 @@ export const RideCard: React.FC<RideCardProps> = ({ ride, onPress, isDesktop }) 
         {/* Icône passagers / places (rond rouge droit) */}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {ride.instantBooking && <Ionicons name="flash" size={16} color="#2563EB" style={{ marginRight: 10 }} />}
-          <Ionicons name="people" size={18} color="#64748B" />
-          <Text style={{ fontSize: 13, fontWeight: '900', color: '#64748B', marginLeft: 4 }}>{ride.seatsLeft}</Text>
+          <View style={{ backgroundColor: isFull ? '#FEF2F2' : isLow ? '#FEF3C7' : '#EFF6FF', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 14, borderWidth: 1, borderColor: isFull ? '#FCA5A5' : isLow ? '#FDE68A' : '#DBEAFE' }}>
+            <Text style={{ fontSize: 12, fontWeight: '900', color: isFull ? '#DC2626' : isLow ? '#D97706' : '#2563EB' }}>
+              {isFull ? 'Complet' : `${ride.seatsLeft} place${ride.seatsLeft > 1 ? 's' : ''}`}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>

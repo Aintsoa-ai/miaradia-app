@@ -75,9 +75,34 @@ export default function SearchResultsScreen() {
   console.log("[SearchResults] Render filteredRides count:", filteredRides.length, "filterType:", filterType, "verifiedOnly:", verifiedOnly, "rides total:", rides.length);
 
 
-  // --- FETCH DATA ---
+  // --- FETCH DATA & REALTIME ---
   React.useEffect(() => {
     fetchRides();
+
+    // Souscription temps réel aux mises à jour de places
+    const channel = supabase
+      .channel('search_rides_updates')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'rides' },
+        (payload) => {
+          const updatedRide = payload.new;
+          if (updatedRide && updatedRide.id) {
+            setRides((prevRides) => 
+              prevRides.map((r) => 
+                r.id === updatedRide.id 
+                  ? { ...r, seatsLeft: updatedRide.seats } 
+                  : r
+              )
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [departure, arrival]);
 
   const extractCleanSearchTerms = (loc: string): string[] => {
