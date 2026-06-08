@@ -349,11 +349,7 @@ export default function DriverProfileScreen() {
                   </View>
                 </View>
 
-                {driver?.vehicle_photo && (
-                  <View className="w-full h-64 rounded-[16px] overflow-hidden border border-slate-200 relative">
-                    <Image source={{ uri: driver.vehicle_photo }} className="w-full h-full" resizeMode="cover" />
-                  </View>
-                )}
+
               </View>
 
               {/* AVIS DES VOYAGEURS */}
@@ -556,13 +552,9 @@ export default function DriverProfileScreen() {
           <View className="mb-8">
             <Text className="text-xl font-bold text-gray-900 mb-4">Mon Véhicule</Text>
             <View className="bg-gray-50 rounded-3xl overflow-hidden border border-gray-100">
-              {driver?.vehicle_photo ? (
-                <Image source={{ uri: driver.vehicle_photo }} className="w-full h-48" resizeMode="cover" />
-              ) : (
-                <View className="w-full h-48 bg-gray-200 items-center justify-center">
-                  <Ionicons name="car-outline" size={60} color="#9CA3AF" />
-                </View>
-              )}
+              <View className="w-full h-48 bg-gray-200 items-center justify-center">
+                <Ionicons name="car-outline" size={60} color="#9CA3AF" />
+              </View>
               <View className="p-4">
                 <Text className="text-lg font-bold text-gray-900">{driver?.vehicle_model || 'Véhicule standard'}</Text>
                 <Text className="text-blue-600 font-medium mb-3">{driver?.vehicle_type || 'Inconnu'}</Text>

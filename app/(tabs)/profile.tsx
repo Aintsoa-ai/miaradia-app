@@ -8,12 +8,12 @@ import { supabase } from '../../lib/supabase';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 export default function ProfileScreen() {
   const router = useRouter();
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [vehicleImage, setVehicleImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -66,9 +66,6 @@ export default function ProfileScreen() {
           setPowerOutlets(profileData.power_outlets || false);
           setRecliningSeats(profileData.reclining_seats || false);
           setToilet(profileData.toilet || false);
-          if (profileData.vehicle_photo) {
-            setVehicleImage(profileData.vehicle_photo);
-          }
           setIsAdmin(profileData.is_admin || false);
         }
       }
@@ -92,13 +89,20 @@ export default function ProfileScreen() {
     try {
       setUploading(true);
       
-      // 1. Préparer le fichier pour Supabase
-      const response = await fetch(uri);
+      // 1. Compresser l'image pour économiser le stockage (Max 500px de large, qualité 0.6, JPEG)
+      const manipResult = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 500 } }],
+        { compress: 0.6, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      
+      // 2. Préparer le fichier pour Supabase
+      const response = await fetch(manipResult.uri);
       const blob = await response.blob();
       const arrayBuffer = await new Response(blob).arrayBuffer();
       
       // Utiliser l'ID utilisateur pour un nom de fichier unique et stable
-      const fileExt = uri.split('.').pop()?.toLowerCase() || 'png';
+      const fileExt = 'jpg';
       const filePath = `${user.id}.${fileExt}`;
 
       // 2. Envoyer vers Supabase Storage (le bucket 'avatars')
@@ -160,64 +164,8 @@ export default function ProfileScreen() {
     }
   };
 
-  const pickVehicleImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      CustomAlert.alert('Permission refusée', 'Désolé, nous avons besoin des permissions !');
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.5,
-    });
-
-    if (!result.canceled) {
-      uploadVehicleImage(result.assets[0].uri);
-    }
-  };
-
-  const uploadVehicleImage = async (uri: string) => {
-    if (!user) return;
-    try {
-      setUploading(true);
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const arrayBuffer = await new Response(blob).arrayBuffer();
-      
-      const fileExt = uri.split('.').pop()?.toLowerCase() || 'png';
-      const filePath = `vehicle_${user.id}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars') // On utilise le même bucket pour simplifier
-        .upload(filePath, arrayBuffer, {
-          contentType: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
-          upsert: true
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      // Mettre à jour la table profiles
-      await supabase.from('profiles').upsert({
-        id: user.id,
-        vehicle_photo: publicUrl,
-        updated_at: new Date()
-      });
-
-      setVehicleImage(publicUrl);
-      CustomAlert.alert('Succès', 'La photo de votre véhicule a été mise à jour !');
-    } catch (error: any) {
-      CustomAlert.alert('Erreur', error.message);
-    } finally {
-      setUploading(false);
-    }
-  };
+  // Photo de véhicule supprimée volontairement pour préserver le stockage Supabase
+  // (500 Mo limité — 1000 conducteurs × 6 Mo = 6 Go, quota dépassé rapidement)
   const [bio, setBio] = useState('Hello, je pars souvent de Tana vers la côte Ouest. J\'ai un coffre moyen donc privilégiez des petits bagages !');
   // Véhicule
   const [vehicleType, setVehicleType] = useState('Voiture');
@@ -568,17 +516,9 @@ export default function ProfileScreen() {
             <View className={`bg-white rounded-[24px] p-6 mb-8 ${!isDesktop ? 'shadow-sm shadow-slate-200 border border-slate-100' : 'border border-slate-200 bg-slate-50/30'}`}>
               <View className="flex-row justify-between items-center mb-6">
                 <Text className="text-xl font-black text-slate-900 tracking-tight">Mon Véhicule</Text>
-                <TouchableOpacity onPress={pickVehicleImage} className="bg-slate-100 hover:bg-slate-200 transition-colors px-4 py-2 rounded-full flex-row items-center">
-                  <Ionicons name="camera" size={16} color="#0F172A" />
-                  <Text className="text-slate-900 font-black text-xs ml-2">Ajouter photo</Text>
-                </TouchableOpacity>
               </View>
               
-              {vehicleImage && (
-                <View className="mb-6 rounded-2xl overflow-hidden h-48 bg-slate-100 border border-slate-200">
-                  <Image source={{ uri: vehicleImage }} className="w-full h-full" resizeMode="cover" />
-                </View>
-              )}
+
               
               <Text className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-3 ml-1">Type de véhicule</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-6">
