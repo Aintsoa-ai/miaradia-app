@@ -356,12 +356,12 @@ export default function RideDetailsScreen() {
       </View>
 
       {/* MAIN CONTAINER */}
-      <ScrollView style={{ flex: 1, zIndex: 10 }} contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1, zIndex: 10 }} contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         <View style={{
           maxWidth: 1000,
           width: '100%',
           alignSelf: 'center',
-          flexDirection: isDesktop ? 'row' : 'column',
+          flexDirection: isDesktop ? 'row' : 'column-reverse',
           gap: 24,
           paddingHorizontal: 16,
           marginTop: isDesktop ? -40 : -20,
@@ -383,13 +383,13 @@ export default function RideDetailsScreen() {
 
               {/* ROUTE INFO */}
               <View style={{ flexDirection: 'row', alignItems: 'stretch' }}>
-                <View style={{ alignItems: 'center', marginRight: 16, width: 56 }}>
+                <View style={{ alignItems: 'center', marginRight: 12, width: 44 }}>
                   <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>{ride.date?.split(' à ')[1] || '08:00'}</Text>
                   <View style={{ width: 2, flex: 1, backgroundColor: '#E2E8F0', marginVertical: 8, position: 'relative', minHeight: 80 }}>
                     <View style={{ position: 'absolute', top: -3, left: -3, width: 8, height: 8, borderRadius: 4, backgroundColor: '#2563EB', borderWidth: 1.5, borderColor: 'white' }} />
-                    <View style={{ position: 'absolute', top: '50%', transform: [{ translateY: -10 }] as any, left: -40, width: 80, alignItems: 'center' }}>
-                      <View style={{ backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
-                        <Text style={{ fontSize: 9, color: '#64748B', fontWeight: '800' }}>{duration}</Text>
+                    <View style={{ position: 'absolute', top: '50%', transform: [{ translateY: -10 }] as any, left: -28, width: 56, alignItems: 'center' }}>
+                      <View style={{ backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10 }}>
+                        <Text style={{ fontSize: 8, color: '#64748B', fontWeight: '800' }}>{duration}</Text>
                       </View>
                     </View>
                     <View style={{ position: 'absolute', bottom: -3, left: -3, width: 8, height: 8, borderRadius: 4, backgroundColor: '#EF4444', borderWidth: 1.5, borderColor: 'white' }} />
