@@ -3,56 +3,101 @@ import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import { supabase } from './supabase';
 
+// ✅ ID EAS officiel du projet (app.json > extra.eas.projectId)
+const EAS_PROJECT_ID = 'f2da6b63-f8d9-471a-8d58-252014dada76';
+
+// Afficher les notifications même quand l'app est ouverte (foreground)
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
-    shouldSetBadge: false,
+    shouldSetBadge: true,
   }),
 });
 
-export async function registerForPushNotificationsAsync() {
-  let token;
+/**
+ * Demande la permission et retourne le token push Expo.
+ * À appeler au démarrage de l'app (dans _layout.tsx).
+ */
+export async function registerForPushNotificationsAsync(): Promise<string | null> {
+  if (Platform.OS === 'web') return null;
 
+  // Canal Android avec vibration et couleur Miara-Dia
   if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
+    await Notifications.setNotificationChannelAsync('miaradia-default', {
+      name: 'Miara-Dia',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#00AFF5',
+      lightColor: '#2563EB',
+      sound: 'default',
     });
   }
 
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      console.log('Failed to get push token for push notification!');
-      return;
-    }
-    token = await Notifications.getExpoPushTokenAsync({
-      projectId: 'b56eb1bb-cb46-4e00-a544-77e8abfccbba', // We'll just let Expo resolve it if possible, but projectId might be required if using EAS
-    }).then(t => t.data).catch(e => {
-        console.error("Error getting Expo Push Token:", e);
-        return null;
-    });
-    console.log("EXPO PUSH TOKEN:", token);
-  } else {
-    console.log('Must use physical device for Push Notifications');
+  if (!Device.isDevice) {
+    console.log('[Push] Appareil physique requis pour les notifications push.');
+    return null;
   }
 
-  return token;
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== 'granted') {
+    console.log('[Push] Permission refusée par l\'utilisateur.');
+    return null;
+  }
+
+  try {
+    const tokenData = await Notifications.getExpoPushTokenAsync({
+      projectId: EAS_PROJECT_ID,
+    });
+    const token = tokenData.data;
+    console.log('[Push] ✅ Token Expo Push :', token);
+    return token;
+  } catch (e) {
+    console.error('[Push] ❌ Erreur obtention token :', e);
+    return null;
+  }
 }
 
-export async function savePushToken(userId: string, token: string) {
-    if (!token) return;
-    try {
-        await supabase.from('profiles').update({ push_token: token }).eq('id', userId);
-    } catch (e) {
-        console.error('Error saving push token', e);
+/**
+ * Sauvegarde le token push dans le profil Supabase de l'utilisateur.
+ * Appelé après connexion ou obtention du token.
+ */
+export async function savePushToken(userId: string, token: string | null): Promise<void> {
+  if (!token || !userId) return;
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ push_token: token })
+      .eq('id', userId);
+    if (error) throw error;
+    console.log('[Push] ✅ Token sauvegardé en BDD pour userId:', userId);
+  } catch (e) {
+    console.error('[Push] ❌ Erreur sauvegarde token :', e);
+  }
+}
+
+/**
+ * Enregistre un listener qui s'active quand l'utilisateur tape sur une notification.
+ * Retourne la fonction de nettoyage (à appeler dans useEffect cleanup).
+ * 
+ * @param onNavigate - Callback appelé avec le rideId extrait de la notification
+ */
+export function addNotificationTapListener(
+  onNavigate: (rideId: string) => void
+): () => void {
+  const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+    const data = response.notification.request.content.data as { rideId?: string };
+    if (data?.rideId) {
+      console.log('[Push] 👆 Tap sur notification, navigation vers trajet:', data.rideId);
+      onNavigate(String(data.rideId));
     }
+  });
+
+  return () => subscription.remove();
 }
