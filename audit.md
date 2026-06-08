@@ -29,6 +29,7 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 *   **Optimisation Densité & Poids (S20) ⚡** : Marges verticales des en-têtes drastiquement réduites sur petits écrans (ex: iPhone SE) pour minimiser le scrolling vers le bouton de réservation. Algorithme de compression des avatars porté à une résolution maximale de 300px (qualité 0.4 JPEG) garantissant une empreinte de stockage et un temps de téléchargement infimes.
 *   **Correctif UI Détails Trajet (S21) 🔧** : Réduction de la largeur de la colonne timeline bleue verticale (`width: 56` → `44`, `marginRight: 16` → `12`) pour libérer de l'espace horizontal. Augmentation du `paddingBottom` du `ScrollView` (`80` → `120`) pour que le badge "Bagages: Moyen" et les équipements du véhicule soient visibles sur les petits écrans mobiles sans être tronqués.
 *   **Expiration Automatique des Trajets Passés (S21) 📅** : Filtre `isRideExpired()` actif dans `resultats-recherche.tsx` pour exclure automatiquement les trajets dépassés des résultats. Dans `app/(tabs)/rides.tsx`, les trajets terminés reçoivent un badge gris "Trajet terminé", sont grisés (opacity 0.7) et reclassés automatiquement en bas de liste via tri dynamique — l'historique du conducteur est préservé.
+*   **Configuration Officielle Notifications Push (S21) 🔔** : Correction du `projectId` EAS officiel (`f2da6b63-f8d9-471a-8d58-252014dada76`) dans la configuration expo-notifications (`lib/notifications.ts`). Intégration d'un écouteur global de tap sur notification dans le Root Layout (`_layout.tsx`) redirigeant automatiquement le passager vers le détail de son voyage (`/ride/[id]`) dès validation de son paiement Mobile Money.
 
 ---
 
@@ -55,7 +56,7 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 |---|---|---|---|
 | 1 | **Dépendance téléphone admin** | Si la batterie est vide ou sans réseau, les paiements ne sont pas validés automatiquement. | Intégrer l'API officielle MVola Telma (B2B). |
 | 2 | **Pas de mode hors-ligne** | Les voyageurs en zone blanche (RN) ne peuvent pas consulter les détails de leur billet. | Cache local SQLite/AsyncStorage pour les billets validés. |
-| 3 | **Pas de notifications push** | Le passager doit laisser l'app ouverte pour être alerté de la validation. | Expo Notifications + EAS Push. |
+| 3 | **Pas de notifications push** | ~~Le passager doit laisser l'app ouverte pour être alerté de la validation.~~ | **✅ RÉALISÉ S21** : Token EAS relié + redirection automatique au tap sur notification. Reste à l'ajouter sur le chat. |
 | 4 | **Paiement partiel (gating)** | Le passager paie 10% pour débloquer le contact, pas 100% du billet → pas de garantie pour le chauffeur. | Paiement en séquestre complet in-app. |
 | 5 | **Expiration des trajets passés** | ~~Les annonces avec une date dépassée continuent d'apparaître dans les résultats.~~ | **✅ RÉALISÉ S21** : Filtre actif + badge "Trajet terminé" + tri dynamique. |
 | 6 | **Pas de KYC (identité)** | Les chauffeurs ne sont pas vérifiés officiellement par leur CIN. | Upload CIN + processus d'approbation admin. |
@@ -73,12 +74,12 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 *   **Action requise** : Intégrer l'API officielle MVola Telma pour s'affranchir de la dépendance à l'APK Android.
 
 ### 🔔 Notifications Push
-*   **Statut actuel** : Manquant.
-*   **Action requise** : Implémenter Expo Notifications pour alerter des messages de chat hors-application.
+*   **Statut actuel** : **RÉALISÉ S21** (Token EAS corrigé + navigation au tap opérationnelle pour la validation de paiement).
+*   **Action requise** : Implémenter l'envoi push lors des messages de chat hors-application.
 
 ### 📅 Expiration Automatique des Trajets
-*   **Statut actuel** : Les trajets passés restent visibles dans les résultats de recherche.
-*   **Action requise** : Ajouter un filtre `date >= now()` dans la requête Supabase des résultats.
+*   **Statut actuel** : **RÉALISÉ S21** (Filtre actif dans les recherches + classement tri automatique dans l'historique chauffeur).
+*   **Action requise** : Aucune (fonctionnelle).
 
 ---
 
@@ -94,9 +95,8 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 ## 🚀 6. Prochaines Étapes Recommandées
 1.  **Phase "Production Client"** : Lancer la phase de test utilisateur réel à grande échelle sur la version Vercel.
 2.  **Phase "Identité"** : Développer le téléversement de la CIN pour labelliser les "Super Drivers".
-3.  **Phase "Notification"** : Configurer les push notifications sur le dépôt EAS.
-4.  **Phase "Offline"** : Implémenter le cache local des billets validés pour les zones sans réseau.
-5.  **Phase "Expiration"** : Ajouter le filtre de date pour masquer automatiquement les trajets passés.
+3.  **Phase "Offline"** : Implémenter le cache local des billets validés pour les zones sans réseau (AsyncStorage / SQLite).
+4.  **Phase "Chat Push"** : Activer l'envoi de notification push lors de la réception de nouveaux messages dans le chat.
 
 ---
 *Audit mis à jour le **8 Juin 2026** par Antigravity à l'issue de la **Session 21** (Correctifs UI Détails Trajet : bande bleue timeline + contenu caché mobile).*
