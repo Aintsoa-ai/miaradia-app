@@ -478,7 +478,6 @@ export default function SearchScreen() {
                 width: '100%',
                 height: '100%',
                 opacity: activeIndex === index ? 1 : 0,
-                transition: 'opacity 1.5s ease-in-out',
               } as any}
               resizeMode="cover"
             />
