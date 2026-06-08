@@ -5,7 +5,7 @@
 > **NE JAMAIS MODIFIER** : `supabase/functions/sms-webhook/index.ts`, les tables `bookings` / `sms_logs` dans Supabase, la publication Realtime `supabase_realtime`, et le polling dans `app/ride/[id].tsx`.
 > Ce système **fonctionne parfaitement en production**. ✅ **NE PAS Y TOUCHER.**
 
-Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la Session 19 (8 Juin 2026).
+Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la **Session 21** (8 Juin 2026).
 
 > [!IMPORTANT]
 > **Critère d'Éligibilité des Audits :** Toute fonctionnalité auditée doit passer avec succès les tests d'ergonomie et de performance sur **version ordinateur (Desktop)** et **version téléphone (Mobile)**. 
@@ -27,10 +27,45 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 *   **Responsive Web & Copie BlaBlaCar 💻** : Mise en page dual-pane double colonne sur ordinateur et vue condensée fluide sur mobile.
 *   **Refonte Premium UI & Z-Index Fixes (S20) ✨** : Déploiement d'un "Dark Hero Header" sur tous les écrans principaux (Détails, Profil Conducteur, Chat, Mon Profil). Résolution totale des problèmes de chevauchement visuel (`zIndex`) entre le header et les conteneurs superposés (`ScrollView`).
 *   **Optimisation Densité & Poids (S20) ⚡** : Marges verticales des en-têtes drastiquement réduites sur petits écrans (ex: iPhone SE) pour minimiser le scrolling vers le bouton de réservation. Algorithme de compression des avatars porté à une résolution maximale de 300px (qualité 0.4 JPEG) garantissant une empreinte de stockage et un temps de téléchargement infimes.
+*   **Correctif UI Détails Trajet (S21) 🔧** : Réduction de la largeur de la colonne timeline bleue verticale (`width: 56` → `44`, `marginRight: 16` → `12`) pour libérer de l'espace horizontal. Augmentation du `paddingBottom` du `ScrollView` (`80` → `120`) pour que le badge "Bagages: Moyen" et les équipements du véhicule soient visibles sur les petits écrans mobiles sans être tronqués.
 
 ---
 
-## 🔍 2. Gap Analysis : Ce qui reste à faire
+## 💪 2. Points Forts de l'Application
+
+| # | Point Fort | Détail |
+|---|---|---|
+| 1 | **Paiement Mobile Money Automatisé** | Validation "zéro-clic" via SMS Gateway + Supabase Webhook. Unique sur le marché malgache. |
+| 2 | **Design Premium Dual-Pane** | Interface inspirée de BlaBlaCar, parfaitement adaptée Desktop et Mobile avec Dark Hero Header. |
+| 3 | **Moteur de Recherche Intelligent** | Tolérance aux graphies complexes malgaches (districts, régions, noms coloniaux). |
+| 4 | **Temps Réel Instantané** | Supabase Realtime sur `bookings` : le passager voit son contact s'afficher sans rafraîchissement. |
+| 5 | **Sécurité Anti-Fraude** | Algorithme de détection de numéros de téléphone dans les biographies + RLS Supabase. |
+| 6 | **Dictionnaire Madagascar Local** | Distances/durées pré-calculées pour toutes les RN sans dépendre d'une API externe. |
+| 7 | **Badge Super Driver Dynamique** | Réputation calculée en temps réel et affichée partout (profil, cartes trajet). |
+| 8 | **Zéro dépendance aux API payantes** | Cartographie CartoDB Voyager (gratuit) + OSRM (gratuit) + SMS Gateway (gratuit). |
+| 9 | **CI/CD Automatique** | Chaque push GitHub déclenche un déploiement Vercel instantané. |
+| 10 | **Compression Image Extrême** | Avatars < 50 Ko (300px, 40% JPEG) pour temps de chargement record. |
+
+---
+
+## ⚠️ 3. Points Faibles / Axes d'Amélioration
+
+| # | Point Faible | Impact | Solution Future |
+|---|---|---|---|
+| 1 | **Dépendance téléphone admin** | Si la batterie est vide ou sans réseau, les paiements ne sont pas validés automatiquement. | Intégrer l'API officielle MVola Telma (B2B). |
+| 2 | **Pas de mode hors-ligne** | Les voyageurs en zone blanche (RN) ne peuvent pas consulter les détails de leur billet. | Cache local SQLite/AsyncStorage pour les billets validés. |
+| 3 | **Pas de notifications push** | Le passager doit laisser l'app ouverte pour être alerté de la validation. | Expo Notifications + EAS Push. |
+| 4 | **Paiement partiel (gating)** | Le passager paie 10% pour débloquer le contact, pas 100% du billet → pas de garantie pour le chauffeur. | Paiement en séquestre complet in-app. |
+| 5 | **Expiration des trajets passés** | Les annonces avec une date dépassée continuent d'apparaître dans les résultats. | Filtrer automatiquement par `date >= aujourd'hui` en BDD. |
+| 6 | **Pas de KYC (identité)** | Les chauffeurs ne sont pas vérifiés officiellement par leur CIN. | Upload CIN + processus d'approbation admin. |
+| 7 | **Chat sans notifications sonores** | Les messages reçus hors-app ne sont pas signalés. | Notifications push sur les nouveaux messages de chat. |
+| 8 | **Pas de support multilingue** | L'application est 100% en français alors que la majorité des Malgaches parle malagasy. | Traduction malagasy officiel + dialectes. |
+| 9 | **Timeline trop large sur mobile** | La bande bleue verticale prenait trop de place (corrigé S21, reste à surveiller sur autres écrans). | Monitoring continu sur différentes tailles d'écran. |
+| 10 | **Souscriptions WebSocket multiples** | Chaque écran crée ses propres souscriptions Supabase Realtime sans centralisation. | Context global pour gérer un seul canal Realtime. |
+
+---
+
+## 🔍 4. Gap Analysis : Ce qui reste à faire
 
 ### 💰 Intégration API MVola Officielle
 *   **Statut actuel** : La passerelle SMS actuelle est 100% gratuite et fonctionnelle, mais dépend de la présence du téléphone administrateur connecté.
@@ -40,19 +75,27 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 *   **Statut actuel** : Manquant.
 *   **Action requise** : Implémenter Expo Notifications pour alerter des messages de chat hors-application.
 
+### 📅 Expiration Automatique des Trajets
+*   **Statut actuel** : Les trajets passés restent visibles dans les résultats de recherche.
+*   **Action requise** : Ajouter un filtre `date >= now()` dans la requête Supabase des résultats.
+
 ---
 
-## 🛠️ 3. Audit Technique & Code
+## 🛠️ 5. Audit Technique & Code
 *   **Performances** : Excellentes. Résolution des ralentissements grâce au cache de distances local.
-*   **Typescript** : Compilations réussies à 100% sans erreur de type.
+*   **TypeScript** : Compilations réussies à 100% sans erreur de type.
 *   **RLS & Sécurité** : Politiques RLS actives sur Supabase. La table `sms_logs` permet d'auditer précisément chaque SMS de paiement MVola/Orange/Airtel intercepté.
+*   **Git** : Historique propre, commits sémantiques (`fix/feat/refactor`). CI/CD actif via GitHub → Vercel.
+*   **Responsive** : Validé sur Desktop (>768px dual-pane) et Mobile (<768px single-column).
 
 ---
 
-## 🚀 4. Prochaines Étapes Recommandées
+## 🚀 6. Prochaines Étapes Recommandées
 1.  **Phase "Production Client"** : Lancer la phase de test utilisateur réel à grande échelle sur la version Vercel.
 2.  **Phase "Identité"** : Développer le téléversement de la CIN pour labelliser les "Super Drivers".
 3.  **Phase "Notification"** : Configurer les push notifications sur le dépôt EAS.
+4.  **Phase "Offline"** : Implémenter le cache local des billets validés pour les zones sans réseau.
+5.  **Phase "Expiration"** : Ajouter le filtre de date pour masquer automatiquement les trajets passés.
 
 ---
-*Audit mis à jour le 8 Juin 2026 par Antigravity à l'issue de la Session 20 (Refonte UI Premium).*
+*Audit mis à jour le **8 Juin 2026** par Antigravity à l'issue de la **Session 21** (Correctifs UI Détails Trajet : bande bleue timeline + contenu caché mobile).*

@@ -63,15 +63,26 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Auto-Rafraîchissement Kiosque Admin *(RÉALISÉ - S17)* :** Actualisation silencieuse en arrière-plan toutes les 5 secondes du tableau de bord Kiosque pour détecter instantanément l'arrivée de nouveaux paiements.
 - [x] **Correction Historique Web *(RÉALISÉ - S17)* :** Fiabilisation de la flèche de retour (<-) sur Vercel/Web via un bloc de sécurité `try/catch` sur `router.canGoBack()` évitant les crashs.
 - [x] **Actualisation Instantanée "Mes Trajets" *(RÉALISÉ - S18)* :** Utilisation de `useFocusEffect` sur la page "Mes Trajets" du conducteur. Dès qu'il revient sur l'onglet après publication, la liste se recharge automatiquement.
+- [x] **Correctif UI Bande Bleue \& Contenu Caché *(RÉALISÉ - S21)* :** Sur l'écran Détails du Trajet (`app/ride/[id].tsx`), réduction de la largeur de la colonne timeline verticale bleue (`width: 56 → 44`, `marginRight: 16 → 12`) pour libérer de l'espace horizontal. Augmentation du `paddingBottom` du `ScrollView` (`80 → 120`) pour rendre visible le badge "Bagages: Moyen" et les équipements du véhicule sur les petits écrans mobiles.
 
 ---
 
 ## ⏳ À ACCOMPLIR
 
-### ⚠️ Points Faibles / Points d'Amélioration restants
-- [ ] **Dépendance au Téléphone Administrateur (Kiosque) :** Tant que nous utilisons la "Passerelle SMS", l'application dépend de l'état de la batterie et de la couverture réseau du téléphone physique de l'administrateur qui reçoit les paiements Mobile Money. *Solution future : Intégrer l'API B2B officielle MVola Telma.*
-- [ ] **Absence de Mode Hors-Ligne (Offline) :** Sur la Route Nationale, les voyageurs peuvent traverser des "zones blanches" (sans réseau). Actuellement, ils ne peuvent pas consulter les détails de leur réservation ou le numéro du chauffeur s'ils ferment l'application. *Solution future : Stocker les billets validés dans le cache local du téléphone.*
-- [ ] **Paiement "Gating" vs "Séquestre" :** Actuellement, le voyageur paie une petite somme (ex: 1 000 Ar) pour "débloquer" le contact du chauffeur. Le reste du billet est payé en main propre. L'application ne garantit donc pas financièrement au chauffeur que le passager viendra vraiment. *Solution future : Permettre le paiement de la totalité du billet via l'application.*
+### ⚠️ Points Faibles Identifiés lors de l'Audit S21
+
+> Ces points ont été identifiés lors de l'audit complet du 8 Juin 2026 (Session 21). Ils sont classés par priorité d'impact.
+
+- [ ] **🔴 CRITIQUE — Dépendance au Téléphone Administrateur (Kiosque) :** Tant que nous utilisons la "Passerelle SMS", l'application dépend de l'état de la batterie et de la couverture réseau du téléphone physique de l'administrateur. *Solution future : Intégrer l'API B2B officielle MVola Telma.*
+- [ ] **🔴 CRITIQUE — Expiration Automatique des Trajets :** Les trajets avec une date de départ passée continuent d'apparaître dans les résultats de recherche, polluant l'expérience utilisateur. *Solution : Ajouter un filtre `date >= today()` dans la requête Supabase des résultats de recherche.*
+- [ ] **🟠 IMPORTANT — Absence de Mode Hors-Ligne (Offline) :** Sur les Routes Nationales, les voyageurs traversent des zones sans réseau. Ils ne peuvent pas consulter leur billet ou le numéro du chauffeur s'ils ferment l'app. *Solution future : SQLite/AsyncStorage pour mettre en cache les billets validés.*
+- [ ] **🟠 IMPORTANT — Pas de Notifications Push Chat :** Les messages reçus hors-application ne sont pas signalés au destinataire. *Solution : Expo Notifications + EAS Push Service.*
+- [ ] **🟠 IMPORTANT — Paiement "Gating" vs "Séquestre" :** Le voyageur paie 10% pour débloquer le contact, mais le reste est payé en main propre. Le chauffeur n'a aucune garantie financière de présence. *Solution future : Paiement total en séquestre in-app.*
+- [ ] **🟡 MODÉRÉ — Pas de KYC (Vérification d'Identité) :** Les conducteurs ne sont pas vérifiés officiellement par leur CIN. Un badge "Vérifié CIN" renforcerait la confiance. *Solution : Formulaire upload CIN + validation admin.*
+- [ ] **🟡 MODÉRÉ — Souscriptions WebSocket Multiples :** Chaque écran crée ses propres souscriptions Supabase Realtime sans centralisation. Risque de fuite mémoire sur des sessions longues. *Solution : Créer un Context React global pour gérer un seul canal Realtime partagé.*
+- [ ] **🟡 MODÉRÉ — Pas de Support Malagasy :** L'application est 100% en français. La majorité des utilisateurs potentiels (chauffeurs de brousse) parle malagasy. *Solution future : i18n avec les chaînes en malagasy officiel.*
+- [ ] **🟢 MINEUR — Surveillance Continue Responsive :** Après la réduction de la bande bleue timeline (S21), surveiller l'affichage sur d'autres tailles d'écran (Galaxy Fold, tablettes). *Solution : Tests visuels réguliers.*
+- [ ] **🟢 MINEUR — Widget Stockage Supabase :** Pas de visibilité sur l'espace de stockage restant pour les photos de profil dans le tableau de bord admin. *Solution : Widget intégré à la page Kiosque.*
 
 ### 🗺️ Géographie & Itinéraires
 - [ ] **Détection d'embouteillages (Tana)** : Intégrer une alerte ou une estimation de temps supplémentaire pour les axes saturés (ex: Anosizato, 67ha).
@@ -125,4 +136,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 > - `plan.md` : Plan de conception et architecture technique
 > - **Règle :** Après chaque modification, vérifier l'impact sur mobile ET desktop, et synchroniser ces 4 documents.
 
-*Dernière mise à jour : 8 Juin 2026 - Session 20 (Refonte UI Premium)*
+*Dernière mise à jour : 8 Juin 2026 - Session 21 (Correctifs UI Détails Trajet + Audit Complet Points Forts/Faibles)*
