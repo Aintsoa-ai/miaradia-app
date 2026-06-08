@@ -46,8 +46,8 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Sélecteurs de Dates Universels Hybrides & Ergonomie (S13) 💻📱** : Remplacement du libellé par défaut "Aujourd'hui" par "Départ" sur ordinateur et mobile. Résolution de l'incompatibilité de DateTimePickerModal sur ordinateur (Web) par l'utilisation d'overlays HTML transparents (`input type="date"` et `input type="datetime-local"`) dotés d'un index d'empilement élevé.
 - [x] **Alertes Premium CustomAlert *(RÉALISÉ - S14)* :** Remplacement universel de tous les `Alert.alert` natifs par un composant `CustomAlert` modal animé professionnel.
 - [x] **Badge "Super Driver" Dynamique *(RÉALISÉ - S20)* :** Calcul du badge en temps réel basé sur le nombre d'avis (>= 5) et la moyenne des notes (>= 4.5/5) directement au chargement du profil et de la carte trajet.
-- [x] **Notifications Push Expo *(RÉALISÉ - S20)* :** Intégration de `expo-notifications` pour alerter le passager instantanément sur son téléphone lorsque son paiement Mobile Money est validé en arrière-plan par le webhook SMS.
 - [x] **Refonte Premium UI (S20) ✨ :** Mise en place du système "Dark Hero Header" sur les écrans "Détails du trajet", "Profil Conducteur", "Messages" et "Mon Profil". Structure aérée avec conteneurs arrondis (`borderRadius: 24`), ombres douces et fix des problèmes de superposition Z-index (`zIndex`) pour un rendu parfait sur bureau et mobile.
+- [x] **Optimisation Densité Mobile & Compression (S20) ⚡ :** Réduction fine des marges (`paddingTop`, `paddingBottom`, `marginTop`) des en-têtes "Dark Hero Header" sur les petits écrans (ex: iPhone SE) pour prioriser l'information vitale sans nécessiter de scroll excessif. Augmentation agressive de la compression des photos de profil (300px, 40% JPEG) pour une taille d'application et des temps de chargement records.
 
 ### Technique & Admin
 - [x] **Système d'Avis & Réputation** : Permettre aux passagers de noter les chauffeurs.

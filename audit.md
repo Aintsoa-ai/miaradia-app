@@ -26,7 +26,7 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 *   **Moteur de Recherche Madagascar Intelligent (S13) 🗺️ :** Parsing tolérant via `extractCleanSearchTerms` pour faire correspondre les requêtes textuelles complexes d'autocomplétion (contenant districts, régions ou chiffres romains) avec les simples chaînes en base de données.
 *   **Responsive Web & Copie BlaBlaCar 💻** : Mise en page dual-pane double colonne sur ordinateur et vue condensée fluide sur mobile.
 *   **Refonte Premium UI & Z-Index Fixes (S20) ✨** : Déploiement d'un "Dark Hero Header" sur tous les écrans principaux (Détails, Profil Conducteur, Chat, Mon Profil). Résolution totale des problèmes de chevauchement visuel (`zIndex`) entre le header et les conteneurs superposés (`ScrollView`).
-*   **Polissage UX & Visuel ✨** : Suppression absolue des rectangles de focus (`outlineStyle: 'none'`), gestion des débordements de texte sur les en-têtes sans coupure abrupte, et flexibilité optimale des composants (bouton retour et date) sur ordinateur.
+*   **Optimisation Densité & Poids (S20) ⚡** : Marges verticales des en-têtes drastiquement réduites sur petits écrans (ex: iPhone SE) pour minimiser le scrolling vers le bouton de réservation. Algorithme de compression des avatars porté à une résolution maximale de 300px (qualité 0.4 JPEG) garantissant une empreinte de stockage et un temps de téléchargement infimes.
 
 ---
 

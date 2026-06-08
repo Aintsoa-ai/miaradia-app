@@ -118,6 +118,8 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Gestion des Voyages (`app/(tabs)/rides.tsx`) :** Tableau de bord de type SaaS (`max-w-4xl`) avec onglets en pilules de sélection et cartes d'itinéraire haut de gamme.
 - **Profil Public Conducteur (`app/driver/[id].tsx`) :** Section véhicule et galerie photo à gauche intégrées dans des cartes aux bords fortement arrondis (`borderRadius: 24`), et résumé de confiance avec contacts à droite.
 - **Polissages Esthétiques & Expérience Utilisateur :**
+  - **Densité Mobile Optimisée ⚡ :** Réduction des espacements superflus sur petits écrans (iPhone SE) pour placer le bouton d'action au-dessus de la ligne de flottaison.
+  - **Compression d'Image Extrême 🗜️ :** Algorithme de compression agressif (300px max, 0.4 qualité) sur les photos de profil, pour un affichage instantané et zéro surcharge serveur.
   - **Suppression ABSOLUE des rectangles noirs (Focus) :** Injection de `style={{ outlineStyle: 'none' }}` et de la classe `outline-none` sur l'ensemble des champs de saisie (`TextInput`) de l'application, éliminant définitivement tout rectangle noir de focus navigateur sur ordinateur et téléphone.
   - **Bouton d'Effacement Rapide "x" :** Ajout de petits boutons interactifs d'effacement rapide à l'extrémité droite des zones de saisie textuelle de lieux (Départ / Arrivée) sur ordinateur et téléphone.
   - **Saisie & Formatage des destinations :** Rendu compact en deux lignes avec limitation stricte de retour à la ligne (`numberOfLines={1}`) et transformation en capitales du nom de la commune (en noir) et de la Route Nationale (en gris).

@@ -95,7 +95,7 @@ miaradia-app/
 *   **Déploiement Web Vercel *(RÉALISÉ - S14)* :** Application en production sur https://miaradia-app.vercel.app avec CI/CD automatique (GitHub → Vercel) et gestion de l'historique de routage (S17).
 *   **Alertes Premium *(RÉALISÉ - S14)* :** Composant `CustomAlert` modal animé déployé sur toute l'application.
 *   **Notifications Push (Expo Notifications) *(RÉALISÉ - S20)* :** Intégration de `expo-notifications` pour alerter le passager instantanément sur son téléphone lorsque son paiement Mobile Money est validé en arrière-plan.
-*   **Refonte UI Premium (S20) ✨ :** Déploiement transversal d'un système de "Dark Hero Header", optimisation des z-index pour des superpositions propres, et design aéré des cartes d'information avec fort arrondi (`borderRadius: 24`).
+*   **Refonte UI Premium & Optimisations (S20) ✨ :** Déploiement transversal d'un système de "Dark Hero Header", design aéré des cartes (`borderRadius: 24`), ajustement drastique des densités sur écrans mobiles pour minimiser le scrolling, et compression extrême des avatars via `ImageManipulator` (300px, 40% JPEG).
 *   **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Obtenir un compte business Telma pour une validation encore plus fiable que la solution SMS Gateway.
 
 ### Phase 3 : Fiabilité & Mode Offline
