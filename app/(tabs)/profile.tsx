@@ -232,8 +232,34 @@ export default function ProfileScreen() {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.replace('/');
+    CustomAlert.alert(
+      "Se déconnecter",
+      "Voulez-vous vraiment vous déconnecter de Miara-Dia ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Se déconnecter",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await supabase.auth.signOut();
+            } catch (e) {
+              console.log('SignOut error (non-blocking):', e);
+            } finally {
+              // Forcer la redirection vers login dans tous les cas
+              try {
+                router.replace('/login' as any);
+              } catch (e) {
+                // Fallback web : rechargement complet vers login
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/login';
+                }
+              }
+            }
+          }
+        }
+      ]
+    );
   };
 
   const containsHiddenPhone = (text: string) => {
