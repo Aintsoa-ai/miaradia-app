@@ -327,7 +327,7 @@ export default function RideDetailsScreen() {
       <View style={{
         backgroundColor: '#1E3A5F',
         paddingTop: isDesktop ? 50 : 40,
-        paddingBottom: isDesktop ? 90 : 60,
+        paddingBottom: isDesktop ? 50 : 40,
         paddingHorizontal: 24,
         alignItems: 'center',
         zIndex: 1,
@@ -364,7 +364,7 @@ export default function RideDetailsScreen() {
           flexDirection: isDesktop ? 'row' : 'column-reverse',
           gap: 24,
           paddingHorizontal: 16,
-          marginTop: isDesktop ? -40 : -20,
+          marginTop: isDesktop ? -20 : -16,
           zIndex: 10,
         }}>
           {/* COLUMN LEFT - RIDE INFO (65% on Desktop) */}
