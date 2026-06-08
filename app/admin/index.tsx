@@ -389,13 +389,13 @@ export default function AdminDashboard() {
               {(storageUsage / (1024 * 1024)).toFixed(2)} Mo
             </Text>
             <Text style={{ fontSize: 11, fontWeight: '700', color: '#64748B', marginBottom: 4 }}>
-              / 1024 Mo (1Go)
+              / 500 Mo
             </Text>
           </View>
           
           {/* Progress bar */}
           <View style={{ height: 8, backgroundColor: '#E2E8F0', borderRadius: 4, overflow: 'hidden' }}>
-            <View style={{ height: '100%', width: `${Math.max(1, Math.min(100, (storageUsage / (1024 * 1024 * 1024)) * 100))}%`, backgroundColor: '#10B981', borderRadius: 4 }} />
+            <View style={{ height: '100%', width: `${Math.max(1, Math.min(100, (storageUsage / (500 * 1024 * 1024)) * 100))}%`, backgroundColor: '#10B981', borderRadius: 4 }} />
           </View>
           <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 8, fontStyle: 'italic' }}>
             Espace consommé par les photos de profil (compressées à 40%).
