@@ -590,7 +590,7 @@ export default function ProfileScreen() {
                   <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Prénom</Text>
                   <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as any}
                       value={firstName}
                       onChangeText={setFirstName}
                       placeholder="Votre prénom"
@@ -603,7 +603,7 @@ export default function ProfileScreen() {
                   <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Nom</Text>
                   <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as any}
                       value={lastName}
                       onChangeText={setLastName}
                       placeholder="Votre nom"
@@ -641,7 +641,7 @@ export default function ProfileScreen() {
                 <TextInput
                   multiline
                   numberOfLines={4}
-                  style={{ fontSize: 15, color: '#334155', fontWeight: '500', minHeight: 100, textAlignVertical: 'top', outlineStyle: 'none' } as any}
+                  style={{ fontSize: 15, color: '#334155', fontWeight: '500', minHeight: 100, textAlignVertical: 'top' } as any}
                   value={bio}
                   onChangeText={setBio}
                   placeholder="Décrivez-vous en quelques mots..."
@@ -712,7 +712,7 @@ export default function ProfileScreen() {
                   <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Carrosserie</Text>
                   <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as any}
                       value={vehicleSpecificType}
                       onChangeText={setVehicleSpecificType}
                       placeholder="Ex: SUV, Berline..."
@@ -725,7 +725,7 @@ export default function ProfileScreen() {
                   <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Modèle & Couleur</Text>
                   <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as any}
                       value={vehicleModel}
                       onChangeText={setVehicleModel}
                       placeholder="Ex: Renault Duster - Blanc"
@@ -796,7 +796,7 @@ export default function ProfileScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View style={{ flex: 1, backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', marginRight: 12 }}>
                     <TextInput
-                      style={{ fontSize: 14, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
+                      style={{ fontSize: 14, fontWeight: '600', color: '#0F172A' } as any}
                       placeholder="Ex: Arrêt pipi toutes les 2h..."
                       placeholderTextColor="#94A3B8"
                       value={newPreference}
@@ -848,7 +848,6 @@ export default function ProfileScreen() {
 
           </View>
         </KeyboardAwareScrollView>
-      </View>
     </View>
   );
 }
