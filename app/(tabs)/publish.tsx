@@ -1058,31 +1058,30 @@ export default function PublishScreen() {
             )}
 
             <View className="flex-row justify-between">
-              <View className="flex-1 mr-2">
-                <Text className="text-gray-600 font-semibold mb-2 ml-1">Prix trajet complet</Text>
-                <View className="bg-gray-50 rounded-2xl h-16 px-4 flex-row items-center border border-gray-200">
+              <View className="flex-[1.2] mr-2">
+                <Text className="text-gray-600 font-semibold mb-2 ml-1 text-xs">Prix trajet (Ar)</Text>
+                <View className="bg-gray-50 rounded-2xl h-14 px-3 flex-row items-center border border-gray-200 overflow-hidden">
                   <TextInput
-                    className="flex-1 text-lg font-bold text-center h-full outline-none"
-                    placeholder=""
+                    className="flex-1 min-w-0 text-base font-bold text-center h-full outline-none"
+                    placeholder="Ex: 10000"
                     keyboardType="numeric"
                     value={price}
                     onChangeText={handlePriceChange}
                     onFocus={() => setExpandedStopIndex(null)}
                     style={{ outlineStyle: 'none' } as any}
                   />
-                  <Text className="text-gray-500 font-bold ml-1">Ar</Text>
                 </View>
               </View>
 
               <View className="flex-1 ml-2">
-                <Text className="text-gray-600 font-semibold mb-2 ml-1">Places libres</Text>
-                <View className="bg-gray-50 rounded-2xl h-16 px-4 flex-row items-center justify-between border border-gray-200">
-                  <TouchableOpacity onPress={() => seats > 1 && setSeats(seats - 1)}>
-                    <Ionicons name="remove-circle-outline" size={28} color={seats > 1 ? "#2563EB" : "gray"} />
+                <Text className="text-gray-600 font-semibold mb-2 ml-1 text-xs text-center">Places libres</Text>
+                <View className="bg-gray-50 rounded-2xl h-14 px-2 flex-row items-center justify-between border border-gray-200">
+                  <TouchableOpacity onPress={() => seats > 1 && setSeats(seats - 1)} className="p-1">
+                    <Ionicons name="remove-circle-outline" size={26} color={seats > 1 ? "#2563EB" : "gray"} />
                   </TouchableOpacity>
-                  <Text className="text-xl font-bold">{seats}</Text>
-                  <TouchableOpacity onPress={() => !isMoto && setSeats(seats + 1)}>
-                    <Ionicons name="add-circle-outline" size={28} color={!isMoto && seats < 25 ? "#2563EB" : "gray"} />
+                  <Text className="text-lg font-bold">{seats}</Text>
+                  <TouchableOpacity onPress={() => !isMoto && setSeats(seats + 1)} className="p-1">
+                    <Ionicons name="add-circle-outline" size={26} color={!isMoto && seats < 25 ? "#2563EB" : "gray"} />
                   </TouchableOpacity>
                 </View>
               </View>
