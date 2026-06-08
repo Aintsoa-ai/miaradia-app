@@ -81,7 +81,8 @@ Deno.serve(async (req) => {
   if (req.method === 'GET') {
     try {
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
-      const { data: bookings } = await supabase.from('bookings').select('*, rides(*)').eq('payment_status', 'pending');
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { data: bookings } = await supabase.from('bookings').select('*, rides(*)').gt('created_at', oneHourAgo);
       const { data: logs } = await supabase.from('sms_logs').select('*').order('received_at', { ascending: false }).limit(20);
       return new Response(JSON.stringify({ bookings, logs }), {
         status: 200,
