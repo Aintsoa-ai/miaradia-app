@@ -24,6 +24,7 @@ export default function DriverProfileScreen() {
   const [isUnlocked, setIsUnlocked] = React.useState(false);
   const [isPaymentModalVisible, setIsPaymentModalVisible] = React.useState(false);
   const [paymentLoading, setPaymentLoading] = React.useState(false);
+  const [isWaitingForSms, setIsWaitingForSms] = React.useState(false);
 
   // Calcul dynamique des frais (10% du prix, min 1000, max 5000)
   const getCleanPrice = () => {
@@ -49,6 +50,47 @@ export default function DriverProfileScreen() {
       fetchDriverData();
       checkIfUnlocked();
     }
+  }, [id]);
+
+  // ✅ Realtime listener : met à jour l'UI dès que le webhook SMS valide le paiement
+  React.useEffect(() => {
+    let channel: any = null;
+    const setupRealtimeListener = async () => {
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData?.user;
+      if (!user) return;
+
+      channel = supabase
+        .channel(`booking-unlock-${user.id}-${id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'bookings',
+            filter: `passenger_id=eq.${user.id}`
+          },
+          (payload: any) => {
+            if (
+              payload.new.driver_id === id &&
+              payload.new.payment_status === 'completed'
+            ) {
+              setIsUnlocked(true);
+              setIsWaitingForSms(false);
+              CustomAlert.alert(
+                '✅ Paiement Confirmé !',
+                'Votre paiement Mobile Money a été vérifié automatiquement. Le contact du chauffeur est maintenant déverrouillé !'
+              );
+            }
+          }
+        )
+        .subscribe();
+    };
+
+    setupRealtimeListener();
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
   }, [id]);
 
   const checkIfUnlocked = async () => {
@@ -196,8 +238,9 @@ export default function DriverProfileScreen() {
 
       const isManual = method === 'Kiosque';
       
-      // Simulation d'attente
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // ✅ FIX: Toujours créer en 'pending' — le webhook SMS valide automatiquement
+      // Le numéro de téléphone est nettoyé pour matcher le sender du SMS MVola
+      const cleanReference = reference ? reference.replace(/\s/g, '') : null;
 
       const { error } = await supabase
         .from('bookings')
@@ -209,19 +252,18 @@ export default function DriverProfileScreen() {
           amount_fee: dynamicFee, 
           amount_total: cleanRidePrice + dynamicFee,
           payment_method: method,
-          payment_status: isManual ? 'pending' : 'completed',
-          payment_reference: reference || null
+          payment_status: 'pending',   // Toujours pending, webhook SMS valide automatiquement
+          payment_reference: cleanReference
         }]);
 
       if (error) throw error;
 
-      if (isManual) {
-        CustomAlert.alert("En attente", "Votre demande a été envoyée. L'admin déverrouillera le contact après réception de votre transfert.");
-      } else {
-        setIsUnlocked(true);
-        CustomAlert.alert("Succès", "Paiement réussi ! Le contact est maintenant déverrouillé.");
-      }
+      setIsWaitingForSms(true);
       setIsPaymentModalVisible(false);
+      CustomAlert.alert(
+        '📱 Vérification en cours...',
+        `Votre demande est enregistrée. Effectuez maintenant le transfert MVola/Orange/Airtel.\n\nLe contact sera déverrouillé automatiquement dès réception du SMS de confirmation.`
+      );
     } catch (error: any) {
       CustomAlert.alert("Erreur", error.message);
     } finally {
@@ -554,15 +596,25 @@ export default function DriverProfileScreen() {
       </ScrollView>
 
       <SafeAreaView className="absolute bottom-0 w-full p-6 bg-white/80">
-        <TouchableOpacity 
-          onPress={handleContact}
-          className={`w-full py-4 rounded-2xl items-center shadow-lg ${isUnlocked ? 'bg-green-600 shadow-green-300' : 'bg-blue-600 shadow-blue-300'}`}
-        >
-          <Text className="text-white font-bold text-lg">
-            {isUnlocked ? `Appeler ${driver?.full_name}` : `Déverrouiller le contact (${formatPrice(dynamicFee)} Ar)`}
-          </Text>
-        </TouchableOpacity>
+        {isWaitingForSms ? (
+          <View className="w-full py-4 rounded-2xl items-center bg-amber-500 shadow-lg flex-row justify-center">
+            <ActivityIndicator color="white" size="small" />
+            <Text className="text-white font-bold text-base ml-3">
+              Vérification en cours...
+            </Text>
+          </View>
+        ) : (
+          <TouchableOpacity 
+            onPress={handleContact}
+            className={`w-full py-4 rounded-2xl items-center shadow-lg ${isUnlocked ? 'bg-green-600 shadow-green-300' : 'bg-blue-600 shadow-blue-300'}`}
+          >
+            <Text className="text-white font-bold text-lg">
+              {isUnlocked ? `Appeler ${driver?.full_name}` : `Déverrouiller le contact (${formatPrice(dynamicFee)} Ar)`}
+            </Text>
+          </TouchableOpacity>
+        )}
       </SafeAreaView>
+
 
       <PaymentModal 
         isVisible={isPaymentModalVisible}

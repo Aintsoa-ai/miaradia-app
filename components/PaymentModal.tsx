@@ -61,9 +61,12 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
       onSelectMethod('Kiosque', reference);
     } else {
       if (!phoneNumber) return;
-      onSelectMethod(selectedMethod?.id || 'Inconnu', phoneNumber);
+      // ✅ FIX: Toujours envoyer sans espaces pour matcher le sender du SMS MVola
+      const cleanPhone = phoneNumber.replace(/\s/g, '');
+      onSelectMethod(selectedMethod?.id || 'Inconnu', cleanPhone);
     }
   };
+
 
   const renderContent = () => {
     if (step === 'select') {

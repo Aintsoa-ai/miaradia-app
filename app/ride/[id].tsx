@@ -93,14 +93,17 @@ export default function RideDetailsScreen() {
       if (data) {
         if (data.payment_status === 'completed') {
           setIsUnlocked(true);
+          setIsPendingVerification(false);
         } else if (data.payment_status === 'pending') {
           setIsPendingVerification(true);
+          setIsUnlocked(false);
         }
       }
     } catch (err) {
       // Pas de booking trouvé, normal
     }
   };
+
   useEffect(() => {
     const checkAuthAndBooking = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -116,18 +119,49 @@ export default function RideDetailsScreen() {
     checkAuthAndBooking();
   }, [id]);
 
+  // Écoute en temps réel via Supabase Realtime pour mettre à jour la page dès que le webhook valide le paiement
   useEffect(() => {
-    let interval: any;
-    if (isPendingVerification && currentUserId && id) {
-      // Polling toutes les 3 secondes pour vérifier si l'admin ou le SMS a validé
-      interval = setInterval(() => {
-        checkExistingBooking(id as string, currentUserId);
-      }, 3000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
+    let channel: any = null;
+    
+    const setupRealtime = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+      if (!user || !id) return;
+
+      channel = supabase
+        .channel(`ride-booking-status-${user.id}-${id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'bookings',
+            filter: `passenger_id=eq.${user.id}`
+          },
+          (payload: any) => {
+            const booking = payload.new;
+            if (booking && String(booking.ride_id) === String(id)) {
+              if (booking.payment_status === 'completed') {
+                setIsUnlocked(true);
+                setIsPendingVerification(false);
+                CustomAlert.alert("Succès", "Paiement validé ! Coordonnées déverrouillées.");
+              } else if (booking.payment_status === 'pending') {
+                setIsPendingVerification(true);
+                setIsUnlocked(false);
+              }
+            }
+          }
+        )
+        .subscribe();
     };
-  }, [isPendingVerification, currentUserId, id]);
+
+    setupRealtime();
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [id, currentUserId]);
+
 
   const handleUpdateSeats = async (newSeats: number) => {
     try {
@@ -198,6 +232,9 @@ export default function RideDetailsScreen() {
       // Simulation d'attente réseau
       await new Promise(resolve => setTimeout(resolve, 2000));
 
+      // ✅ FIX : Nettoyer le numéro de téléphone (enlever les espaces) pour matcher le sender MVola du SMS
+      const cleanReference = reference ? reference.replace(/\s/g, '') : null;
+
       // Enregistrement dans la base de données
       const { error: bookingError } = await supabase
         .from('bookings')
@@ -210,8 +247,9 @@ export default function RideDetailsScreen() {
           amount_total: Number(ride.price || 0) + fee,
           payment_method: method,
           payment_status: 'pending',
-          payment_reference: reference || null
+          payment_reference: cleanReference
         }]);
+
 
       if (bookingError) throw bookingError;
 
