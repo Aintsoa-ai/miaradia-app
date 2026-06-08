@@ -78,6 +78,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Frais dynamiques :** 10% du prix du trajet (min 1 000, max 5 000 Ar).
 - **Validation Automatique SMS *(S14/S16/S19)* :** Système de validation automatique des paiements Mobile Money via détection et parsing des SMS entrants (MVola/Orange/Airtel). L'app SMS Gateway sur le téléphone de l'admin intercepte les SMS, avec des parseurs regex adaptés au **format réel malgache** (gestion des espaces dans les montants et formats de références multiples).
 - **Intégration Realtime Instantanée *(S19)* :** Grâce à l'activation du Supabase Realtime sur la table `bookings`, l'écran du passager passe instantanément de "Vérification en cours..." à "Contact Déverrouillé" sans aucune actualisation manuelle de sa part dès que le SMS est traité.
+- **Notifications Push Expo *(NOUVEAU - S20)* :** Envoi d'une notification push silencieuse et immédiate sur le téléphone du passager dès que le webhook valide son paiement Mobile Money en arrière-plan.
 - **Table `sms_logs` :** Audit complet de tous les SMS Mobile Money reçus.
 - **Sécurisation Blindée :** Le numéro du chauffeur reste strictement verrouillé tant que la passerelle SMS n'a pas confirmé le paiement en base de données, empêchant tout contournement manuel.
 - **Chat de Confirmation Automatique :** Immédiatement après la validation du paiement, le système insère de manière asynchrone un message automatique dans le chat de la réservation.
@@ -92,7 +93,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 ### 10. Système de Réputation & Avis *(NOUVEAU - V2.0)*
 - **Notation 5 Étoiles :** Les passagers peuvent noter les chauffeurs après chaque trajet terminé.
 - **Commentaires vérifiés :** Les avis sont liés à une réservation réelle pour garantir leur authenticité.
-- **Badge "Super Driver" :** Attribution automatique aux chauffeurs exemplaires (Moyenne > 4.5 et + de 5 avis).
+- **Badge "Super Driver" Dynamique *(NOUVEAU - S20)* :** Attribution dynamique et en temps réel aux chauffeurs exemplaires (Moyenne >= 4.5 et >= 5 avis), affiché sur le profil et la carte du trajet.
 - **Historique Interactif :** Bouton "Noter le chauffeur" dynamique dans l'onglet "Mes Voyages" pour les trajets passés.
 - **Profil Public Enrichi :** Affichage de la moyenne globale et de la liste chronologique des commentaires.
 

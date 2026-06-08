@@ -4,12 +4,30 @@ import { Platform } from "react-native";
 import { useEffect } from "react";
 import { CustomAlertComponent, CustomAlertRef } from "../components/CustomAlert";
 import { autoStartSmsListener } from "../lib/smsAutoStart";
+import { registerForPushNotificationsAsync, savePushToken } from "../lib/notifications";
+import { supabase } from "../lib/supabase";
 
 export default function Layout() {
   useEffect(() => {
     // Démarrer le listener SMS automatiquement au lancement (Android uniquement)
     // Fonctionne si la préférence 'sms_listening_pref' = 'true' est sauvegardée
     autoStartSmsListener();
+
+    // Enregistrer pour les notifications push
+    const initPushNotifications = async () => {
+      try {
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            await savePushToken(session.user.id, token);
+          }
+        }
+      } catch (e) {
+        console.error("Erreur init push:", e);
+      }
+    };
+    initPushNotifications();
 
     // Protection anti-inspection uniquement sur le Web
     if (Platform.OS === "web") {

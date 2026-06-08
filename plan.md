@@ -94,7 +94,7 @@ miaradia-app/
 *   **Validation SMS Mobile Money *(RÉALISÉ - S16/S17)* :** Création d'une "Passerelle SMS" Native Android. L'application lit en arrière-plan les SMS MVola/Orange/Airtel entrants, compare avec les réservations en attente via une syntaxe RegExp ajustée au format malgache réel, et déverrouille automatiquement le contact chauffeur. Implémentation du système `PermissionsAndroid.request` (S17) et d'un double polling (Client & Admin) pour un rafraîchissement 100% sans contact.
 *   **Déploiement Web Vercel *(RÉALISÉ - S14)* :** Application en production sur https://miaradia-app.vercel.app avec CI/CD automatique (GitHub → Vercel) et gestion de l'historique de routage (S17).
 *   **Alertes Premium *(RÉALISÉ - S14)* :** Composant `CustomAlert` modal animé déployé sur toute l'application.
-*   **Notifications Push (Expo Notifications) *(EN ATTENTE)* :** Alerter les utilisateurs hors-app des nouveaux messages de chat et de la confirmation des réservations.
+*   **Notifications Push (Expo Notifications) *(RÉALISÉ - S20)* :** Intégration de `expo-notifications` pour alerter le passager instantanément sur son téléphone lorsque son paiement Mobile Money est validé en arrière-plan.
 *   **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Obtenir un compte business Telma pour une validation encore plus fiable que la solution SMS Gateway.
 
 ### Phase 3 : Fiabilité & Mode Offline
@@ -119,4 +119,4 @@ miaradia-app/
 | **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
 | **SMS Gateway** | App Android sur téléphone admin | Gratuit |
 
-*Dernière mise à jour : **8 Juin 2026** - Session 19*
+*Dernière mise à jour : **8 Juin 2026** - Session 20*

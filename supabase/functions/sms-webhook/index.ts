@@ -275,6 +275,36 @@ Deno.serve(async (req) => {
           }]);
       }
 
+      // 4. Envoyer une notification Push au passager
+      if (booking.passenger_id) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('push_token')
+          .eq('id', booking.passenger_id)
+          .single();
+          
+        if (profile?.push_token) {
+          try {
+            await fetch('https://exp.host/--/api/v2/push/send', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                to: profile.push_token,
+                sound: 'default',
+                title: '✅ Paiement validé !',
+                body: 'Votre paiement a été confirmé automatiquement. Vous pouvez maintenant appeler votre chauffeur.',
+                data: { rideId: booking.ride_id },
+              }),
+            });
+          } catch (e) {
+            console.error('Failed to send push notification', e);
+          }
+        }
+      }
+
       validated++;
       console.log(`✅ Réservation ${booking.id} validée automatiquement ! Passager: ${booking.passenger_id}`);
     }

@@ -61,6 +61,18 @@ export default function RideDetailsScreen() {
       if (rideError) throw rideError;
       setRide(rideData);
 
+      // 1.5 Fetch reviews dynamically for Super Driver check
+      const { data: reviewsData } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('driver_id', rideData.driver_id);
+      
+      const reviews = reviewsData || [];
+      const averageRating = reviews.length > 0 
+        ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1)
+        : "5.0";
+      const isSuperDriver = reviews.length >= 5 && parseFloat(averageRating) >= 4.5;
+
       // 2. Récupérer le profil du chauffeur
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -69,7 +81,11 @@ export default function RideDetailsScreen() {
         .single();
 
       if (!profileError) {
-        setDriverProfile(profileData);
+        setDriverProfile({
+          ...profileData,
+          rating: averageRating,
+          is_super_driver: isSuperDriver
+        });
       }
     } catch (error: any) {
       console.error('Error fetching ride details:', error.message);
