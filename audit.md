@@ -25,7 +25,8 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 *   **Sécurité Blindée du Flux de Paiement (S16) 🔒 :** Statut verrouillé à `pending` et blocage des bypass locaux. La validation ne se fait que par signature du webhook en BDD.
 *   **Moteur de Recherche Madagascar Intelligent (S13) 🗺️ :** Parsing tolérant via `extractCleanSearchTerms` pour faire correspondre les requêtes textuelles complexes d'autocomplétion (contenant districts, régions ou chiffres romains) avec les simples chaînes en base de données.
 *   **Responsive Web & Copie BlaBlaCar 💻** : Mise en page dual-pane double colonne sur ordinateur et vue condensée fluide sur mobile.
-*   **Polissage UX & Visuel ✨** : Suppression absolue des rectangles de focus (`outlineStyle: 'none'`), limitation de texte sur deux lignes capitales (`numberOfLines={1}`), et wrapper `ScrollView` sur l'authentification.
+*   **Refonte Premium UI & Z-Index Fixes (S20) ✨** : Déploiement d'un "Dark Hero Header" sur tous les écrans principaux (Détails, Profil Conducteur, Chat, Mon Profil). Résolution totale des problèmes de chevauchement visuel (`zIndex`) entre le header et les conteneurs superposés (`ScrollView`).
+*   **Polissage UX & Visuel ✨** : Suppression absolue des rectangles de focus (`outlineStyle: 'none'`), gestion des débordements de texte sur les en-têtes sans coupure abrupte, et flexibilité optimale des composants (bouton retour et date) sur ordinateur.
 
 ---
 
@@ -54,4 +55,4 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 3.  **Phase "Notification"** : Configurer les push notifications sur le dépôt EAS.
 
 ---
-*Audit mis à jour le 8 Juin 2026 par Antigravity à l'issue de la Session 19 (Fin du cycle de validation).*
+*Audit mis à jour le 8 Juin 2026 par Antigravity à l'issue de la Session 20 (Refonte UI Premium).*

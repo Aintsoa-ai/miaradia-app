@@ -47,6 +47,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Alertes Premium CustomAlert *(RÉALISÉ - S14)* :** Remplacement universel de tous les `Alert.alert` natifs par un composant `CustomAlert` modal animé professionnel.
 - [x] **Badge "Super Driver" Dynamique *(RÉALISÉ - S20)* :** Calcul du badge en temps réel basé sur le nombre d'avis (>= 5) et la moyenne des notes (>= 4.5/5) directement au chargement du profil et de la carte trajet.
 - [x] **Notifications Push Expo *(RÉALISÉ - S20)* :** Intégration de `expo-notifications` pour alerter le passager instantanément sur son téléphone lorsque son paiement Mobile Money est validé en arrière-plan par le webhook SMS.
+- [x] **Refonte Premium UI (S20) ✨ :** Mise en place du système "Dark Hero Header" sur les écrans "Détails du trajet", "Profil Conducteur", "Messages" et "Mon Profil". Structure aérée avec conteneurs arrondis (`borderRadius: 24`), ombres douces et fix des problèmes de superposition Z-index (`zIndex`) pour un rendu parfait sur bureau et mobile.
 
 ### Technique & Admin
 - [x] **Système d'Avis & Réputation** : Permettre aux passagers de noter les chauffeurs.
@@ -119,4 +120,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 > - `plan.md` : Plan de conception et architecture technique
 > - **Règle :** Après chaque modification, vérifier l'impact sur mobile ET desktop, et synchroniser ces 4 documents.
 
-*Dernière mise à jour : 8 Juin 2026 - Session 19 (Fin)*
+*Dernière mise à jour : 8 Juin 2026 - Session 20 (Refonte UI Premium)*

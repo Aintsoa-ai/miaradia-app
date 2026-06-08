@@ -109,13 +109,14 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Accès Premium :** La messagerie est débloquée en même temps que le numéro de téléphone après validation du paiement.
 - **Badge de Notification :** Badge rouge dynamique sur l'onglet "Messages" indiquant le nombre de nouveaux messages reçus en temps réel.
 
-### 13. Interface Ultra-Pro Desktop *(AMÉLIORÉ)* 💻✨
-- **Mise en Page Double Colonne (Dual-Pane) :** Déploiement d'un design inspiré de BlaBlaCar (Teal sombre `#054752`, Bleu vif `#00AFF5`, Fond gris doux `#F6F6F6`) sur grand écran.
+### 13. Interface Ultra-Pro Desktop & Mobile *(AMÉLIORÉ - SESSION 20)* 💻✨
+- **Mise en Page Double Colonne (Dual-Pane) :** Déploiement d'un design inspiré de BlaBlaCar (Teal sombre `#1E3A5F`, Bleu vif `#2563EB`, Fond gris doux `#F1F5F9`) sur grand écran et condensé sur mobile.
+- **Dark Hero Header :** Refonte premium des en-têtes (Détails du trajet, Profil Conducteur, Chat, Mon Profil) offrant un contraste élevé et un esthétisme SaaS de haut niveau.
 - **Résultats de Recherche (`app/resultats-recherche.tsx`) :** Sidebar de filtres latérale fixe à gauche (Tri, Confiance, Équipements) et grille de résultats aérée à droite.
-- **Fiche de Détail du Trajet (`app/ride/[id].tsx`) :** Timeline interactive d'itinéraire à gauche, et conteneur de réservation flottant (**Sticky**) à droite avec gating de contact et messagerie instantanée.
+- **Fiche de Détail du Trajet (`app/ride/[id].tsx`) :** En-tête bleu inversé superposé aux cartes de détails (gestion optimisée du `zIndex` pour éviter les coupures/désordres), avec timeline interactive d'itinéraire à gauche, et conteneur de réservation flottant à droite.
 - **Publication de Trajet (`app/(tabs)/publish.tsx`) :** Formulaire limité à une largeur de `680px` et centré avec sélection en un clic des villes d'escale suggérées.
 - **Gestion des Voyages (`app/(tabs)/rides.tsx`) :** Tableau de bord de type SaaS (`max-w-4xl`) avec onglets en pilules de sélection et cartes d'itinéraire haut de gamme.
-- **Profil Public Conducteur (`app/driver/[id].tsx`) :** Section véhicule et galerie photo à gauche, et résumé de confiance avec contacts à droite.
+- **Profil Public Conducteur (`app/driver/[id].tsx`) :** Section véhicule et galerie photo à gauche intégrées dans des cartes aux bords fortement arrondis (`borderRadius: 24`), et résumé de confiance avec contacts à droite.
 - **Polissages Esthétiques & Expérience Utilisateur :**
   - **Suppression ABSOLUE des rectangles noirs (Focus) :** Injection de `style={{ outlineStyle: 'none' }}` et de la classe `outline-none` sur l'ensemble des champs de saisie (`TextInput`) de l'application, éliminant définitivement tout rectangle noir de focus navigateur sur ordinateur et téléphone.
   - **Bouton d'Effacement Rapide "x" :** Ajout de petits boutons interactifs d'effacement rapide à l'extrémité droite des zones de saisie textuelle de lieux (Départ / Arrivée) sur ordinateur et téléphone.
@@ -180,4 +181,4 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 
 ---
 
-*Dernière mise à jour : **8 Juin 2026** — Session 19 : Déploiement de la validation de paiement SMS de bout en bout et activation du Supabase Realtime sur la table bookings.*
+*Dernière mise à jour : **8 Juin 2026** — Session 20 : Refonte Premium UI et correction des chevauchements d'interface (z-index).*

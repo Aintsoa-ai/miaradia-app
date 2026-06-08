@@ -155,8 +155,8 @@ export default function ChatListScreen() {
       {/* HERO HEADER */}
       <View style={{
         backgroundColor: '#1E3A5F',
-        paddingTop: isDesktop ? 60 : 80,
-        paddingBottom: 60,
+        paddingTop: isDesktop ? 60 : 40,
+        paddingBottom: isDesktop ? 60 : 40,
         paddingHorizontal: 32,
         width: '100%',
         alignItems: isDesktop ? 'center' : 'flex-start',
@@ -192,7 +192,7 @@ export default function ChatListScreen() {
         width: '100%',
         maxWidth: isDesktop ? 700 : '100%',
         alignSelf: 'center',
-        marginTop: -30,
+        marginTop: isDesktop ? -30 : -20,
         paddingHorizontal: isDesktop ? 40 : 16,
       }}>
         {loading ? (

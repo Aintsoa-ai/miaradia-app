@@ -298,8 +298,8 @@ export default function DriverProfileScreen() {
       {/* HERO / DARK HEADER */}
       <View style={{
         backgroundColor: '#1E3A5F',
-        paddingTop: isDesktop ? 50 : 60,
-        paddingBottom: isDesktop ? 90 : 80,
+        paddingTop: isDesktop ? 50 : 40,
+        paddingBottom: isDesktop ? 90 : 60,
         paddingHorizontal: 24,
         alignItems: 'center',
         zIndex: 1,
@@ -349,7 +349,7 @@ export default function DriverProfileScreen() {
           flexDirection: isDesktop ? 'row' : 'column',
           gap: 24,
           paddingHorizontal: 16,
-          marginTop: -30,
+          marginTop: isDesktop ? -30 : -20,
           zIndex: 10,
         }}>
           {/* COLUMN LEFT */}

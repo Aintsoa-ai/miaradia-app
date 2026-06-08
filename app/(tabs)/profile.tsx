@@ -89,11 +89,11 @@ export default function ProfileScreen() {
     try {
       setUploading(true);
       
-      // 1. Compresser l'image pour économiser le stockage (Max 500px de large, qualité 0.6, JPEG)
+      // 1. Compresser l'image pour économiser le stockage (Max 300px de large, qualité 0.4, JPEG)
       const manipResult = await ImageManipulator.manipulateAsync(
         uri,
-        [{ resize: { width: 500 } }],
-        { compress: 0.6, format: ImageManipulator.SaveFormat.JPEG }
+        [{ resize: { width: 300 } }],
+        { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG }
       );
       
       // 2. Préparer le fichier pour Supabase
@@ -456,8 +456,8 @@ export default function ProfileScreen() {
         {/* HERO HEADER */}
         <View style={{
           backgroundColor: '#1E3A5F',
-          paddingTop: isDesktop ? 60 : 80,
-          paddingBottom: 90,
+          paddingTop: isDesktop ? 60 : 40,
+          paddingBottom: isDesktop ? 90 : 60,
           paddingHorizontal: 32,
           width: '100%',
           alignItems: isDesktop ? 'center' : 'flex-start',
@@ -481,7 +481,7 @@ export default function ProfileScreen() {
           width: '100%',
           maxWidth: isDesktop ? 700 : '100%',
           alignItems: 'center',
-          marginTop: -60,
+          marginTop: isDesktop ? -60 : -30,
           paddingHorizontal: isDesktop ? 40 : 20,
         }}>
 
