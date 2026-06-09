@@ -5,7 +5,15 @@
 > **NE JAMAIS MODIFIER** : `supabase/functions/sms-webhook/index.ts`, les tables `bookings` / `sms_logs` dans Supabase, la publication Realtime `supabase_realtime`, et le polling dans `app/ride/[id].tsx`.
 > Ce système **fonctionne parfaitement en production**. ✅ **NE PAS Y TOUCHER.**
 
-Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la **Session 22** (9 Juin 2026).
+## 📅 Historique des Audits & Résolutions
+
+### Session 23 (10 Juin 2026) : Stratégie de Lancement & Layout
+*   **Fix Layout Desktop :** Remplacement de l'alignement vertical (`items-center`) par un espacement explicite (`pt-10`) dans le Hero Desktop pour empêcher le texte d'être coupé après la réduction de hauteur (480px).
+*   **Barre de Recherche Sticky :** Application de `position: sticky` sur la barre de recherche desktop pour la garder toujours visible lors du défilement, avec ajustement des marges (`marginBottom`) pour dégager l'affichage complet des opérateurs (MVola, Orange Money, Airtel Money).
+*   **Onboarding Freemium :** Implémentation d'un système de crédits d'acquisition (5 trajets gratuits par nouvel utilisateur via la colonne `free_unlocks`). Ce mécanisme contourne la passerelle SMS et valide automatiquement le statut en `completed` avec la méthode `Gratuit` pour instaurer la confiance sans friction de paiement.
+*   **Stratégie API :** Décision officielle de repousser l'intégration B2B de l'API Telma MVola en raison des coûts prohibitifs à Madagascar. La **Passerelle SMS** locale est consacrée comme solution pérenne principale.
+
+### Session 22 (9 Juin 2026) : Admin Dashboard & Desktop Polish
 
 > [!IMPORTANT]
 > **Critère d'Éligibilité des Audits :** Toute fonctionnalité auditée doit passer avec succès les tests d'ergonomie et de performance sur **version ordinateur (Desktop)** et **version téléphone (Mobile)**. 

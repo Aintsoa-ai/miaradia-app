@@ -49,6 +49,12 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Refonte Premium UI (S20/S22) ✨ :** Mise en place du système "Dark Hero Header" sur tous les écrans. Sur ordinateur, réduction de la hauteur du Hero (600px -> 480px) pour garantir que la barre de recherche (Départ/Arrivée) soit immédiatement visible "above the fold" sur tous les écrans sans scroller. Structure aérée avec conteneurs arrondis (`borderRadius: 24`), ombres douces et fix des problèmes de superposition Z-index (`zIndex`) pour un rendu parfait sur bureau et mobile.
 - [x] **Dashboard Administrateur Exhaustif Premium (S22) 📊 :** Refonte totale du Kiosque avec un design SaaS "Glassmorphism/Neumorphism". Intégration d'animations fluides "façon pompe à essence" sur les compteurs financiers, de cartes de CA Global dégradées, d'un calendrier de simulation interactif, et de logos opérateurs (MVola, Airtel, Orange) pour le détail des transactions.
 - [x] **Optimisation Densité Mobile & Compression (S20) ⚡ :** Réduction fine des marges (`paddingTop`, `paddingBottom`, `marginTop`) des en-têtes "Dark Hero Header" sur les petits écrans (ex: iPhone SE) pour prioriser l'information vitale sans nécessiter de scroll excessif. Augmentation agressive de la compression des photos de profil (300px, 40% JPEG) pour une taille d'application et des temps de chargement records.
+- [x] **Crédits de Bienvenue / Freemium (S23) 🎁 :** Implémentation d'un système d'acquisition offrant 5 trajets gratuits aux nouveaux inscrits (`free_unlocks`). Contourne totalement la passerelle SMS et débloque le contact instantanément pour prouver la valeur de l'application sans friction.
+
+### 🌟 Points Forts Actuels (Avantages Compétitifs)
+- **Zéro dépendance API payante** : Le système de validation SMS fait économiser les coûts B2B exorbitants des opérateurs à Madagascar.
+- **Onboarding Magique** : Grâce aux 5 crédits gratuits, l'utilisateur a une expérience instantanée et gratifiante dès sa première utilisation.
+- **Parité Totale Desktop/Mobile** : L'interface réagit parfaitement sur toutes les tailles d'écran avec un design premium (SaaS) très rare sur le marché local.
 
 ### Technique & Admin
 - [x] **Système d'Avis & Réputation** : Permettre aux passagers de noter les chauffeurs.
@@ -96,7 +102,6 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Sortie de Famille / Privatisation** : Ajouter une catégorie où les voyageurs cherchent spécifiquement à privatiser une voiture pour une sortie de famille (frais de publication spécifique, ex: 1 000 Ar).
 
 ### 💰 Monétisation & Prix
-- [ ] **Crédits de Bienvenue (Stratégie de Lancement) 🎁 :** Offrir automatiquement 4 ou 5 "Permis de déblocage" gratuits à chaque nouvel utilisateur lors de sa première connexion. Permet de supprimer le frein psychologique du premier paiement, d'instaurer la confiance ("ça marche vraiment") et de créer l'habitude avant de rendre le service payant.
 - [ ] **Tarification au km automatique** : Proposer un prix suggéré au chauffeur dès qu'il entre son trajet, basé sur les prix moyens du marché malgache.
 - [ ] **Paiement In-App complet** : Passer d'un gating de contact à une réservation avec séquestre (l'argent est gardé par l'app jusqu'à l'arrivée).
 - [ ] **Intégration API MVola Officielle *(EN PAUSE)* :** L'intégration de l'API B2B Telma est très onéreuse à Madagascar. La **Passerelle SMS** développée reste donc notre solution principale et stratégique à long terme pour la validation automatique et gratuite des paiements.
