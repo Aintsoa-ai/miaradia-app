@@ -366,7 +366,7 @@ export default function AdminDashboard() {
                       <Text style={{ fontSize: 15, fontWeight: '900', color: log.matched ? '#065F46' : '#0F172A' }}>
                         {log.extracted_amount ? `${formatPrice(log.extracted_amount)} Ar` : 'Montant inconnu'}
                       </Text>
-                      <Text style={{ fontSize: 12, color: log.matched ? '#047857' : '#64748B', mt: 4, fontWeight: '600' }} numberOfLines={1}>
+                      <Text style={{ fontSize: 12, color: log.matched ? '#047857' : '#64748B', marginTop: 4, fontWeight: '600' }} numberOfLines={1}>
                         Réf: {log.extracted_reference || 'Non lue'}
                       </Text>
                     </View>
