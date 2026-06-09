@@ -466,7 +466,7 @@ export default function SearchScreen() {
   const renderDesktopView = () => (
     <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
       {/* SECTION HERO DESKTOP */}
-      <View className="bg-slate-900 h-[550px] w-full flex-row items-center px-24 overflow-hidden relative">
+      <View className="bg-slate-900 h-[600px] w-full flex-row items-center px-24 overflow-hidden relative">
         {/* CARROUSEL D'IMAGES EN FOND AVEC FONDU */}
         <View className="absolute inset-0 w-full h-full bg-slate-900">
           {CAROUSEL_DATA.map((item, index) => (
@@ -537,7 +537,7 @@ export default function SearchScreen() {
       </View>
 
       {/* BARRE DE RECHERCHE HORIZONTALE (STYLE BLABLACAR) */}
-      <View className="px-12 items-center -mt-16 z-50">
+      <View className="px-12 items-center -mt-8 z-50">
         <View className="bg-white rounded-full shadow-2xl border border-gray-100 flex-row items-center p-2 max-w-6xl w-full">
           
           {/* DÉPART */}
