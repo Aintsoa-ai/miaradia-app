@@ -77,7 +77,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 > Ces points ont été identifiés lors de l'audit complet du 8 Juin 2026 (Session 21). Ils sont classés par priorité d'impact.
 
-- [ ] **🔴 CRITIQUE — Dépendance au Téléphone Administrateur (Kiosque) :** Tant que nous utilisons la "Passerelle SMS", l'application dépend de l'état de la batterie et de la couverture réseau du téléphone physique de l'administrateur. *Solution future : Intégrer l'API B2B officielle MVola Telma.*
+- [ ] **🔴 CRITIQUE — Dépendance au Téléphone Administrateur (Kiosque) :** L'application dépend de l'état de la batterie et de la couverture réseau du téléphone physique de l'administrateur. *Solution (API Telma) écartée pour des raisons de coût : la Passerelle SMS doit donc être maintenue comme solution robuste principale.*
 - [x] **Expiration Automatique des Trajets *(RÉALISÉ - S21)* :** ~~Les trajets avec une date de départ passée continuent d'apparaître dans les résultats de recherche~~. Filtre actif dans la recherche + badge "Trajet terminé" + tri automatique en bas dans l'onglet conducteur. ✅
 - [ ] **🟠 IMPORTANT — Absence de Mode Hors-Ligne (Offline) :** Sur les Routes Nationales, les voyageurs traversent des zones sans réseau. Ils ne peuvent pas consulter leur billet ou le numéro du chauffeur s'ils ferment l'app. *Solution future : SQLite/AsyncStorage pour mettre en cache les billets validés.*
 - [x] **Configuration des Notifications Push *(RÉALISÉ - S21)* :** Liaison complète du Token de notification Expo et redirection lors du clic de l'utilisateur. Reste à coupler cela avec l'envoi push lors des messages de chat.
@@ -98,7 +98,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 ### 💰 Monétisation & Prix
 - [ ] **Tarification au km automatique** : Proposer un prix suggéré au chauffeur dès qu'il entre son trajet, basé sur les prix moyens du marché malgache.
 - [ ] **Paiement In-App complet** : Passer d'un gating de contact à une réservation avec séquestre (l'argent est gardé par l'app jusqu'à l'arrivée).
-- [ ] **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Remplacer la solution SMS Gateway par l'API officielle Telma MVola pour une validation encore plus fiable et instantanée (nécessite un compte business Telma).
+- [ ] **Intégration API MVola Officielle *(EN PAUSE)* :** L'intégration de l'API B2B Telma est très onéreuse à Madagascar. La **Passerelle SMS** développée reste donc notre solution principale et stratégique à long terme pour la validation automatique et gratuite des paiements.
 - [ ] **Abonnement Premium Chauffeur** : Permettre aux chauffeurs pro de payer un abonnement mensuel pour ne plus avoir de frais sur les réservations.
 - [ ] **Offres d'Abonnement Passager (Accès Illimité Contacts)** : Proposer des abonnements pour les voyageurs réguliers au lieu de payer à chaque trajet :
   - **Hebdomadaire :** Affiche tous les numéros de conducteurs pendant une semaine entière sans surcoût.
