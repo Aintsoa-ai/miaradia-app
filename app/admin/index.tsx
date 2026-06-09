@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CustomAlert } from '../../utils/alert';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, useWindowDimensions, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, useWindowDimensions, Platform, Image } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -325,17 +325,42 @@ export default function AdminDashboard() {
               </Text>
               
               <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 20, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.02, shadowRadius: 4 }}>
-                <Text style={{ fontSize: 13, color: '#1E293B', fontWeight: '700', marginBottom: 12 }}>Chiffre d'Affaires du {selectedDate?.toString().padStart(2, '0')} Juin</Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={{ fontSize: 13, color: '#1E293B', fontWeight: '700', marginBottom: 16 }}>Chiffre d'Affaires</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <Text style={{ fontSize: 24, fontWeight: '800', color: '#0F172A' }}>19 500 Ar</Text>
                   <View style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
                     <Ionicons name="wallet-outline" size={20} color="#475569" />
                   </View>
                 </View>
+
+                {/* Breakdown Mobile Money */}
+                <View style={{ gap: 12, borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 16 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Image source={require('../../assets/images/mvola_madagascar_logo.jpeg')} style={{ width: 20, height: 20, borderRadius: 4, marginRight: 8 }} resizeMode="cover" />
+                      <Text style={{ fontSize: 12, color: '#475569', fontWeight: '600' }}>MVola</Text>
+                    </View>
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#1E293B' }}>10 000 Ar</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Image source={require('../../assets/images/airtel.png')} style={{ width: 20, height: 20, borderRadius: 4, marginRight: 8 }} resizeMode="cover" />
+                      <Text style={{ fontSize: 12, color: '#475569', fontWeight: '600' }}>Airtel Money</Text>
+                    </View>
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#1E293B' }}>6 500 Ar</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Image source={require('../../assets/images/orange.png')} style={{ width: 20, height: 20, borderRadius: 4, marginRight: 8 }} resizeMode="contain" />
+                      <Text style={{ fontSize: 12, color: '#475569', fontWeight: '600' }}>Orange Money</Text>
+                    </View>
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#1E293B' }}>3 000 Ar</Text>
+                  </View>
+                </View>
               </View>
 
               <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 20, borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.02, shadowRadius: 4 }}>
-                <Text style={{ fontSize: 13, color: '#1E293B', fontWeight: '700', marginBottom: 12 }}>Voyages Publiés le {selectedDate?.toString().padStart(2, '0')} Juin</Text>
+                <Text style={{ fontSize: 13, color: '#1E293B', fontWeight: '700', marginBottom: 12 }}>Voyages Publiés</Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Text style={{ fontSize: 24, fontWeight: '800', color: '#0F172A' }}>3</Text>
                   <View style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
@@ -345,20 +370,36 @@ export default function AdminDashboard() {
               </View>
             </View>
 
-            {/* SMS & Stockage */}
-            <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1E293B', marginBottom: 20 }}>SMS & Stockage</Text>
-              
-              <View style={{ flexDirection: 'row', gap: 16 }}>
-                <TouchableOpacity onPress={() => router.push('/admin/sms-gateway')} style={{ flex: 1, alignItems: 'center', padding: 16, backgroundColor: '#F8FAFC', borderRadius: 12, borderWidth: 1, borderColor: '#E2E8F0' }}>
-                  <Ionicons name="phone-portrait-outline" size={28} color="#475569" style={{ marginBottom: 12 }} />
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#1E293B', textAlign: 'center' }}>Passerelle SMS</Text>
-                </TouchableOpacity>
+            {/* Passerelle SMS */}
+            <TouchableOpacity onPress={() => router.push('/admin/sms-gateway')} style={{ backgroundColor: 'white', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
+                <Ionicons name="phone-portrait-outline" size={24} color="#3B82F6" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '800', color: '#1E293B' }}>Passerelle SMS</Text>
+                <Text style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>Gérer les validations</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
+            </TouchableOpacity>
 
-                <View style={{ flex: 1, alignItems: 'center', padding: 16, backgroundColor: '#F8FAFC', borderRadius: 12, borderWidth: 1, borderColor: '#E2E8F0' }}>
-                  <Ionicons name="cloud-outline" size={28} color="#475569" style={{ marginBottom: 12 }} />
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#1E293B', textAlign: 'center' }}>Stockage Avatars</Text>
+            {/* STOCKAGE AVATARS */}
+            <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                <View style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: '#F5F3FF', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
+                  <Ionicons name="cloud-outline" size={24} color="#8B5CF6" />
                 </View>
+                <Text style={{ fontSize: 15, fontWeight: '800', color: '#1E293B', letterSpacing: -0.5 }}>Espace de Stockage</Text>
+              </View>
+              
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 }}>
+                <Text style={{ fontSize: 24, fontWeight: '800', color: '#0F172A', letterSpacing: -0.5 }}>
+                  {(storageUsage / (1024 * 1024)).toFixed(2)} <Text style={{ fontSize: 14, color: '#64748B' }}>Mo</Text>
+                </Text>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#64748B', marginBottom: 4 }}>/ 500 Mo</Text>
+              </View>
+              
+              <View style={{ height: 8, backgroundColor: '#F1F5F9', borderRadius: 4, overflow: 'hidden' }}>
+                <View style={{ height: '100%', width: `${Math.max(1, Math.min(100, (storageUsage / (500 * 1024 * 1024)) * 100))}%`, backgroundColor: '#8B5CF6', borderRadius: 4 }} />
               </View>
             </View>
 
