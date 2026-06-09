@@ -504,7 +504,7 @@ export default function SearchScreen() {
             <Text style={{ color: '#C7D2FE', fontSize: 12, fontWeight: '700', marginLeft: 6, letterSpacing: 0.5 }}>Plateforme N°1 à Madagascar</Text>
           </View>
 
-          <Text style={{ fontSize: 58, fontWeight: '900', color: 'white', lineHeight: 62, letterSpacing: -2, marginBottom: 20 }}>
+          <Text style={{ fontSize: 44, fontWeight: '900', color: 'white', lineHeight: 48, letterSpacing: -1, marginBottom: 20 }}>
             Voyagez à travers{'\n'}Madagascar,{'\n'}
             <Text style={{ color: '#818CF8' }}>simplement.</Text>
           </Text>
@@ -537,7 +537,10 @@ export default function SearchScreen() {
       </View>
 
       {/* BARRE DE RECHERCHE HORIZONTALE (STYLE BLABLACAR) */}
-      <View className="px-12 items-center -mt-8 z-50">
+      <View 
+        className="px-12 items-center z-50" 
+        style={Platform.OS === 'web' ? { position: 'sticky', top: 32, marginTop: -32, zIndex: 100 } as any : { marginTop: -32 }}
+      >
         <View className="bg-white rounded-full shadow-2xl border border-gray-100 flex-row items-center p-2 max-w-6xl w-full">
           
           {/* DÉPART */}
