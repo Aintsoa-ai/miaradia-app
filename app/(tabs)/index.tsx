@@ -466,7 +466,7 @@ export default function SearchScreen() {
   const renderDesktopView = () => (
     <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
       {/* SECTION HERO DESKTOP */}
-      <View className="bg-slate-900 h-[480px] w-full flex-row items-center px-24 overflow-hidden relative">
+      <View className="bg-slate-900 h-[480px] w-full flex-row pt-16 px-24 overflow-hidden relative">
         {/* CARROUSEL D'IMAGES EN FOND AVEC FONDU */}
         <View className="absolute inset-0 w-full h-full bg-slate-900">
           {CAROUSEL_DATA.map((item, index) => (
@@ -523,10 +523,18 @@ export default function SearchScreen() {
           </View>
 
           {/* Badges */}
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', gap: 8 }}>
               <Ionicons name="shield-checkmark" size={16} color="#60A5FA" />
               <Text style={{ color: 'white', fontWeight: '700', fontSize: 13 }}>Paiement MVola</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', gap: 8 }}>
+              <Ionicons name="shield-checkmark" size={16} color="#F97316" />
+              <Text style={{ color: 'white', fontWeight: '700', fontSize: 13 }}>Orange Money</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', gap: 8 }}>
+              <Ionicons name="shield-checkmark" size={16} color="#EF4444" />
+              <Text style={{ color: 'white', fontWeight: '700', fontSize: 13 }}>Airtel Money</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', gap: 8 }}>
               <Ionicons name="car-sport" size={16} color="#34D399" />
