@@ -24,6 +24,7 @@ export default function RideDetailsScreen() {
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [freeUnlocks, setFreeUnlocks] = useState(0);
 
   // Calcul du montant dynamique (10% du prix, min 1000, max 5000)
   const calculateUnlockFee = (price: number) => {
@@ -123,6 +124,21 @@ export default function RideDetailsScreen() {
       
       if (user) {
         setCurrentUserId(user.id);
+
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('free_unlocks')
+            .eq('id', user.id)
+            .single();
+            
+          if (!error && profile && typeof profile.free_unlocks === 'number') {
+            setFreeUnlocks(profile.free_unlocks);
+          }
+        } catch (e) {
+          console.log("Column free_unlocks might not exist yet.", e);
+        }
+
         if (id) {
           checkExistingBooking(id as string, user.id);
         }
@@ -227,6 +243,50 @@ export default function RideDetailsScreen() {
       return;
     }
     setIsPaymentModalVisible(true);
+  };
+
+  const handleFreeUnlock = async () => {
+    setPaymentLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+      if (!user) throw new Error("Veuillez vous connecter.");
+
+      const fee = calculateUnlockFee(Number(ride.price || 0));
+      
+      // Insérer un paiement validé avec la méthode "Gratuit"
+      const { error: bookingError } = await supabase
+        .from('bookings')
+        .insert([{
+          ride_id: ride.id,
+          passenger_id: user.id,
+          driver_id: ride.driver_id,
+          amount_ride: ride.price,
+          amount_fee: fee,
+          amount_total: Number(ride.price || 0) + fee,
+          payment_method: 'Gratuit',
+          payment_status: 'completed',
+          payment_reference: 'CADEAU_BIENVENUE'
+        }]);
+
+      if (bookingError) throw bookingError;
+
+      // Décrémenter les crédits gratuits
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ free_unlocks: freeUnlocks - 1 })
+        .eq('id', user.id);
+
+      if (profileError) console.error("Erreur mise à jour crédits gratuits", profileError);
+
+      setIsUnlocked(true);
+      setFreeUnlocks(prev => prev - 1);
+      CustomAlert.alert("Cadeau utilisé ! 🎁", "Contact déverrouillé avec succès. Bon voyage !");
+    } catch (error: any) {
+      CustomAlert.alert("Erreur", error.message || "Erreur lors du déblocage gratuit.");
+    } finally {
+      setPaymentLoading(false);
+    }
   };
 
   const handleConfirmPayment = async (method: string, reference?: string) => {
@@ -670,13 +730,26 @@ export default function RideDetailsScreen() {
                         </Text>
                       </View>
 
+                      {freeUnlocks > 0 && (
+                        <TouchableOpacity 
+                          onPress={handleFreeUnlock}
+                          disabled={ride.seats <= 0 || paymentLoading}
+                          style={{ width: '100%', backgroundColor: ride.seats <= 0 ? '#E2E8F0' : '#10B981', paddingVertical: 14, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <Ionicons name="gift" size={16} color="white" />
+                          <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, textTransform: 'uppercase', marginLeft: 8 }}>Débloquer Gratuitement ({freeUnlocks})</Text>
+                        </TouchableOpacity>
+                      )}
+
                       <TouchableOpacity 
                         onPress={handleBooking}
-                        disabled={ride.seats <= 0}
-                        style={{ width: '100%', backgroundColor: ride.seats <= 0 ? '#E2E8F0' : '#2563EB', paddingVertical: 14, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                        disabled={ride.seats <= 0 || paymentLoading}
+                        style={{ width: '100%', backgroundColor: ride.seats <= 0 ? '#E2E8F0' : (freeUnlocks > 0 ? '#F1F5F9' : '#2563EB'), borderWidth: freeUnlocks > 0 ? 1 : 0, borderColor: '#E2E8F0', paddingVertical: 14, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
                       >
-                        <Ionicons name="lock-open-outline" size={16} color="white" />
-                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, textTransform: 'uppercase', marginLeft: 8 }}>Réserver ce trajet</Text>
+                        <Ionicons name="lock-open-outline" size={16} color={freeUnlocks > 0 ? "#64748B" : "white"} />
+                        <Text style={{ color: freeUnlocks > 0 ? '#64748B' : 'white', fontWeight: '900', fontSize: 13, textTransform: 'uppercase', marginLeft: 8 }}>
+                          {freeUnlocks > 0 ? 'Payer avec Mobile Money' : 'Réserver ce trajet'}
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   )}
