@@ -96,6 +96,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Sortie de Famille / Privatisation** : Ajouter une catégorie où les voyageurs cherchent spécifiquement à privatiser une voiture pour une sortie de famille (frais de publication spécifique, ex: 1 000 Ar).
 
 ### 💰 Monétisation & Prix
+- [ ] **Crédits de Bienvenue (Stratégie de Lancement) 🎁 :** Offrir automatiquement 4 ou 5 "Permis de déblocage" gratuits à chaque nouvel utilisateur lors de sa première connexion. Permet de supprimer le frein psychologique du premier paiement, d'instaurer la confiance ("ça marche vraiment") et de créer l'habitude avant de rendre le service payant.
 - [ ] **Tarification au km automatique** : Proposer un prix suggéré au chauffeur dès qu'il entre son trajet, basé sur les prix moyens du marché malgache.
 - [ ] **Paiement In-App complet** : Passer d'un gating de contact à une réservation avec séquestre (l'argent est gardé par l'app jusqu'à l'arrivée).
 - [ ] **Intégration API MVola Officielle *(EN PAUSE)* :** L'intégration de l'API B2B Telma est très onéreuse à Madagascar. La **Passerelle SMS** développée reste donc notre solution principale et stratégique à long terme pour la validation automatique et gratuite des paiements.
