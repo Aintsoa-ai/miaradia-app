@@ -46,7 +46,8 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Sélecteurs de Dates Universels Hybrides & Ergonomie (S13) 💻📱** : Remplacement du libellé par défaut "Aujourd'hui" par "Départ" sur ordinateur et mobile. Résolution de l'incompatibilité de DateTimePickerModal sur ordinateur (Web) par l'utilisation d'overlays HTML transparents (`input type="date"` et `input type="datetime-local"`) dotés d'un index d'empilement élevé.
 - [x] **Alertes Premium CustomAlert *(RÉALISÉ - S14)* :** Remplacement universel de tous les `Alert.alert` natifs par un composant `CustomAlert` modal animé professionnel.
 - [x] **Badge "Super Driver" Dynamique *(RÉALISÉ - S20)* :** Calcul du badge en temps réel basé sur le nombre d'avis (>= 5) et la moyenne des notes (>= 4.5/5) directement au chargement du profil et de la carte trajet.
-- [x] **Refonte Premium UI (S20) ✨ :** Mise en place du système "Dark Hero Header" sur les écrans "Détails du trajet", "Profil Conducteur", "Messages" et "Mon Profil". Structure aérée avec conteneurs arrondis (`borderRadius: 24`), ombres douces et fix des problèmes de superposition Z-index (`zIndex`) pour un rendu parfait sur bureau et mobile.
+- [x] **Refonte Premium UI (S20/S22) ✨ :** Mise en place du système "Dark Hero Header" sur tous les écrans. Sur ordinateur, réduction de la hauteur du Hero (600px -> 480px) pour garantir que la barre de recherche (Départ/Arrivée) soit immédiatement visible "above the fold" sur tous les écrans sans scroller. Structure aérée avec conteneurs arrondis (`borderRadius: 24`), ombres douces et fix des problèmes de superposition Z-index (`zIndex`) pour un rendu parfait sur bureau et mobile.
+- [x] **Dashboard Administrateur Exhaustif Premium (S22) 📊 :** Refonte totale du Kiosque avec un design SaaS "Glassmorphism/Neumorphism". Intégration d'animations fluides "façon pompe à essence" sur les compteurs financiers, de cartes de CA Global dégradées, d'un calendrier de simulation interactif, et de logos opérateurs (MVola, Airtel, Orange) pour le détail des transactions.
 - [x] **Optimisation Densité Mobile & Compression (S20) ⚡ :** Réduction fine des marges (`paddingTop`, `paddingBottom`, `marginTop`) des en-têtes "Dark Hero Header" sur les petits écrans (ex: iPhone SE) pour prioriser l'information vitale sans nécessiter de scroll excessif. Augmentation agressive de la compression des photos de profil (300px, 40% JPEG) pour une taille d'application et des temps de chargement records.
 
 ### Technique & Admin
@@ -131,10 +132,10 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ## 📋 Règles de Documentation (Charte de Mise à Jour)
 
-> - `nos_idees.md` : Idées futures et ce qui est déjà réalisé
+> - `nos_idees.md` : Idées futures et ce qui est déjà réalisé (Points forts/faibles)
 > - `audit.md` : Rapport d'état de santé technique de l'app
 > - `README.md` : Toutes les fonctionnalités actives de l'application
 > - `plan.md` : Plan de conception et architecture technique
 > - **Règle :** Après chaque modification, vérifier l'impact sur mobile ET desktop, et synchroniser ces 4 documents.
 
-*Dernière mise à jour : 8 Juin 2026 - Session 21 (UI fixes + Audit complet + Expiration trajets + Fix push notifications)*
+*Dernière mise à jour : 9 Juin 2026 - Session 22 (Dashboard Admin Premium + Optimisations Desktop/Signup)*

@@ -5,7 +5,7 @@
 > **NE JAMAIS MODIFIER** : `supabase/functions/sms-webhook/index.ts`, les tables `bookings` / `sms_logs` dans Supabase, la publication Realtime `supabase_realtime`, et le polling dans `app/ride/[id].tsx`.
 > Ce système **fonctionne parfaitement en production**. ✅ **NE PAS Y TOUCHER.**
 
-Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la **Session 21** (8 Juin 2026).
+Ce document récapitule l'état de santé technique et fonctionnel de l'application à l'issue de la **Session 22** (9 Juin 2026).
 
 > [!IMPORTANT]
 > **Critère d'Éligibilité des Audits :** Toute fonctionnalité auditée doit passer avec succès les tests d'ergonomie et de performance sur **version ordinateur (Desktop)** et **version téléphone (Mobile)**. 
@@ -24,8 +24,10 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 *   **Résolution Crash Navigation Web Vercel (S17) 🌐 :** Correction de la flèche de retour (<-) sur Vercel avec blocs protecteurs `try/catch` sur `router.canGoBack()`.
 *   **Sécurité Blindée du Flux de Paiement (S16) 🔒 :** Statut verrouillé à `pending` et blocage des bypass locaux. La validation ne se fait que par signature du webhook en BDD.
 *   **Moteur de Recherche Madagascar Intelligent (S13) 🗺️ :** Parsing tolérant via `extractCleanSearchTerms` pour faire correspondre les requêtes textuelles complexes d'autocomplétion (contenant districts, régions ou chiffres romains) avec les simples chaînes en base de données.
-*   **Responsive Web & Copie BlaBlaCar 💻** : Mise en page dual-pane double colonne sur ordinateur et vue condensée fluide sur mobile.
-*   **Refonte Premium UI & Z-Index Fixes (S20) ✨** : Déploiement d'un "Dark Hero Header" sur tous les écrans principaux (Détails, Profil Conducteur, Chat, Mon Profil). Résolution totale des problèmes de chevauchement visuel (`zIndex`) entre le header et les conteneurs superposés (`ScrollView`).
+*   **Responsive Web & Copie BlaBlaCar 💻** : Mise en page dual-pane double colonne sur ordinateur et vue condensée fluide sur mobile. Ajustement précis de la hauteur du Hero header sur Desktop (480px) pour garder la barre de recherche au-dessus de la ligne de flottaison.
+*   **Refonte Premium UI & Z-Index Fixes (S20) ✨** : Déploiement d'un "Dark Hero Header" sur tous les écrans principaux. Résolution des problèmes de chevauchement visuel (`zIndex`).
+*   **Dashboard Administrateur Ultra-Premium (S22) 📊** : Refonte "Glassmorphism/Neumorphism" du Kiosque avec un calendrier dynamique, des compteurs financiers animés (effet pompe à essence), des tuiles avec dégradés, l'affichage détaillé par opérateur avec logos, et restauration de la barre de progression d'espace de stockage.
+*   **Stabilité Composants (S22) 🔧** : Correction des erreurs de nidification JSX (`Text` dans `View` non valide) sur l'écran d'inscription (`signup.tsx`).
 *   **Optimisation Densité & Poids (S20) ⚡** : Marges verticales des en-têtes drastiquement réduites sur petits écrans (ex: iPhone SE) pour minimiser le scrolling vers le bouton de réservation. Algorithme de compression des avatars porté à une résolution maximale de 300px (qualité 0.4 JPEG) garantissant une empreinte de stockage et un temps de téléchargement infimes.
 *   **Correctif UI Détails Trajet (S21) 🔧** : Réduction de la largeur de la colonne timeline bleue verticale (`width: 56` → `44`, `marginRight: 16` → `12`) pour libérer de l'espace horizontal. Augmentation du `paddingBottom` du `ScrollView` (`80` → `120`) pour que le badge "Bagages: Moyen" et les équipements du véhicule soient visibles sur les petits écrans mobiles sans être tronqués.
 *   **Expiration Automatique des Trajets Passés (S21) 📅** : Filtre `isRideExpired()` actif dans `resultats-recherche.tsx` pour exclure automatiquement les trajets dépassés des résultats. Dans `app/(tabs)/rides.tsx`, les trajets terminés reçoivent un badge gris "Trajet terminé", sont grisés (opacity 0.7) et reclassés automatiquement en bas de liste via tri dynamique — l'historique du conducteur est préservé.
@@ -46,7 +48,7 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 | 7 | **Badge Super Driver Dynamique** | Réputation calculée en temps réel et affichée partout (profil, cartes trajet). |
 | 8 | **Zéro dépendance aux API payantes** | Cartographie CartoDB Voyager (gratuit) + OSRM (gratuit) + SMS Gateway (gratuit). |
 | 9 | **CI/CD Automatique** | Chaque push GitHub déclenche un déploiement Vercel instantané. |
-| 10 | **Compression Image Extrême** | Avatars < 50 Ko (300px, 40% JPEG) pour temps de chargement record. |
+| 10 | **Expérience Dashboard Premium** | Visualisation financière animée, UI exhaustive avec micro-animations et design SaaS de haute volée. |
 
 ---
 
@@ -99,4 +101,4 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 4.  **Phase "Chat Push"** : Activer l'envoi de notification push lors de la réception de nouveaux messages dans le chat.
 
 ---
-*Audit mis à jour le **8 Juin 2026** par Antigravity à l'issue de la **Session 21** (Correctifs UI Détails Trajet : bande bleue timeline + contenu caché mobile).*
+*Audit mis à jour le **9 Juin 2026** par Antigravity à l'issue de la **Session 22** (Dashboard Admin Premium, Animations financières, Ajustement Desktop Hero).*

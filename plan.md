@@ -95,8 +95,9 @@ miaradia-app/
 *   **Déploiement Web Vercel *(RÉALISÉ - S14)* :** Application en production sur https://miaradia-app.vercel.app avec CI/CD automatique (GitHub → Vercel) et gestion de l'historique de routage (S17).
 *   **Alertes Premium *(RÉALISÉ - S14)* :** Composant `CustomAlert` modal animé déployé sur toute l'application.
 *   **Notifications Push Expo *(AMÉLIORÉ - S21)* :** Intégration de `expo-notifications` (S20) + correction du `projectId` EAS officiel et ajout d'un écouteur global de clic sur notification (`addNotificationTapListener`) dans `_layout.tsx` redirigeant le passager vers le détail de son trajet validé.
-*   **Refonte UI Premium & Optimisations (S20) ✨ :** Déploiement transversal d'un système de "Dark Hero Header", design aéré des cartes (`borderRadius: 24`), ajustement drastique des densités sur écrans mobiles pour minimiser le scrolling, et compression extrême des avatars via `ImageManipulator` (300px, 40% JPEG).
-*   **Correctifs UI & Expiration Automatique des Trajets (S21) 🔧📅 :** Réduction de la timeline bleue verticale (`width: 56→44`) et augmentation du `paddingBottom` (`80→120`) pour corriger le contenu tronqué sur mobile. Filtre `isRideExpired()` dans les résultats de recherche + badge "Trajet terminé" + tri dynamique dans l'onglet conducteur.
+*   **Refonte UI Premium & Optimisations (S20/S22) ✨ :** Déploiement transversal d'un système de "Dark Hero Header", design aéré des cartes (`borderRadius: 24`), ajustement des densités sur écrans mobiles et optimisation de la hauteur Hero sur Desktop (`480px`) pour garantir la visibilité "above the fold" de la recherche.
+*   **Dashboard Admin Exhaustif (S22) 📊 :** Création d'une interface d'administration ultra-premium avec animations de compteurs (style pompe à essence), ventilation par opérateur avec logos, et cartes d'analyse financière.
+*   **Correctifs UI & Expiration Automatique des Trajets (S21) 🔧📅 :** Réduction de la timeline bleue verticale (`width: 56→44`) et augmentation du `paddingBottom` (`80→120`). Filtre `isRideExpired()` dans les résultats de recherche + badge "Trajet terminé" + tri dynamique dans l'onglet conducteur.
 *   **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Obtenir un compte business Telma pour une validation encore plus fiable que la solution SMS Gateway.
 
 ### Phase 3 : Fiabilité & Mode Offline
@@ -121,4 +122,4 @@ miaradia-app/
 | **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
 | **SMS Gateway** | App Android sur téléphone admin | Gratuit |
 
-*Dernière mise à jour : **8 Juin 2026** - Session 21 (Expiration + Correctifs UI + Push EAS)*
+*Dernière mise à jour : **9 Juin 2026** - Session 22 (Dashboard Admin Premium + Optimisations Desktop/Signup)*
