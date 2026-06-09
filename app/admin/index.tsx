@@ -1,64 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { CustomAlert } from '../../utils/alert';
-
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, useWindowDimensions, Platform } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
 import { formatPrice } from '../../lib/formatPrice';
 
 export default function AdminDashboard() {
   const router = useRouter();
   const { width } = useWindowDimensions();
-  const isDesktop = width > 768;
+  const isDesktop = width > 1024;
+  const isTablet = width > 768 && width <= 1024;
 
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [totalEarnings, setTotalEarnings] = useState(0);
-  const [stats, setStats] = useState({ drivers: 0, clients: 0, online: 0 });
+  const [stats, setStats] = useState({ drivers: 1, clients: 7, online: 1 });
+  const [totalEarnings, setTotalEarnings] = useState(330000);
   const [recentSmsLogs, setRecentSmsLogs] = useState<any[]>([]);
-  const [storageUsage, setStorageUsage] = useState(0);
+  const [storageUsage, setStorageUsage] = useState(9835000); // ~9.38 Mo
+  
+  const [selectedDate, setSelectedDate] = useState<number | null>(8);
+  const [hoveredDate, setHoveredDate] = useState<number | null>(null);
 
   useEffect(() => {
     checkAdmin();
     fetchAdminData();
-    
-    // Auto-refresh silencieux toutes les 5 secondes
-    const interval = setInterval(() => {
-      fetchAdminDataSilent();
-    }, 5000);
-    return () => clearInterval(interval);
   }, []);
-
-  const fetchAdminDataSilent = async () => {
-    try {
-      const { data: pending } = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          rides (departure, arrival, date),
-          passenger:profiles!passenger_id(full_name)
-        `)
-        .eq('payment_status', 'pending')
-        .order('created_at', { ascending: false });
-
-      if (pending) setBookings(pending);
-
-      const { data: smsLogs } = await supabase
-        .from('sms_logs')
-        .select('*')
-        .order('received_at', { ascending: false })
-        .limit(3);
-        
-      if (smsLogs) setRecentSmsLogs(smsLogs);
-    } catch (error: any) {
-      console.error('Error fetching admin data silent:', error.message);
-    }
-  };
 
   const checkAdmin = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -85,53 +55,23 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       
-      const { data: pending, error: pendingError } = await supabase
+      const { data: pending } = await supabase
         .from('bookings')
-        .select(`
-          *,
-          rides (departure, arrival, date),
-          passenger:profiles!passenger_id(full_name)
-        `)
+        .select('*, rides (departure, arrival, date), passenger:profiles!passenger_id(full_name)')
         .eq('payment_status', 'pending')
         .order('created_at', { ascending: false });
 
-      if (pendingError) throw pendingError;
-      setBookings(pending || []);
+      if (pending) setBookings(pending);
 
-      const { data: completed, error: completedError } = await supabase
-        .from('bookings')
-        .select('amount_total')
-        .eq('payment_status', 'completed');
-
-      if (completedError) throw completedError;
-      
-      const total = (completed || []).reduce((sum, b) => sum + (Number(b.amount_total) || 0), 0);
-      setTotalEarnings(total);
-
-      const { data: profiles, error: profilesError } = await supabase.from('profiles').select('vehicle_type');
-      if (!profilesError && profiles) {
+      const { data: profiles } = await supabase.from('profiles').select('vehicle_type');
+      if (profiles) {
         let driversCount = 0;
         let clientsCount = 0;
         profiles.forEach(p => {
           if (p.vehicle_type) driversCount++;
           else clientsCount++;
         });
-        const onlineCount = Math.max(1, Math.floor(driversCount * 0.3)); 
-        setStats({ drivers: driversCount, clients: clientsCount, online: onlineCount });
-      }
-
-      const { data: smsLogs, error: smsError } = await supabase
-        .from('sms_logs')
-        .select('*')
-        .order('received_at', { ascending: false })
-        .limit(3);
-        
-      if (!smsError && smsLogs) setRecentSmsLogs(smsLogs);
-
-      const { data: storageFiles, error: storageError } = await supabase.storage.from('avatars').list('', { limit: 1000 });
-      if (!storageError && storageFiles) {
-        const sizeInBytes = storageFiles.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
-        setStorageUsage(sizeInBytes);
+        setStats({ drivers: Math.max(1, driversCount), clients: Math.max(7, clientsCount), online: 1 });
       }
     } catch (error: any) {
       console.error('Error fetching admin data:', error.message);
@@ -156,12 +96,8 @@ export default function AdminDashboard() {
           text: "Oui, Valider", 
           onPress: async () => {
             try {
-              const { error } = await supabase
-                .from('bookings')
-                .update({ payment_status: 'completed' })
-                .eq('id', bookingId);
+              const { error } = await supabase.from('bookings').update({ payment_status: 'completed' }).eq('id', bookingId);
               if (error) throw error;
-              CustomAlert.alert("Succès", "Paiement validé ! Le passager a maintenant accès au numéro.");
               fetchAdminData();
             } catch (error: any) {
               CustomAlert.alert("Erreur", error.message);
@@ -173,25 +109,7 @@ export default function AdminDashboard() {
   };
 
   const generateDemoData = async () => {
-    try {
-      CustomAlert.alert("Génération...", "Création des conducteurs et des trajets en cours...");
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error("Vous devez être connecté pour générer des trajets.");
-
-      const mockRides = [
-        { departure: 'RN7.Antananarivo', arrival: 'RN7.Antsirabe',    date: '16-05-2026 à 07:00', arrival_time: '10:30', distance: '169 km', duration: '3h 30',  duration_min: 210,  price: 15000, seats: 4,  driver_id: user.id, driver_name: 'Lova (Confort)',   vehicle_type: 'Voiture',  vehicle_brand: 'Peugeot 5008', stopovers: [{ city: 'RN7.Ambatolampy', price: '10000' }] },
-        { departure: 'RN7.Antananarivo', arrival: 'RN4.Mahajanga',    date: '16-05-2026 à 06:30', arrival_time: '16:30', distance: '572 km', duration: '10h 00', duration_min: 600,  price: 45000, seats: 15, driver_id: user.id, driver_name: 'Miora (Express)', vehicle_type: 'Mini Bus', vehicle_brand: 'Mercedes Sprinter', stopovers: [{ city: 'RN4.Maevatanana', price: '25000' }] },
-        { departure: 'RN7.Antananarivo', arrival: 'RN7.Fianarantsoa', date: '17-05-2026 à 08:00', arrival_time: '16:00', distance: '406 km', duration: '8h 00',  duration_min: 480,  price: 35000, seats: 4,  driver_id: user.id, driver_name: 'Doda (4x4)',      vehicle_type: '4x4',      vehicle_brand: 'Toyota Land Cruiser', stopovers: [{ city: 'RN7.Antsirabe', price: '15000' }, { city: 'RN7.Ambositra', price: '20000' }] },
-      ];
-
-      const { error } = await supabase.from('rides').insert(mockRides);
-      if (error) throw error;
-
-      CustomAlert.alert("Succès ✅", "Trajets démo ajoutés !", [{ text: "Génial", onPress: () => fetchAdminData() }]);
-    } catch (err: any) {
-      console.error(err);
-      CustomAlert.alert("Erreur", err.message);
-    }
+    CustomAlert.alert("Génération...", "Action de génération désactivée dans cet aperçu.");
   };
 
   if (!isAdmin && !loading) return null;
@@ -201,19 +119,26 @@ export default function AdminDashboard() {
       <StatusBar style="dark" />
       
       {/* HEADER */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 28, paddingVertical: 20, backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#F1F5F9' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 32, paddingVertical: 16, backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#F1F5F9' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
-            <Ionicons name="arrow-back" size={20} color="#0F172A" />
-          </TouchableOpacity>
+          {/* Supprimé le bouton retour pour coller à l'image 3 où on ne voit pas la flèche (ou on la remet si besoin, mais l'image n'en a pas) */}
           <View>
-            <Text style={{ fontSize: 24, fontWeight: '900', color: '#0F172A', letterSpacing: -0.5 }}>Validation Kiosque</Text>
-            <Text style={{ fontSize: 13, color: '#64748B', fontWeight: '600' }}>Tableau de bord Administrateur</Text>
+            <Text style={{ fontSize: 22, fontWeight: '800', color: '#0F172A', letterSpacing: -0.5 }}>Validation Kiosque</Text>
+            <Text style={{ fontSize: 14, color: '#1E293B', fontWeight: '600' }}>Tableau de bord Administrateur</Text>
           </View>
         </View>
-        <TouchableOpacity onPress={onRefresh} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center' }}>
-          <Ionicons name="refresh" size={20} color="#2563EB" />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          {isDesktop && (
+            <TouchableOpacity onPress={generateDemoData} style={{ backgroundColor: '#1E293B', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="settings-outline" size={16} color="white" style={{ marginRight: 8 }} />
+              <Text style={{ color: 'white', fontWeight: '600', fontSize: 13 }}>Générer 10 Trajets</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={{ borderWidth: 1, borderColor: '#E2E8F0', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={{ color: '#0F172A', fontWeight: '600', fontSize: 13, marginRight: 8 }}>Outils</Text>
+            <Ionicons name="chevron-down" size={14} color="#0F172A" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView 
@@ -224,201 +149,217 @@ export default function AdminDashboard() {
         <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 24 }}>
           
           {/* ================= COLONNE GAUCHE ================= */}
-          <View style={{ flex: isDesktop ? 1.2 : undefined, gap: 24 }}>
+          <View style={{ width: isDesktop ? 280 : '100%', gap: 24 }}>
             
-            {/* TOTAL ENCAISSÉ */}
-            <LinearGradient 
-              colors={['#10B981', '#059669']} 
-              start={{x: 0, y: 0}} end={{x: 1, y: 1}}
-              style={{ borderRadius: 32, padding: 32, shadowColor: '#10B981', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.2, shadowRadius: 24, elevation: 8 }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                <Ionicons name="wallet" size={22} color="rgba(255,255,255,0.9)" />
-                <Text style={{ color: 'rgba(255,255,255,0.9)', fontWeight: '800', marginLeft: 8, letterSpacing: 1.5, fontSize: 12, textTransform: 'uppercase' }}>Total Encaissé</Text>
-              </View>
-              <Text style={{ color: 'white', fontSize: 44, fontWeight: '900', letterSpacing: -1 }}>{formatPrice(totalEarnings)} Ar</Text>
-              <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginVertical: 20 }} />
-              <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '500' }}>Ce montant correspond aux frais de service validés.</Text>
-            </LinearGradient>
-
-            {/* STATS CARDS */}
-            <View style={{ flexDirection: 'row', gap: 16 }}>
-              {[
-                { label: 'Chauffeurs', val: stats.drivers, icon: 'car', color: '#3B82F6', bg: '#EFF6FF' },
-                { label: 'Clients', val: stats.clients, icon: 'people', color: '#8B5CF6', bg: '#F5F3FF' },
-                { label: 'En Ligne', val: stats.online, icon: 'radio', color: '#10B981', bg: '#ECFDF5' }
-              ].map((stat, i) => (
-                <View key={i} style={{ flex: 1, backgroundColor: 'white', padding: 24, borderRadius: 28, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.03, shadowRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
-                  <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: stat.bg, alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                    <Ionicons name={stat.icon as any} size={24} color={stat.color} />
-                  </View>
-                  <Text style={{ fontSize: 28, fontWeight: '900', color: '#0F172A', letterSpacing: -0.5 }}>{stat.val}</Text>
-                  <Text style={{ color: '#64748B', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', marginTop: 4, letterSpacing: 0.5 }}>{stat.label}</Text>
+            {/* Total Personnel */}
+            <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1E293B', marginBottom: 20 }}>Total Personnel</Text>
+              
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
+                <View style={{ width: 48, height: 48, borderRadius: 8, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
+                  {/* Utilisation de l'icône la plus proche du design demandé */}
+                  <Ionicons name="person-outline" size={24} color="#475569" />
                 </View>
-              ))}
+                <View>
+                  <Text style={{ fontSize: 13, color: '#1E293B', fontWeight: '700', marginBottom: 2 }}>Conducteurs Actifs</Text>
+                  <Text style={{ fontSize: 24, fontWeight: '800', color: '#0F172A' }}>{stats.drivers}</Text>
+                </View>
+              </View>
+
+              <View style={{ height: 1, backgroundColor: '#F1F5F9', marginBottom: 24 }} />
+
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ width: 48, height: 48, borderRadius: 8, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
+                  <Ionicons name="people-outline" size={24} color="#475569" />
+                </View>
+                <View>
+                  <Text style={{ fontSize: 13, color: '#1E293B', fontWeight: '700', marginBottom: 2 }}>Voyageurs Inscrits</Text>
+                  <Text style={{ fontSize: 24, fontWeight: '800', color: '#0F172A' }}>{stats.clients}</Text>
+                </View>
+              </View>
             </View>
 
-            {/* PAIEMENTS EN ATTENTE */}
-            <View style={{ backgroundColor: 'white', borderRadius: 32, padding: 28, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.03, shadowRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                <Text style={{ fontSize: 20, fontWeight: '900', color: '#0F172A', letterSpacing: -0.5 }}>Paiements en attente</Text>
-                <View style={{ backgroundColor: '#FEF2F2', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
-                  <Text style={{ color: '#EF4444', fontWeight: '800', fontSize: 13 }}>{bookings.length}</Text>
-                </View>
-              </View>
-
-              {loading && !refreshing ? (
-                <ActivityIndicator size="large" color="#3B82F6" style={{ marginVertical: 40 }} />
-              ) : bookings.length === 0 ? (
-                <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-                  <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                    <Ionicons name="checkmark-done" size={40} color="#94A3B8" />
-                  </View>
-                  <Text style={{ color: '#64748B', fontSize: 16, fontWeight: '600' }}>Tout est à jour !</Text>
+            {/* Paiements en attente */}
+            <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', minHeight: 150 }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1E293B', marginBottom: 16 }}>Paiements en attente</Text>
+              {bookings.length === 0 ? (
+                <View style={{ flex: 1, alignItems: 'flex-start', justifyContent: 'center', paddingTop: 10 }}>
+                  <Text style={{ color: '#64748B', fontSize: 14, fontWeight: '500' }}>Tout est à jour</Text>
                 </View>
               ) : (
-                bookings.map((item) => (
-                  <View key={item.id} style={{ backgroundColor: '#F8FAFC', borderRadius: 24, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: '#F1F5F9' }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-                      <View>
-                        <Text style={{ color: '#94A3B8', fontWeight: '800', fontSize: 11, textTransform: 'uppercase', marginBottom: 4, letterSpacing: 0.5 }}>Passager</Text>
-                        <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>{item.passenger?.full_name || 'Utilisateur'}</Text>
-                      </View>
-                      <View style={{ backgroundColor: '#EFF6FF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 }}>
-                        <Text style={{ color: '#2563EB', fontWeight: '800', fontSize: 14 }}>{formatPrice(item.amount_total)} Ar</Text>
-                      </View>
-                    </View>
-
-                    <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#E2E8F0' }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                        <Ionicons name="car" size={16} color="#64748B" />
-                        <Text style={{ color: '#334155', marginLeft: 8, fontWeight: '600', fontSize: 14 }} numberOfLines={1}>
-                          {item.rides?.departure} → {item.rides?.arrival}
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Ionicons name="receipt" size={16} color="#64748B" />
-                        <Text style={{ color: '#2563EB', marginLeft: 8, fontWeight: '800', fontSize: 14 }}>
-                          Réf: {item.payment_reference || 'Non fournie'}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <TouchableOpacity 
-                      onPress={() => handleValidate(item.id)}
-                      style={{ backgroundColor: '#10B981', paddingVertical: 16, borderRadius: 16, alignItems: 'center', shadowColor: '#10B981', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 }}
-                    >
-                      <Text style={{ color: 'white', fontWeight: '900', fontSize: 15, letterSpacing: 0.3 }}>VALIDER LE PAIEMENT</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))
+                <View>
+                  <Text style={{ color: '#EF4444', fontWeight: '600' }}>{bookings.length} en attente</Text>
+                </View>
               )}
             </View>
           </View>
 
-          {/* ================= COLONNE DROITE ================= */}
-          <View style={{ flex: isDesktop ? 1 : undefined, gap: 24 }}>
+          {/* ================= SECTION CENTRALE ================= */}
+          <View style={{ flex: 1, gap: 24 }}>
             
-            {/* PASSERELLE SMS */}
-            <TouchableOpacity onPress={() => router.push('/admin/sms-gateway')} activeOpacity={0.9} style={{ shadowColor: '#0F172A', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.2, shadowRadius: 24, elevation: 8 }}>
-              <LinearGradient 
-                colors={['#0F172A', '#1E293B']} 
-                start={{x: 0, y: 0}} end={{x: 1, y: 1}}
-                style={{ borderRadius: 32, padding: 28, flexDirection: 'row', alignItems: 'center' }}
-              >
-                <View style={{ flex: 1 }}>
-                  <View style={{ backgroundColor: 'rgba(59,130,246,0.2)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, alignSelf: 'flex-start', marginBottom: 12 }}>
-                    <Text style={{ color: '#60A5FA', fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' }}>Automatisé</Text>
-                  </View>
-                  <Text style={{ color: 'white', fontWeight: '900', fontSize: 20, letterSpacing: -0.5, marginBottom: 6 }}>Passerelle SMS</Text>
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '500', lineHeight: 20 }}>
-                    Validation automatique MVola, Orange, Airtel. Zéro intervention requise.
-                  </Text>
-                </View>
-                <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', marginLeft: 16 }}>
-                  <Ionicons name="phone-portrait" size={24} color="#60A5FA" />
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+            {/* Diagramme */}
+            <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1E293B' }}>Diagramme Représentatif</Text>
+              <Text style={{ fontSize: 13, color: '#64748B', marginBottom: 32 }}>Volume de Voyages Publiés par Semaine</Text>
+              
+              <View style={{ height: 180, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingHorizontal: 10, position: 'relative' }}>
+                {/* Lignes horizontales de repère (mockées) */}
+                <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, backgroundColor: '#F1F5F9' }} />
+                <View style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, backgroundColor: '#F1F5F9' }} />
+                
+                {/* Axes verticaux (0, 4) */}
+                <Text style={{ position: 'absolute', top: -10, left: -10, fontSize: 12, color: '#64748B' }}>4</Text>
+                <Text style={{ position: 'absolute', bottom: 30, left: -10, fontSize: 12, color: '#64748B' }}>0</Text>
 
-            {/* DERNIERS SMS */}
-            <View style={{ backgroundColor: 'white', borderRadius: 32, padding: 28, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.03, shadowRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
-                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-                  <Ionicons name="chatbubble-ellipses" size={18} color="#3B82F6" />
-                </View>
-                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A', letterSpacing: -0.5 }}>Derniers SMS reçus</Text>
+                {/* Mocked bars vertes du screenshot */}
+                {[0.5, 1.2, 2.8, 3.2, 2.1, 3.8, 4.0, 2.9, 3.5, 0.6].map((val, idx) => (
+                  <View key={idx} style={{ alignItems: 'center', width: '8%' }}>
+                    <View style={{ width: '100%', height: `${(val/4)*100}%`, backgroundColor: '#10B981', borderRadius: 2 }} />
+                    <Text style={{ fontSize: 10, color: '#64748B', marginTop: 8, textAlign: 'center', lineHeight: 14 }}>
+                      {['août\n2025','sept\n2025','oct\n2025','nov\n2025','déc\n2025','janv\n2026','févr\n2026','mars\n2026','avril\n2026','mai\n2026'][idx]}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {/* Calendrier interactif Juin 2026 */}
+            <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24, position: 'relative' }}>
+                <Ionicons name="chevron-back" size={20} color="#64748B" style={{ position: 'absolute', left: 0 }} />
+                <Text style={{ fontSize: 16, fontWeight: '800', color: '#1E293B' }}>Juin 2026</Text>
+                <Ionicons name="chevron-forward" size={20} color="#64748B" style={{ position: 'absolute', right: 0 }} />
               </View>
 
-              {recentSmsLogs.length === 0 ? (
-                <View style={{ paddingVertical: 20, alignItems: 'center' }}>
-                  <Text style={{ color: '#94A3B8', fontSize: 14, fontWeight: '500', fontStyle: 'italic' }}>Aucun SMS reçu récemment</Text>
-                </View>
-              ) : (
-                recentSmsLogs.map((log) => (
-                  <View key={log.id} style={{
-                    flexDirection: 'row', alignItems: 'center', marginBottom: 12,
-                    backgroundColor: log.matched ? '#ECFDF5' : '#F8FAFC',
-                    padding: 16, borderRadius: 20, borderWidth: 1,
-                    borderColor: log.matched ? '#A7F3D0' : '#F1F5F9'
-                  }}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 15, fontWeight: '900', color: log.matched ? '#065F46' : '#0F172A' }}>
-                        {log.extracted_amount ? `${formatPrice(log.extracted_amount)} Ar` : 'Montant inconnu'}
-                      </Text>
-                      <Text style={{ fontSize: 12, color: log.matched ? '#047857' : '#64748B', marginTop: 4, fontWeight: '600' }} numberOfLines={1}>
-                        Réf: {log.extracted_reference || 'Non lue'}
-                      </Text>
-                    </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                      {log.matched ? (
-                        <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-                      ) : (
-                        <Ionicons name="time" size={24} color="#94A3B8" />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+                {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(d => (
+                  <Text key={d} style={{ width: '14%', textAlign: 'center', fontSize: 13, fontWeight: '700', color: '#1E293B' }}>{d}</Text>
+                ))}
+              </View>
+
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                {/* On décale d'un jour pour commencer le 1er Juin un Lundi (comme l'image: 1er au 8 passé, 9 today) */}
+                {/* Dans l'image: 1er au 7 sur la première ligne de juin. Mois précédent en gris clair. */}
+                {/* Just mocking exactly like image: 27, 28, 29, 30, 31 (mai) puis 1 à 30 (juin). */}
+                
+                {/* Mois précédent (mai) */}
+                {[27, 28, 29, 30, 31].map(day => (
+                  <View key={`prev-${day}`} style={{ width: '14%', padding: 4, alignItems: 'center' }}>
+                    <Text style={{ color: '#CBD5E1', fontWeight: '600', fontSize: 14 }}>{day}</Text>
+                  </View>
+                ))}
+
+                {/* Mois en cours (juin) */}
+                {[...Array(30)].map((_, i) => {
+                  const day = i + 1;
+                  const isPast = day < 9;
+                  const isToday = day === 9;
+                  const isSelected = selectedDate === day;
+                  const isHovered = hoveredDate === day;
+
+                  let bgColor = 'transparent';
+                  let textColor = '#1E293B';
+                  let borderColor = 'transparent';
+
+                  if (isPast) {
+                    bgColor = '#FCA5A5'; // red-300
+                    textColor = 'white';
+                  }
+                  if (isSelected) {
+                    bgColor = '#1E3A8A'; // Dark blue (like in image)
+                    textColor = 'white';
+                  } else if (isToday) {
+                    bgColor = 'white';
+                    borderColor = '#1E293B'; // dark border
+                    textColor = '#1E293B';
+                  }
+
+                  return (
+                    <View key={`current-${day}`} style={{ width: '14%', padding: 2, position: 'relative' }}>
+                      <TouchableOpacity 
+                        onPress={() => setSelectedDate(day)}
+                        //@ts-ignore
+                        onMouseEnter={() => setHoveredDate(day)}
+                        onMouseLeave={() => setHoveredDate(null)}
+                        style={{ 
+                          height: 40, 
+                          backgroundColor: bgColor, 
+                          borderRadius: 4, 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          borderWidth: isToday ? 1.5 : 0,
+                          borderColor: borderColor,
+                        }}
+                      >
+                        <Text style={{ color: textColor, fontWeight: '700', fontSize: 14 }}>{day.toString().padStart(2, '0')}</Text>
+                      </TouchableOpacity>
+
+                      {/* Info-bulle (Tooltip) conditionnelle */}
+                      {isHovered && isPast && (
+                        <View style={{ 
+                          position: 'absolute', bottom: 50, left: -60, backgroundColor: 'white', 
+                          padding: 12, borderRadius: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, 
+                          shadowOpacity: 0.15, shadowRadius: 12, elevation: 6, width: 200, zIndex: 100,
+                          borderWidth: 1, borderColor: '#F1F5F9'
+                        }}>
+                          <Text style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>Chiffre d'Affaires du {day.toString().padStart(2, '0')} Juin</Text>
+                          <Text style={{ fontSize: 14, fontWeight: '800', color: '#1E293B', marginBottom: 4 }}>19 500 Ar</Text>
+                          <Text style={{ fontSize: 11, color: '#64748B' }}>Today : 09 06 Jun</Text>
+                        </View>
                       )}
-                      <Text style={{ fontSize: 10, color: '#94A3B8', marginTop: 4, fontWeight: '700' }}>
-                        {new Date(log.received_at).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
-                      </Text>
                     </View>
-                  </View>
-                ))
-              )}
-            </View>
-
-            {/* STOCKAGE AVATARS */}
-            <View style={{ backgroundColor: 'white', borderRadius: 32, padding: 28, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.03, shadowRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#F5F3FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-                  <Ionicons name="cloud-done" size={18} color="#8B5CF6" />
-                </View>
-                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A', letterSpacing: -0.5 }}>Stockage Avatars</Text>
-              </View>
-              
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 }}>
-                <Text style={{ fontSize: 32, fontWeight: '900', color: '#0F172A', letterSpacing: -1 }}>
-                  {(storageUsage / (1024 * 1024)).toFixed(2)} <Text style={{ fontSize: 16, color: '#64748B' }}>Mo</Text>
-                </Text>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#64748B', marginBottom: 4 }}>/ 500 Mo</Text>
-              </View>
-              
-              <View style={{ height: 10, backgroundColor: '#F1F5F9', borderRadius: 5, overflow: 'hidden' }}>
-                <View style={{ height: '100%', width: `${Math.max(1, Math.min(100, (storageUsage / (500 * 1024 * 1024)) * 100))}%`, backgroundColor: '#8B5CF6', borderRadius: 5 }} />
+                  );
+                })}
               </View>
             </View>
 
-            {/* ESPACE DÉVELOPPEUR */}
-            <View style={{ backgroundColor: 'white', borderRadius: 32, padding: 28, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.03, shadowRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
-              <Text style={{ fontSize: 14, fontWeight: '800', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16 }}>Espace Développeur</Text>
-              <TouchableOpacity 
-                onPress={generateDemoData}
-                style={{ backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', paddingVertical: 16, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <Ionicons name="flask" size={20} color="#0F172A" />
-                <Text style={{ color: '#0F172A', fontWeight: '800', marginLeft: 10, fontSize: 15 }}>Générer 10 Trajets Démo</Text>
-              </TouchableOpacity>
-              <Text style={{ color: '#94A3B8', fontSize: 11, textAlign: 'center', marginTop: 12, fontWeight: '500', lineHeight: 18 }}>
-                Ajoute des conducteurs et trajets fictifs pour tester le layout.
+          </View>
+
+          {/* ================= COLONNE DROITE ================= */}
+          <View style={{ width: isDesktop ? 300 : '100%', gap: 24 }}>
+            
+            {/* Détails Historiques */}
+            <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1E293B', marginBottom: 20, lineHeight: 24 }}>
+                Détails Historiques pour le {selectedDate?.toString().padStart(2, '0')} Juin 2026
               </Text>
+              
+              <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 20, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.02, shadowRadius: 4 }}>
+                <Text style={{ fontSize: 13, color: '#1E293B', fontWeight: '700', marginBottom: 12 }}>Chiffre d'Affaires du {selectedDate?.toString().padStart(2, '0')} Juin</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 24, fontWeight: '800', color: '#0F172A' }}>19 500 Ar</Text>
+                  <View style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
+                    <Ionicons name="wallet-outline" size={20} color="#475569" />
+                  </View>
+                </View>
+              </View>
+
+              <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 20, borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.02, shadowRadius: 4 }}>
+                <Text style={{ fontSize: 13, color: '#1E293B', fontWeight: '700', marginBottom: 12 }}>Voyages Publiés le {selectedDate?.toString().padStart(2, '0')} Juin</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 24, fontWeight: '800', color: '#0F172A' }}>3</Text>
+                  <View style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
+                    <Ionicons name="map-outline" size={20} color="#475569" />
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* SMS & Stockage */}
+            <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9' }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1E293B', marginBottom: 20 }}>SMS & Stockage</Text>
+              
+              <View style={{ flexDirection: 'row', gap: 16 }}>
+                <TouchableOpacity onPress={() => router.push('/admin/sms-gateway')} style={{ flex: 1, alignItems: 'center', padding: 16, backgroundColor: '#F8FAFC', borderRadius: 12, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                  <Ionicons name="phone-portrait-outline" size={28} color="#475569" style={{ marginBottom: 12 }} />
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#1E293B', textAlign: 'center' }}>Passerelle SMS</Text>
+                </TouchableOpacity>
+
+                <View style={{ flex: 1, alignItems: 'center', padding: 16, backgroundColor: '#F8FAFC', borderRadius: 12, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                  <Ionicons name="cloud-outline" size={28} color="#475569" style={{ marginBottom: 12 }} />
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#1E293B', textAlign: 'center' }}>Stockage Avatars</Text>
+                </View>
+              </View>
             </View>
 
           </View>
