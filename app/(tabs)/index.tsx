@@ -498,22 +498,40 @@ export default function SearchScreen() {
         </View>
 
         <View className="flex-1 z-10 pr-12">
-          <Text className="text-[64px] font-black text-white leading-[1.05] tracking-tighter mb-6">
-            Votre voyage à {"\n"}Madagascar, {"\n"}
-            <Text className="text-blue-400">redéfini.</Text>
+          {/* Badge premium */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(59,130,246,0.18)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.4)', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, alignSelf: 'flex-start', marginBottom: 20 }}>
+            <Ionicons name="star" size={14} color="#FBBF24" />
+            <Text style={{ color: '#C7D2FE', fontSize: 12, fontWeight: '700', marginLeft: 6, letterSpacing: 0.5 }}>Plateforme N°1 à Madagascar</Text>
+          </View>
+
+          <Text style={{ fontSize: 58, fontWeight: '900', color: 'white', lineHeight: 62, letterSpacing: -2, marginBottom: 20 }}>
+            Voyagez à travers{'\n'}Madagascar,{'\n'}
+            <Text style={{ color: '#818CF8' }}>simplement.</Text>
           </Text>
-          <Text className="text-xl text-slate-300 font-medium leading-relaxed max-w-xl mb-10">
-            Le 1er réseau de covoiturage et de transport premium à Madagascar. Voyagez à travers toute l'île avec des chauffeurs vérifiés, en toute sérénité et au meilleur prix.
+          <Text style={{ fontSize: 18, color: 'rgba(203,213,225,0.9)', fontWeight: '500', lineHeight: 28, maxWidth: 480, marginBottom: 28 }}>
+            Le covoiturage premium entre malgaches. Chauffeurs vérifiés, paiement Mobile Money intégré, sur toutes les Routes Nationales.
           </Text>
-          <View className="flex-row items-center gap-8">
-             <View className="flex-row items-center bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700/50 backdrop-blur-md">
-                <Ionicons name="shield-checkmark" size={20} color="#60A5FA" />
-                <Text className="text-white font-semibold ml-2">Paiement Sécurisé</Text>
-             </View>
-             <View className="flex-row items-center bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700/50 backdrop-blur-md">
-                <Ionicons name="star" size={20} color="#FBBF24" />
-                <Text className="text-white font-semibold ml-2">Profils Vérifiés</Text>
-             </View>
+
+          {/* Stats */}
+          <View style={{ flexDirection: 'row', gap: 24, marginBottom: 24 }}>
+            {[{val:'500+', label:'Trajets publiés'},{val:'120+', label:'Villes couvertes'},{val:'1200+', label:'Voyageurs'}].map((s, i) => (
+              <View key={i} style={{ alignItems: 'center' }}>
+                <Text style={{ color: 'white', fontSize: 22, fontWeight: '900', letterSpacing: -0.5 }}>{s.val}</Text>
+                <Text style={{ color: 'rgba(148,163,184,0.8)', fontSize: 11, fontWeight: '600', marginTop: 2 }}>{s.label}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Badges */}
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', gap: 8 }}>
+              <Ionicons name="shield-checkmark" size={16} color="#60A5FA" />
+              <Text style={{ color: 'white', fontWeight: '700', fontSize: 13 }}>Paiement MVola</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', gap: 8 }}>
+              <Ionicons name="car-sport" size={16} color="#34D399" />
+              <Text style={{ color: 'white', fontWeight: '700', fontSize: 13 }}>Toutes les RN</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -714,28 +732,30 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      {/* SECTION SERVICES PRO */}
-      <View className="py-24 px-24 flex-row justify-between bg-gray-50 mt-12">
-        <View className="items-center flex-1">
-           <View className="w-16 h-16 bg-blue-100 rounded-2xl items-center justify-center mb-4">
-              <Ionicons name="wallet-outline" size={32} color="#2563EB" />
-           </View>
-           <Text className="text-xl font-bold text-gray-900 mb-2 text-center">Des prix imbattables</Text>
-           <Text className="text-gray-500 text-center px-4">Économisez sur vos trajets à travers tout Madagascar.</Text>
+      {/* SECTION SERVICES PREMIUM */}
+      <View style={{ paddingVertical: 80, paddingHorizontal: 80, marginTop: 20, backgroundColor: '#F8FAFF' }}>
+        <View style={{ alignItems: 'center', marginBottom: 52 }}>
+          <View style={{ backgroundColor: '#EEF2FF', paddingHorizontal: 14, paddingVertical: 5, borderRadius: 20, marginBottom: 14 }}>
+            <Text style={{ color: '#4F46E5', fontSize: 12, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' }}>Pourquoi Miara-Dia ?</Text>
+          </View>
+          <Text style={{ fontSize: 36, fontWeight: '900', color: '#0F172A', letterSpacing: -1, textAlign: 'center' }}>Le transport malgache, réinventé.</Text>
+          <Text style={{ fontSize: 16, color: '#64748B', marginTop: 10, textAlign: 'center', maxWidth: 540, fontWeight: '500', lineHeight: 24 }}>Une expérience premium adaptée aux réalités de Madagascar, des grandes villes aux routes nationales les plus reculées.</Text>
         </View>
-        <View className="items-center flex-1">
-           <View className="w-16 h-16 bg-green-100 rounded-2xl items-center justify-center mb-4">
-              <Ionicons name="shield-checkmark-outline" size={32} color="#16A34A" />
-           </View>
-           <Text className="text-xl font-bold text-gray-900 mb-2 text-center">Voyagez en sécurité</Text>
-           <Text className="text-gray-500 text-center px-4">Chauffeurs vérifiés et système de notation transparent.</Text>
-        </View>
-        <View className="items-center flex-1">
-           <View className="w-16 h-16 bg-orange-100 rounded-2xl items-center justify-center mb-4">
-              <Ionicons name="earth-outline" size={32} color="#F59E0B" />
-           </View>
-           <Text className="text-xl font-bold text-gray-900 mb-2 text-center">Couverture Nationale</Text>
-           <Text className="text-gray-500 text-center px-4">De Tana à Tuléar, trouvez un trajet pour chaque RN.</Text>
+        <View style={{ flexDirection: 'row', gap: 20 }}>
+          {[
+            { icon: 'wallet-outline', label: 'Prix imbattables', desc: 'Partagez les frais de trajet et économisez significativement sur chaque voyage.', color: '#3B82F6', bg: '#EFF6FF', border: '#DBEAFE' },
+            { icon: 'shield-checkmark-outline', label: 'Sécurité garantie', desc: 'Chauffeurs évalués, notation 5 étoiles et système de paiement Mobile Money sécurisé.', color: '#10B981', bg: '#ECFDF5', border: '#A7F3D0' },
+            { icon: 'earth-outline', label: 'Couverture nationale', desc: 'De Tana à Tuléar, Mahajanga ou Tamatave — toutes les Routes Nationales couvertes.', color: '#F59E0B', bg: '#FFFBEB', border: '#FDE68A' },
+            { icon: 'phone-portrait-outline', label: 'MVola intégré', desc: 'Validation automatique des paiements Mobile Money. Zéro friction, 100% digital.', color: '#8B5CF6', bg: '#F5F3FF', border: '#DDD6FE' },
+          ].map((item, i) => (
+            <View key={i} style={{ flex: 1, backgroundColor: 'white', borderRadius: 22, padding: 26, borderWidth: 1, borderColor: item.border, shadowColor: item.color, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.08, shadowRadius: 20, elevation: 3 }}>
+              <View style={{ width: 52, height: 52, backgroundColor: item.bg, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginBottom: 16, borderWidth: 1, borderColor: item.border }}>
+                <Ionicons name={item.icon as any} size={26} color={item.color} />
+              </View>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: '#0F172A', marginBottom: 8, letterSpacing: -0.3 }}>{item.label}</Text>
+              <Text style={{ fontSize: 13, color: '#64748B', lineHeight: 20, fontWeight: '500' }}>{item.desc}</Text>
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>

@@ -75,34 +75,9 @@ export default function SearchResultsScreen() {
   console.log("[SearchResults] Render filteredRides count:", filteredRides.length, "filterType:", filterType, "verifiedOnly:", verifiedOnly, "rides total:", rides.length);
 
 
-  // --- FETCH DATA & REALTIME ---
+  // --- FETCH DATA ---
   React.useEffect(() => {
     fetchRides();
-
-    // Souscription temps réel aux mises à jour de places
-    const channel = supabase
-      .channel('search_rides_updates')
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'rides' },
-        (payload) => {
-          const updatedRide = payload.new;
-          if (updatedRide && updatedRide.id) {
-            setRides((prevRides) => 
-              prevRides.map((r) => 
-                r.id === updatedRide.id 
-                  ? { ...r, seatsLeft: updatedRide.seats } 
-                  : r
-              )
-            );
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [departure, arrival]);
 
   const extractCleanSearchTerms = (loc: string): string[] => {
@@ -400,17 +375,19 @@ export default function SearchResultsScreen() {
       
       {/* MOBILE HEADER */}
       {!isDesktop && (
-        <View style={{ backgroundColor: '#1E3A5F', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20 }}>
+        <View style={{ backgroundColor: '#0B1E35', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20 }}>
+          {/* Ligne accent */}
+          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, backgroundColor: 'rgba(96,165,250,0.5)' }} />
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <TouchableOpacity onPress={handleBack} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+            <TouchableOpacity onPress={handleBack} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' }}>
               <Ionicons name="arrow-back" size={20} color="white" />
             </TouchableOpacity>
             <View style={{ alignItems: 'center', flex: 1, marginHorizontal: 16 }}>
-              <Text style={{ fontSize: 17, fontWeight: '900', color: 'white' }} numberOfLines={1}>{depStr} → {arrStr}</Text>
-              <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: '600', marginTop: 2 }}>{filteredRides.length} trajet{filteredRides.length > 1 ? 's' : ''} disponible{filteredRides.length > 1 ? 's' : ''}</Text>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: 'white', letterSpacing: -0.3 }} numberOfLines={1}>{depStr} → {arrStr}</Text>
+              <Text style={{ color: 'rgba(148,163,184,0.8)', fontSize: 11, fontWeight: '600', marginTop: 2 }}>{filteredRides.length} trajet{filteredRides.length > 1 ? 's' : ''} disponible{filteredRides.length > 1 ? 's' : ''}</Text>
             </View>
-            <TouchableOpacity 
-              style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}
+            <TouchableOpacity
+              style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' }}
               onPress={() => setShowFilterModal(true)}
             >
               <Ionicons name="options-outline" size={20} color="white" />
@@ -422,7 +399,9 @@ export default function SearchResultsScreen() {
       {isDesktop ? (
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
           {/* BARRE DE RECHERCHE DESKTOP */}
-          <View style={{ backgroundColor: '#1E3A5F', paddingVertical: 20, paddingHorizontal: 48, alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#0B1E35', paddingVertical: 18, paddingHorizontal: 48, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
+            {/* Ligne accent */}
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, backgroundColor: 'rgba(96,165,250,0.4)' }} />
             <View style={{ backgroundColor: 'white', borderRadius: 20, flexDirection: 'row', alignItems: 'center', padding: 6, maxWidth: 1100, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 8 }}>
               <View style={{ flex: 2, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', borderRightWidth: 1, borderRightColor: '#F1F5F9', height: 48 }}>
                 <Ionicons name="ellipse-outline" size={16} color="#94A3B8" />
