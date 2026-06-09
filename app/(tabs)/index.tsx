@@ -466,7 +466,7 @@ export default function SearchScreen() {
   const renderDesktopView = () => (
     <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
       {/* SECTION HERO DESKTOP */}
-      <View className="bg-slate-900 h-[480px] w-full flex-row pt-16 px-24 overflow-hidden relative">
+      <View className="bg-slate-900 h-[480px] w-full flex-row pt-10 px-24 overflow-hidden relative">
         {/* CARROUSEL D'IMAGES EN FOND AVEC FONDU */}
         <View className="absolute inset-0 w-full h-full bg-slate-900">
           {CAROUSEL_DATA.map((item, index) => (
@@ -499,21 +499,21 @@ export default function SearchScreen() {
 
         <View className="flex-1 z-10 pr-12">
           {/* Badge premium */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(59,130,246,0.18)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.4)', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, alignSelf: 'flex-start', marginBottom: 20 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(59,130,246,0.18)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.4)', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, alignSelf: 'flex-start', marginBottom: 16 }}>
             <Ionicons name="star" size={14} color="#FBBF24" />
             <Text style={{ color: '#C7D2FE', fontSize: 12, fontWeight: '700', marginLeft: 6, letterSpacing: 0.5 }}>Plateforme N°1 à Madagascar</Text>
           </View>
 
-          <Text style={{ fontSize: 44, fontWeight: '900', color: 'white', lineHeight: 48, letterSpacing: -1, marginBottom: 20 }}>
+          <Text style={{ fontSize: 44, fontWeight: '900', color: 'white', lineHeight: 48, letterSpacing: -1, marginBottom: 12 }}>
             Voyagez à travers{'\n'}Madagascar,{'\n'}
             <Text style={{ color: '#818CF8' }}>simplement.</Text>
           </Text>
-          <Text style={{ fontSize: 18, color: 'rgba(203,213,225,0.9)', fontWeight: '500', lineHeight: 28, maxWidth: 480, marginBottom: 28 }}>
+          <Text style={{ fontSize: 18, color: 'rgba(203,213,225,0.9)', fontWeight: '500', lineHeight: 28, maxWidth: 480, marginBottom: 16 }}>
             Le covoiturage premium entre malgaches. Chauffeurs vérifiés, paiement Mobile Money intégré, sur toutes les Routes Nationales.
           </Text>
 
           {/* Stats */}
-          <View style={{ flexDirection: 'row', gap: 24, marginBottom: 24 }}>
+          <View style={{ flexDirection: 'row', gap: 24, marginBottom: 16 }}>
             {[{val:'500+', label:'Trajets publiés'},{val:'120+', label:'Villes couvertes'},{val:'1200+', label:'Voyageurs'}].map((s, i) => (
               <View key={i} style={{ alignItems: 'center' }}>
                 <Text style={{ color: 'white', fontSize: 22, fontWeight: '900', letterSpacing: -0.5 }}>{s.val}</Text>
