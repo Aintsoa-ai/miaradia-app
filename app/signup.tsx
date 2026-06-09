@@ -439,9 +439,7 @@ export default function SignUpScreen() {
             </View>
 
             <Text style={{ color: 'white', fontSize: 42, fontWeight: '900', letterSpacing: -1.5, lineHeight: 50, marginBottom: 16 }}>
-              Rejoignez{'
-'}la communauté{'
-'}<Text style={{ color: '#60A5FA' }}>malgache.</Text>
+              Rejoignez{"\n"}la communauté{"\n"}<Text style={{ color: '#60A5FA' }}>malgache.</Text>
             </Text>
             <Text style={{ color: 'rgba(203,213,225,0.8)', fontSize: 16, fontWeight: '500', lineHeight: 26, marginBottom: 40, maxWidth: 380 }}>
               Des milliers de trajets chaque semaine, des chauffeurs vérifiés et un paiement Mobile Money intégré.
