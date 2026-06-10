@@ -136,6 +136,17 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ---
 
+## 🏗️ Architecture & Bonnes Pratiques (Clean Architecture)
+
+Pour garantir la maintenabilité du code et éviter la dette technique, les 5 règles suivantes doivent être strictement respectées :
+
+1. **Séparation des préoccupations (Custom Hooks) :** Ne jamais mélanger la logique de base de données (fetch, insert, requêtes Supabase, useEffect complexes) avec l'interface graphique (HTML/JSX). Toute la logique métier doit être extraite dans des "Custom Hooks" séparés qui retournent uniquement les données et les fonctions nécessaires.
+2. **Composants Modulaires (Max 150-200 lignes) :** Si un composant (page) devient trop grand, le découper obligatoirement en sous-composants réutilisables.
+3. **Gestion propre des Styles :** Éviter les immenses blocs de styles inline. Utiliser Tailwind CSS (NativeWind) ou des fichiers de styles séparés pour garder les composants lisibles.
+4. **Typage strict (TypeScript) :** Utiliser des interfaces typées pour la base de données. Ne jamais utiliser le type `any`.
+5. **Refactorisation continue (Boy Scout Rule) :** À chaque ajout de fonctionnalité, vérifier si le fichier cible est déjà trop chargé. Si cest le cas, découper ou extraire la logique avant d'ajouter la nouvelle fonctionnalité.
+
+---
 ## 📋 Règles de Documentation (Charte de Mise à Jour)
 
 > - `nos_idees.md` : Idées futures et ce qui est déjà réalisé (Points forts/faibles)

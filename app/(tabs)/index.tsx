@@ -13,6 +13,7 @@ import * as Location from 'expo-location';
 import { MADAGASCAR_LOCATIONS } from '../../constants/madagascarLocations';
 import { formatLocationSelection } from '../../lib/locationFormatter';
 import { findBestLocationMatch } from '../../lib/locationMatcher';
+import { usePlatformStats } from '../../hooks/usePlatformStats';
 
 const CAROUSEL_DATA = [
   { id: '1', source: require('../../assets/images/starex_comp.png') },
@@ -37,6 +38,7 @@ export default function SearchScreen() {
   const [arrFocused, setArrFocused] = useState(false);
 
   const [passengers, setPassengers] = useState(1);
+  const stats = usePlatformStats();
 
 
 
@@ -516,7 +518,11 @@ export default function SearchScreen() {
 
           {/* Stats */}
           <View style={{ flexDirection: 'row', gap: 24, marginBottom: 16 }}>
-            {[{val:'500+', label:'Trajets publiés'},{val:'120+', label:'Villes couvertes'},{val:'1200+', label:'Voyageurs'}].map((s, i) => (
+            {[
+              { val: stats.rides, label: 'Trajets publiés' },
+              { val: stats.cities, label: 'Villes couvertes' },
+              { val: stats.users, label: 'Voyageurs' }
+            ].map((s, i) => (
               <View key={i} style={{ alignItems: 'center' }}>
                 <Text style={{ color: 'white', fontSize: 22, fontWeight: '900', letterSpacing: -0.5 }}>{s.val}</Text>
                 <Text style={{ color: 'rgba(148,163,184,0.8)', fontSize: 11, fontWeight: '600', marginTop: 2 }}>{s.label}</Text>
