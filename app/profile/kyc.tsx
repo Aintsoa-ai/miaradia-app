@@ -84,7 +84,16 @@ export default function KycScreen() {
       
       {/* Header */}
       <View className="bg-white px-6 pt-14 pb-4 flex-row items-center border-b border-gray-100 shadow-sm z-10">
-        <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 items-center justify-center bg-gray-50 rounded-full mr-3 hover:bg-gray-100">
+        <TouchableOpacity 
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.push('/(tabs)/profile' as any);
+            }
+          }} 
+          className="w-10 h-10 items-center justify-center bg-gray-50 rounded-full mr-3 hover:bg-gray-100"
+        >
           <Ionicons name="arrow-back" size={24} color="#2563EB" />
         </TouchableOpacity>
         <Text className="text-xl font-black text-gray-900 tracking-tight">Vérification CIN</Text>
