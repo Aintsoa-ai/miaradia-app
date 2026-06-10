@@ -481,7 +481,7 @@ export default function ProfileScreen() {
         {/* MAIN CONTAINER */}
         <View style={{
           width: '100%',
-          maxWidth: isDesktop ? 1000 : '100%',
+          maxWidth: isDesktop ? 1200 : '100%',
           alignItems: 'center',
           marginTop: isDesktop ? -60 : -30,
           paddingHorizontal: isDesktop ? 40 : 20,
@@ -550,10 +550,10 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* GRILLE DEUX COLONNES SUR DESKTOP */}
+          {/* GRILLE TROIS COLONNES SUR DESKTOP */}
           <View style={{ flexDirection: isDesktop ? 'row' : 'column', width: '100%', gap: 24 }}>
             
-            {/* ================= COLONNE GAUCHE ================= */}
+            {/* ================= COLONNE 1 ================= */}
             <View style={{ flex: 1, gap: 24 }}>
               
               {/* ALERTE PHOTO RÉELLE */}
@@ -650,6 +650,10 @@ export default function ProfileScreen() {
               </View>
               {phoneError ? <Text style={{ color: '#EF4444', fontSize: 11, fontWeight: '700', marginTop: 6, marginLeft: 4 }}>{phoneError}</Text> : null}
             </View>
+          </View> {/* FIN COLONNE 1 */}
+
+          {/* ================= COLONNE 2 ================= */}
+          <View style={{ flex: 1, gap: 24 }}>
 
             {/* Ma Bio */}
             <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
@@ -671,12 +675,6 @@ export default function ProfileScreen() {
                 />
               </View>
             </View>
-
-          </View> {/* FIN COLONNE GAUCHE */}
-
-
-          {/* ================= COLONNE DROITE ================= */}
-          <View style={{ flex: 1, gap: 24 }}>
 
             {/* Mon Véhicule */}
             <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
@@ -763,6 +761,10 @@ export default function ProfileScreen() {
                 </View>
               </View>
             </View>
+          </View> {/* FIN COLONNE 2 */}
+
+          {/* ================= COLONNE 3 ================= */}
+          <View style={{ flex: 1, gap: 24 }}>
 
             {/* Mes Préférences */}
             <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
@@ -841,15 +843,18 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-          </View> {/* FIN COLONNE DROITE */}
+            </View>
 
-        </View> {/* FIN GRILLE DEUX COLONNES */}
+          </View> {/* FIN COLONNE 3 */}
+
+        </View> {/* FIN GRILLE TROIS COLONNES */}
 
         {/* Boutons (Sauvegarder & Déconnexion) */}
-        <View style={{ width: '100%', maxWidth: isDesktop ? 1000 : '100%', paddingHorizontal: isDesktop ? 40 : 20, marginTop: 32, paddingBottom: 40 }}>
+        <View style={{ width: '100%', maxWidth: isDesktop ? 600 : '100%', paddingHorizontal: isDesktop ? 0 : 20, marginTop: 32, paddingBottom: 40, flexDirection: isDesktop ? 'row' : 'column', gap: 16 }}>
               <TouchableOpacity 
                 onPress={handleSaveProfile}
                 style={{
+                  flex: isDesktop ? 1 : undefined,
                   backgroundColor: '#2563EB',
                   paddingVertical: 18, borderRadius: 20, alignItems: 'center',
                   shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 10,
@@ -861,6 +866,7 @@ export default function ProfileScreen() {
               <TouchableOpacity 
                 onPress={handleSignOut}
                 style={{
+                  flex: isDesktop ? 1 : undefined,
                   backgroundColor: 'white', paddingVertical: 18, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#FECACA',
                 }}
               >

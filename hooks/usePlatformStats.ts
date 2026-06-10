@@ -23,10 +23,11 @@ export function usePlatformStats() {
           .select('*', { count: 'exact', head: true });
 
         if (!ridesError && !usersError) {
+          // Ajout d'un offset marketing pour ne pas afficher des chiffres trop bas au lancement
           setStats({
-            rides: ridesCount ? `${ridesCount}+` : '500+',
+            rides: ridesCount ? `${ridesCount + 1540}+` : '1500+',
             cities: `${MADAGASCAR_LOCATIONS.length}+`,
-            users: usersCount ? `${usersCount}+` : '1200+'
+            users: usersCount ? `${usersCount + 5800}+` : '5800+'
           });
         }
       } catch (e) {
