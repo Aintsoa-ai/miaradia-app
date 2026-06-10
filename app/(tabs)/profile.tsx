@@ -252,7 +252,7 @@ export default function ProfileScreen() {
             } finally {
               // Forcer la redirection vers l'accueil dans tous les cas
               try {
-                router.replace('/(tabs)' as any);
+                router.replace('/' as any);
               } catch (e) {
                 // Fallback web : rechargement complet vers l'accueil
                 if (typeof window !== 'undefined') {

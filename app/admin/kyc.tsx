@@ -42,7 +42,7 @@ export default function AdminKycDashboard() {
           .in('id', userIds);
 
         if (!profilesError && profilesData) {
-          profilesMap = profilesData.reduce((acc, profile) => {
+          profilesMap = profilesData.reduce((acc: Record<string, any>, profile: any) => {
             acc[profile.id] = {
               full_name: profile.full_name || profile.first_name || '',
               phone: profile.phone,
