@@ -479,6 +479,20 @@ export default function AdminDashboard() {
               </View>
             </TouchableOpacity>
 
+            {/* RÉPERTOIRE UTILISATEURS */}
+            <TouchableOpacity onPress={() => router.push('/admin/users' as any)} style={{ backgroundColor: 'white', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
+              <View style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: '#FEF3C7', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
+                <Ionicons name="people" size={24} color="#D97706" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 15, fontWeight: '800', color: '#1E293B', letterSpacing: -0.5 }}>Répertoire Utilisateurs</Text>
+                <Text style={{ fontSize: 12, color: '#64748B', marginTop: 2, fontWeight: '500' }}>Liste des chauffeurs vérifiés</Text>
+              </View>
+              <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#F8FAFC', alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="chevron-forward" size={16} color="#64748B" />
+              </View>
+            </TouchableOpacity>
+
             {/* CENTRE KYC */}
             <TouchableOpacity onPress={() => router.push('/admin/kyc' as any)} style={{ backgroundColor: 'white', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
               <View style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: '#ECFDF5', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
