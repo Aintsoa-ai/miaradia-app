@@ -481,7 +481,7 @@ export default function ProfileScreen() {
         {/* MAIN CONTAINER */}
         <View style={{
           width: '100%',
-          maxWidth: isDesktop ? 700 : '100%',
+          maxWidth: isDesktop ? 1000 : '100%',
           alignItems: 'center',
           marginTop: isDesktop ? -60 : -30,
           paddingHorizontal: isDesktop ? 40 : 20,
@@ -550,8 +550,14 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-            {/* ALERTE PHOTO RÉELLE */}
-            <View className="bg-red-50 border border-red-100 rounded-[24px] p-6 mb-8">
+          {/* GRILLE DEUX COLONNES SUR DESKTOP */}
+          <View style={{ flexDirection: isDesktop ? 'row' : 'column', width: '100%', gap: 24 }}>
+            
+            {/* ================= COLONNE GAUCHE ================= */}
+            <View style={{ flex: 1, gap: 24 }}>
+              
+              {/* ALERTE PHOTO RÉELLE */}
+              <View className="bg-red-50 border border-red-100 rounded-[24px] p-6">
               <View className="flex-row items-center mb-4">
                 <Ionicons name="shield-checkmark" size={24} color="#DC2626" />
                 <Text className="text-red-900 font-black text-sm ml-2 uppercase tracking-wide">Vérification de profil</Text>
@@ -571,14 +577,13 @@ export default function ProfileScreen() {
                   <Text className="text-red-800 text-xs ml-2 flex-1 font-semibold leading-relaxed">Les photos de voitures ou paysages sont rejetées.</Text>
                 </View>
               </View>
-            </View>
 
-            {/* Bouton Admin */}
-            {isAdmin && (
-              <TouchableOpacity 
-                onPress={() => router.push('/admin' as any)}
-                className="bg-slate-900 rounded-[24px] p-6 mb-8 flex-row items-center justify-between hover:bg-slate-800 transition-colors"
-              >
+              {/* Bouton Admin */}
+              {isAdmin && (
+                <TouchableOpacity 
+                  onPress={() => router.push('/admin' as any)}
+                  className="bg-slate-900 rounded-[24px] p-6 flex-row items-center justify-between hover:bg-slate-800 transition-colors"
+                >
                 <View className="flex-row items-center">
                   <View className="w-12 h-12 bg-white/10 rounded-2xl items-center justify-center mr-4">
                     <Ionicons name="shield-checkmark" size={24} color="white" />
@@ -589,11 +594,11 @@ export default function ProfileScreen() {
                   </View>
                 </View>
                 <Ionicons name="chevron-forward" size={24} color="#94A3B8" />
-              </TouchableOpacity>
-            )}
+                </TouchableOpacity>
+              )}
 
-            {/* Mes Informations */}
-            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, marginBottom: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+              {/* Mes Informations */}
+              <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
                 <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                   <Ionicons name="person" size={16} color="#2563EB" />
@@ -642,11 +647,12 @@ export default function ProfileScreen() {
                   maxLength={13}
                 />
               </View>
+              </View>
               {phoneError ? <Text style={{ color: '#EF4444', fontSize: 11, fontWeight: '700', marginTop: 6, marginLeft: 4 }}>{phoneError}</Text> : null}
             </View>
 
             {/* Ma Bio */}
-            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, marginBottom: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
                 <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                   <Ionicons name="chatbubble-ellipses" size={16} color="#2563EB" />
@@ -666,8 +672,14 @@ export default function ProfileScreen() {
               </View>
             </View>
 
+          </View> {/* FIN COLONNE GAUCHE */}
+
+
+          {/* ================= COLONNE DROITE ================= */}
+          <View style={{ flex: 1, gap: 24 }}>
+
             {/* Mon Véhicule */}
-            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, marginBottom: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
                 <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                   <Ionicons name="car-sport" size={16} color="#2563EB" />
@@ -753,7 +765,7 @@ export default function ProfileScreen() {
             </View>
 
             {/* Mes Préférences */}
-            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, marginBottom: 32, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
+            <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
                 <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                   <Ionicons name="options" size={16} color="#2563EB" />
@@ -829,8 +841,12 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            {/* Actions de fin */}
-            <View style={{ width: '100%', marginBottom: 40, gap: 16 }}>
+          </View> {/* FIN COLONNE DROITE */}
+
+        </View> {/* FIN GRILLE DEUX COLONNES */}
+
+        {/* Boutons (Sauvegarder & Déconnexion) */}
+        <View style={{ width: '100%', maxWidth: isDesktop ? 1000 : '100%', paddingHorizontal: isDesktop ? 40 : 20, marginTop: 32, paddingBottom: 40 }}>
               <TouchableOpacity 
                 onPress={handleSaveProfile}
                 style={{
