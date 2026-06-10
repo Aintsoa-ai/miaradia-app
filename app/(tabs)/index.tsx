@@ -764,15 +764,15 @@ export default function SearchScreen() {
           {[
             { icon: 'wallet-outline', label: 'Prix imbattables', desc: 'Partagez les frais de trajet et économisez significativement sur chaque voyage.', color: '#3B82F6', bg: '#EFF6FF', border: '#DBEAFE' },
             { icon: 'shield-checkmark-outline', label: 'Sécurité garantie', desc: 'Chauffeurs évalués, notation 5 étoiles et système de paiement Mobile Money sécurisé.', color: '#10B981', bg: '#ECFDF5', border: '#A7F3D0' },
-            { icon: 'earth-outline', label: 'Couverture nationale', desc: 'De Tana à Tuléar, Mahajanga ou Tamatave — toutes les Routes Nationales couvertes.', color: '#F59E0B', bg: '#FFFBEB', border: '#FDE68A' },
-            { icon: 'phone-portrait-outline', label: 'MVola intégré', desc: 'Validation automatique des paiements Mobile Money. Zéro friction, 100% digital.', color: '#8B5CF6', bg: '#F5F3FF', border: '#DDD6FE' },
+            { icon: 'earth-outline', label: 'Couverture nationale', desc: 'De Tana à Tuléar, Mahajanga ou Tamatave — toutes les Routes Nationales.', color: '#F59E0B', bg: '#FFFBEB', border: '#FDE68A' },
+            { icon: 'phone-portrait-outline', label: 'Mobile Money 3en1', desc: 'Validation automatique MVola, Orange Money et Airtel Money. 100% digital.', color: '#8B5CF6', bg: '#F5F3FF', border: '#DDD6FE' },
           ].map((item, i) => (
-            <View key={i} style={{ flex: 1, backgroundColor: 'white', borderRadius: 22, padding: 26, borderWidth: 1, borderColor: item.border, shadowColor: item.color, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.08, shadowRadius: 20, elevation: 3 }}>
+            <View key={i} style={{ flex: 1, backgroundColor: 'white', borderRadius: 22, padding: 26, borderWidth: 1, borderColor: item.border, shadowColor: item.color, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.08, shadowRadius: 20, elevation: 3, alignItems: 'center' }}>
               <View style={{ width: 52, height: 52, backgroundColor: item.bg, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginBottom: 16, borderWidth: 1, borderColor: item.border }}>
                 <Ionicons name={item.icon as any} size={26} color={item.color} />
               </View>
-              <Text style={{ fontSize: 16, fontWeight: '900', color: '#0F172A', marginBottom: 8, letterSpacing: -0.3 }}>{item.label}</Text>
-              <Text style={{ fontSize: 13, color: '#64748B', lineHeight: 20, fontWeight: '500' }}>{item.desc}</Text>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: '#0F172A', marginBottom: 8, letterSpacing: -0.3, textAlign: 'center' }}>{item.label}</Text>
+              <Text style={{ fontSize: 13, color: '#64748B', lineHeight: 20, fontWeight: '500', textAlign: 'center' }}>{item.desc}</Text>
             </View>
           ))}
         </View>
