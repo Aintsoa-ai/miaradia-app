@@ -250,14 +250,16 @@ export default function ProfileScreen() {
             } catch (e) {
               console.log('SignOut error (non-blocking):', e);
             } finally {
-              // Forcer la redirection vers l'accueil dans tous les cas
+              // Sur web : forcer un rechargement complet (vide le cache de session)
+              if (typeof window !== 'undefined') {
+                window.location.replace('/');
+                return;
+              }
+              // Sur mobile natif : navigation Expo Router
               try {
-                router.replace('/' as any);
+                router.replace('/(tabs)' as any);
               } catch (e) {
-                // Fallback web : rechargement complet vers l'accueil
-                if (typeof window !== 'undefined') {
-                  window.location.href = '/';
-                }
+                console.log('Router fallback error:', e);
               }
             }
           }
