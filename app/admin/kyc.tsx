@@ -20,16 +20,45 @@ export default function AdminKycDashboard() {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data: kycData, error: kycError } = await supabase
         .from('kyc_applications')
-        .select(`
-          *,
-          user:profiles!user_id(full_name, phone, avatar_url)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      if (data) setApplications(data);
+      if (kycError) throw kycError;
+
+      if (!kycData || kycData.length === 0) {
+        setApplications([]);
+        return;
+      }
+
+      const userIds = [...new Set(kycData.map(app => app.user_id).filter(id => id))];
+      let profilesMap: Record<string, any> = {};
+      
+      if (userIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, first_name, last_name, phone, avatar_url')
+          .in('id', userIds);
+
+        if (!profilesError && profilesData) {
+          profilesMap = profilesData.reduce((acc, profile) => {
+            acc[profile.id] = {
+              full_name: profile.full_name || profile.first_name || '',
+              phone: profile.phone,
+              avatar_url: profile.avatar_url
+            };
+            return acc;
+          }, {});
+        }
+      }
+
+      const stitchedData = kycData.map(app => ({
+        ...app,
+        user: profilesMap[app.user_id] || null
+      }));
+
+      setApplications(stitchedData);
     } catch (e: any) {
       console.error(e);
       CustomAlert.alert("Erreur", "Impossible de charger les demandes KYC.");
