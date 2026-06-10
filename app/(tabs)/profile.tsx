@@ -648,7 +648,6 @@ export default function ProfileScreen() {
                   maxLength={13}
                 />
               </View>
-              </View>
               {phoneError ? <Text style={{ color: '#EF4444', fontSize: 11, fontWeight: '700', marginTop: 6, marginLeft: 4 }}>{phoneError}</Text> : null}
             </View>
 
@@ -843,8 +842,6 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
                 </View>
               </View>
-            </View>
-
             </View>
 
           </View> {/* FIN COLONNE 3 */}
