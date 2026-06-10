@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, RefreshControl, useWindowDimensions } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { supabase } from '../../lib/supabase';
+import { useMyRides } from '../../hooks/useMyRides';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { formatPrice } from '../../lib/formatPrice';
@@ -10,67 +10,14 @@ import ReviewModal from '../../components/ReviewModal';
 export default function RidesScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'published' | 'booked'>('published');
-  const [loading, setLoading] = useState(true);
-  const [rides, setRides] = useState<any[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
   const [expandedRideId, setExpandedRideId] = useState<string | null>(null);
+  
+  // Custom Hook: Mode Hors-Ligne & Clean Architecture
+  const { rides, loading, refreshing, reviewedRideIds, setReviewedRideIds, fetchMyRides } = useMyRides(activeTab);
   
   // États pour les avis
   const [selectedRideForReview, setSelectedRideForReview] = useState<any>(null);
   const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
-  const [reviewedRideIds, setReviewedRideIds] = useState<string[]>([]);
-
-  const fetchMyRides = useCallback(async () => {
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) return;
-
-      if (activeTab === 'published') {
-        const { data, error } = await supabase
-          .from('rides')
-          .select('*')
-          .eq('driver_id', user.id)
-          .order('date', { ascending: false });
-
-        if (error) throw error;
-        setRides(data || []);
-      } else {
-        const { data, error } = await supabase
-          .from('bookings')
-          .select(`
-            *,
-            ride:rides (*)
-          `)
-          .eq('passenger_id', user.id)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setRides(data.map((b: any) => ({ 
-          ...b.ride, 
-          booking_id: b.id, 
-          payment_status: b.payment_status,
-          price: b.amount_ride || b.ride.price // Utiliser le prix de la résa
-        })));
-
-        // Récupérer les avis déjà laissés
-        const { data: reviewData } = await supabase
-          .from('reviews')
-          .select('ride_id')
-          .eq('passenger_id', user.id);
-        
-        if (reviewData) {
-          setReviewedRideIds(reviewData.map(r => r.ride_id));
-        }
-      }
-    } catch (error: any) {
-      console.error('Error fetching rides:', error.message);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [activeTab]);
 
   useFocusEffect(
     useCallback(() => {
@@ -79,8 +26,7 @@ export default function RidesScreen() {
   );
 
   const onRefresh = () => {
-    setRefreshing(true);
-    fetchMyRides();
+    fetchMyRides(true);
   };
 
   const renderRideItem = (ride: any) => {

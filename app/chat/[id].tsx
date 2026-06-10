@@ -4,123 +4,28 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
+import { useChat } from '../../hooks/useChat';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ChatScreen() {
   const { id: ride_id, other_id, other_name } = useLocalSearchParams();
-  const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  useEffect(() => {
-    let channel: any;
-
-    const initChat = async () => {
-      await markAsRead();
-      channel = await setupChat();
-    };
-
-    if (ride_id && other_id && other_id !== 'undefined') {
-      initChat();
-    }
-
-    return () => {
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
-    };
-  }, [ride_id, other_id]);
-
-  const markAsRead = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session || !other_id || other_id === 'undefined') return;
-
-    await supabase
-      .from('messages')
-      .update({ is_read: true })
-      .eq('ride_id', ride_id)
-      .eq('receiver_id', session.user.id)
-      .eq('sender_id', other_id);
-  };
-
-  const setupChat = async () => {
-    if (!other_id || other_id === 'undefined') {
-      setLoading(false);
-      return;
-    }
-
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      router.replace('/login');
-      return;
-    }
-    setCurrentUserId(session.user.id);
-
-    // 1. Charger les messages existants
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('ride_id', ride_id)
-      .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${other_id}),and(sender_id.eq.${other_id},receiver_id.eq.${session.user.id})`)
-      .order('created_at', { ascending: true });
-
-    if (!error) {
-      setMessages(data || []);
-    }
-    setLoading(false);
-
-    // 2. Écouter les nouveaux messages
-    const newChannel = supabase
-      .channel(`chat:${ride_id}:${session.user.id}:${Date.now()}`) // Nom unique pour éviter les conflits
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'messages',
-        filter: `ride_id=eq.${ride_id}`
-      }, (payload) => {
-        const msg = payload.new;
-        const isRelated = (msg.sender_id === session.user.id && msg.receiver_id === other_id) || 
-                         (msg.sender_id === other_id && msg.receiver_id === session.user.id);
-        
-        if (isRelated) {
-          if (msg.receiver_id === session.user.id) {
-            markAsRead();
-          }
-          
-          setMessages(prev => {
-            if (prev.find(m => m.id === msg.id)) return prev;
-            return [...prev, msg];
-          });
-        }
-      })
-      .subscribe();
-
-    return newChannel;
-  };
+  // Custom Hook (Clean Architecture & Notifications Push)
+  const { messages, loading, currentUserId, sendMessage: sendChatMessage } = useChat(
+    ride_id as string, 
+    other_id as string
+  );
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !currentUserId) return;
-
-    const messageContent = newMessage.trim();
+    if (!newMessage.trim()) return;
+    const content = newMessage;
     setNewMessage('');
-
-    const { error } = await supabase
-      .from('messages')
-      .insert([{
-        sender_id: currentUserId,
-        receiver_id: other_id,
-        ride_id: ride_id,
-        content: messageContent
-      }]);
-
-    if (error) {
-      console.error('Error sending message:', error.message);
-    }
+    await sendChatMessage(content);
   };
 
   const renderMessage = ({ item }: { item: any }) => {

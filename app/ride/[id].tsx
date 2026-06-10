@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '../../lib/supabase';
+import { useRideDetails } from '../../hooks/useRideDetails';
 import PaymentModal from '../../components/PaymentModal';
 import { formatPrice } from '../../lib/formatPrice';
 import { getRouteInfo } from '../../lib/distancesMadagascar';
@@ -15,16 +16,17 @@ export default function RideDetailsScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width > 768;
   
-  const [ride, setRide] = useState<any>(null);
-  const [driverProfile, setDriverProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  // Custom Hook (Clean Architecture & Mode Hors-Ligne)
+  const { 
+    ride, setRide, driverProfile, loading, isUnlocked, setIsUnlocked, 
+    isPendingVerification, setIsPendingVerification, currentUserId, 
+    freeUnlocks, setFreeUnlocks, fetchRideDetails 
+  } = useRideDetails(id);
+
+  // UI States
   const [isPhotoVisible, setIsPhotoVisible] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [isPendingVerification, setIsPendingVerification] = useState(false);
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [freeUnlocks, setFreeUnlocks] = useState(0);
 
   // Calcul du montant dynamique (10% du prix, min 1000, max 5000)
   const calculateUnlockFee = (price: number) => {
@@ -43,151 +45,6 @@ export default function RideDetailsScreen() {
       router.replace('/');
     }
   };
-
-  useEffect(() => {
-    fetchRideDetails();
-  }, [id]);
-
-  const fetchRideDetails = async () => {
-    try {
-      setLoading(true);
-      const { data: rideData, error: rideError } = await supabase
-        .from('rides')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (rideError) throw rideError;
-      setRide(rideData);
-
-      const { data: reviewsData } = await supabase
-        .from('reviews')
-        .select('rating')
-        .eq('driver_id', rideData.driver_id);
-      
-      const reviews = reviewsData || [];
-      const averageRating = reviews.length > 0 
-        ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1)
-        : "5.0";
-      const isSuperDriver = reviews.length >= 5 && parseFloat(averageRating) >= 4.5;
-
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', rideData.driver_id)
-        .single();
-
-      if (!profileError) {
-        setDriverProfile({
-          ...profileData,
-          rating: averageRating,
-          is_super_driver: isSuperDriver
-        });
-      }
-    } catch (error: any) {
-      console.error('Error fetching ride details:', error.message);
-      CustomAlert.alert("Erreur", "Impossible de charger les détails du trajet.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const checkExistingBooking = async (rideId: string, userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('ride_id', rideId)
-        .eq('passenger_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-      
-      if (data) {
-        if (data.payment_status === 'completed') {
-          setIsUnlocked(true);
-          setIsPendingVerification(false);
-        } else if (data.payment_status === 'pending') {
-          setIsPendingVerification(true);
-          setIsUnlocked(false);
-        }
-      }
-    } catch (err) {
-      // Pas de booking trouvé
-    }
-  };
-
-  useEffect(() => {
-    const checkAuthAndBooking = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user;
-      
-      if (user) {
-        setCurrentUserId(user.id);
-
-        try {
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('free_unlocks')
-            .eq('id', user.id)
-            .single();
-            
-          if (!error && profile && typeof profile.free_unlocks === 'number') {
-            setFreeUnlocks(profile.free_unlocks);
-          }
-        } catch (e) {
-          console.log("Column free_unlocks might not exist yet.", e);
-        }
-
-        if (id) {
-          checkExistingBooking(id as string, user.id);
-        }
-      }
-    };
-    checkAuthAndBooking();
-  }, [id]);
-
-  useEffect(() => {
-    let channel: any = null;
-    
-    const setupRealtime = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user;
-      if (!user || !id) return;
-
-      channel = supabase
-        .channel(`ride-booking-status-${user.id}-${id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'bookings',
-            filter: `passenger_id=eq.${user.id}`
-          },
-          (payload: any) => {
-            const booking = payload.new;
-            if (booking && String(booking.ride_id) === String(id)) {
-              if (booking.payment_status === 'completed') {
-                setIsUnlocked(true);
-                setIsPendingVerification(false);
-                CustomAlert.alert("Succès", "Paiement validé ! Coordonnées déverrouillées.");
-              } else if (booking.payment_status === 'pending') {
-                setIsPendingVerification(true);
-                setIsUnlocked(false);
-              }
-            }
-          }
-        )
-        .subscribe();
-    };
-
-    setupRealtime();
-
-    return () => {
-      if (channel) supabase.removeChannel(channel);
-    };
-  }, [id, currentUserId]);
 
   const handleUpdateSeats = async (newSeats: number) => {
     try {
