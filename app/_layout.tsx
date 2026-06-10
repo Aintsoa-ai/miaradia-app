@@ -1,7 +1,7 @@
 import "../global.css";
 import { Stack, useRouter } from "expo-router";
 import { Platform } from "react-native";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { CustomAlertComponent } from "../components/CustomAlert";
 import { autoStartSmsListener } from "../lib/smsAutoStart";
 import { registerForPushNotificationsAsync, savePushToken, addNotificationTapListener } from "../lib/notifications";
@@ -9,6 +9,24 @@ import { supabase } from "../lib/supabase";
 
 export default function Layout() {
   const router = useRouter();
+  const isSigningOut = useRef(false);
+
+  useEffect(() => {
+    // 🔒 Écouteur GLOBAL de l'état d'authentification
+    // Dès qu'un signOut est détecté, redirige automatiquement vers /login
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        isSigningOut.current = true;
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        } else {
+          try { router.replace('/login' as any); } catch (e) {}
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // Démarrer le listener SMS automatiquement au lancement (Android uniquement)
