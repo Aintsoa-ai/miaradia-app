@@ -7,6 +7,11 @@
 
 ## 📅 Historique des Audits & Résolutions
 
+### Session Actuelle (10 Juin 2026) : Clean Architecture, Offline & Push
+*   **Clean Architecture :** Extraction de la logique métier lourde depuis les interfaces graphiques vers des Custom Hooks réutilisables (`useMyRides`, `useRideDetails`, `usePlatformStats`, `useChat`).
+*   **Mode Hors-Ligne (Offline) :** Implémentation du caching local via `AsyncStorage` dans `useMyRides` et `useRideDetails`. Les passagers peuvent désormais consulter leurs billets et le numéro du chauffeur même sans couverture réseau sur les Routes Nationales.
+*   **Notifications Push Chat :** Couplage de l'API Expo Push au sein de `useChat`. L'envoi d'un message déclenche désormais une notification push ("Nouveau message de [Nom]") sur l'appareil du destinataire pour garantir une réponse rapide.
+
 ### Session 23 (10 Juin 2026) : Stratégie de Lancement & Layout
 *   **Fix Layout Desktop :** Remplacement de l'alignement vertical (`items-center`) par un espacement explicite (`pt-10`) dans le Hero Desktop pour empêcher le texte d'être coupé après la réduction de hauteur (480px).
 *   **Barre de Recherche Sticky :** Application de `position: sticky` sur la barre de recherche desktop pour la garder toujours visible lors du défilement, avec ajustement des marges (`marginBottom`) pour dégager l'affichage complet des opérateurs (MVola, Orange Money, Airtel Money).
@@ -65,12 +70,12 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 | # | Point Faible | Impact | Solution Future |
 |---|---|---|---|
 | 1 | **Dépendance téléphone admin** | Si la batterie est vide ou sans réseau, les paiements ne sont pas validés automatiquement. | Intégrer l'API officielle MVola Telma (B2B). |
-| 2 | **Pas de mode hors-ligne** | Les voyageurs en zone blanche (RN) ne peuvent pas consulter les détails de leur billet. | Cache local SQLite/AsyncStorage pour les billets validés. |
-| 3 | **Pas de notifications push** | ~~Le passager doit laisser l'app ouverte pour être alerté de la validation.~~ | **✅ RÉALISÉ S21** : Token EAS relié + redirection automatique au tap sur notification. Reste à l'ajouter sur le chat. |
+| 2 | **Pas de mode hors-ligne** | ~~Les voyageurs en zone blanche (RN) ne peuvent pas consulter les détails de leur billet.~~ | **✅ RÉALISÉ** : Cache local `AsyncStorage` pour les billets. |
+| 3 | **Pas de notifications push** | ~~Le passager doit laisser l'app ouverte pour être alerté.~~ | **✅ RÉALISÉ** : Token EAS + Push Chat (useChat). |
 | 4 | **Paiement partiel (gating)** | Le passager paie 10% pour débloquer le contact, pas 100% du billet → pas de garantie pour le chauffeur. | Paiement en séquestre complet in-app. |
 | 5 | **Expiration des trajets passés** | ~~Les annonces avec une date dépassée continuent d'apparaître dans les résultats.~~ | **✅ RÉALISÉ S21** : Filtre actif + badge "Trajet terminé" + tri dynamique. |
 | 6 | **Pas de KYC (identité)** | Les chauffeurs ne sont pas vérifiés officiellement par leur CIN. | Upload CIN + processus d'approbation admin. |
-| 7 | **Chat sans notifications sonores** | Les messages reçus hors-app ne sont pas signalés. | Notifications push sur les nouveaux messages de chat. |
+| 7 | **Chat sans notifications sonores** | ~~Les messages reçus hors-app ne sont pas signalés.~~ | **✅ RÉALISÉ** : API Expo Push intégrée pour le Chat. |
 | 8 | **Pas de support multilingue** | L'application est 100% en français alors que la majorité des Malgaches parle malagasy. | Traduction malagasy officiel + dialectes. |
 | 9 | **Timeline trop large sur mobile** | La bande bleue verticale prenait trop de place (corrigé S21, reste à surveiller sur autres écrans). | Monitoring continu sur différentes tailles d'écran. |
 | 10 | **Souscriptions WebSocket multiples** | Chaque écran crée ses propres souscriptions Supabase Realtime sans centralisation. | Context global pour gérer un seul canal Realtime. |
@@ -84,8 +89,8 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 *   **Action requise** : Intégrer l'API officielle MVola Telma pour s'affranchir de la dépendance à l'APK Android.
 
 ### 🔔 Notifications Push
-*   **Statut actuel** : **RÉALISÉ S21** (Token EAS corrigé + navigation au tap opérationnelle pour la validation de paiement).
-*   **Action requise** : Implémenter l'envoi push lors des messages de chat hors-application.
+*   **Statut actuel** : **✅ RÉALISÉ** (Validation de paiement + Notifications Push pour le Chat).
+*   **Action requise** : Aucune (fonctionnel).
 
 ### 📅 Expiration Automatique des Trajets
 *   **Statut actuel** : **RÉALISÉ S21** (Filtre actif dans les recherches + classement tri automatique dans l'historique chauffeur).
