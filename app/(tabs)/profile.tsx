@@ -23,6 +23,7 @@ export default function ProfileScreen() {
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [kycStatus, setKycStatus] = useState('unverified');
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -67,6 +68,7 @@ export default function ProfileScreen() {
           setRecliningSeats(profileData.reclining_seats || false);
           setToilet(profileData.toilet || false);
           setIsAdmin(profileData.is_admin || false);
+          setKycStatus(profileData.kyc_status || 'unverified');
         }
       }
     } catch (error: any) {
@@ -524,8 +526,22 @@ export default function ProfileScreen() {
             <Text style={{ fontSize: 24, fontWeight: '900', color: '#0F172A', marginBottom: 4 }}>{displayName}</Text>
             
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-              <Ionicons name="shield-checkmark" size={14} color="#059669" />
-              <Text style={{ fontSize: 13, color: '#059669', fontWeight: '700', marginLeft: 4 }}>Profil vérifié</Text>
+              {kycStatus === 'verified' ? (
+                <>
+                  <Ionicons name="shield-checkmark" size={14} color="#059669" />
+                  <Text style={{ fontSize: 13, color: '#059669', fontWeight: '700', marginLeft: 4 }}>Identité Vérifiée</Text>
+                </>
+              ) : kycStatus === 'pending' ? (
+                <>
+                  <Ionicons name="time" size={14} color="#F59E0B" />
+                  <Text style={{ fontSize: 13, color: '#F59E0B', fontWeight: '700', marginLeft: 4 }}>Vérification en cours...</Text>
+                </>
+              ) : (
+                <TouchableOpacity onPress={() => router.push('/profile/kyc' as any)} style={{ backgroundColor: '#EEF2FF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#C7D2FE' }}>
+                  <Ionicons name="shield-half" size={14} color="#4F46E5" />
+                  <Text style={{ fontSize: 12, color: '#4F46E5', fontWeight: '800', marginLeft: 6, textTransform: 'uppercase' }}>Vérifier mon identité (CIN)</Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             <View style={{ backgroundColor: '#EFF6FF', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, flexDirection: 'row', alignItems: 'center' }}>
