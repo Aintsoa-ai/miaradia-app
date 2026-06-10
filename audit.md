@@ -7,7 +7,13 @@
 
 ## 📅 Historique des Audits & Résolutions
 
-### Session Actuelle (10 Juin 2026) : Clean Architecture, Offline & Push
+### Session 24 (10 Juin 2026) : KYC & Identité Chauffeur
+*   **Vérification d'Identité :** Implémentation du système KYC (Know Your Customer) pour les chauffeurs.
+*   **Auto-Validation :** Stratégie de croissance rapide (zéro friction) avec mise à jour immédiate du statut "Identité Vérifiée" lors de la soumission du formulaire et de la CIN (Recto/Verso).
+*   **UX Rapide :** Auto-formatage instantané des dates (`JJ/MM/AAAA`) pour la saisie sans calendrier natif.
+*   **RLS Supabase :** Configuration sécurisée pour l'insertion des demandes KYC avec rattachement `auth.uid()`.
+
+### Session 23 (10 Juin 2026) : Clean Architecture, Offline & Push
 *   **Clean Architecture :** Extraction de la logique métier lourde depuis les interfaces graphiques vers des Custom Hooks réutilisables (`useMyRides`, `useRideDetails`, `usePlatformStats`, `useChat`).
 *   **Mode Hors-Ligne (Offline) :** Implémentation du caching local via `AsyncStorage` dans `useMyRides` et `useRideDetails`. Les passagers peuvent désormais consulter leurs billets et le numéro du chauffeur même sans couverture réseau sur les Routes Nationales.
 *   **Notifications Push Chat :** Couplage de l'API Expo Push au sein de `useChat`. L'envoi d'un message déclenche désormais une notification push ("Nouveau message de [Nom]") sur l'appareil du destinataire pour garantir une réponse rapide.
@@ -74,7 +80,7 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 | 3 | **Pas de notifications push** | ~~Le passager doit laisser l'app ouverte pour être alerté.~~ | **✅ RÉALISÉ** : Token EAS + Push Chat (useChat). |
 | 4 | **Paiement partiel (gating)** | Le passager paie 10% pour débloquer le contact, pas 100% du billet → pas de garantie pour le chauffeur. | Paiement en séquestre complet in-app. |
 | 5 | **Expiration des trajets passés** | ~~Les annonces avec une date dépassée continuent d'apparaître dans les résultats.~~ | **✅ RÉALISÉ S21** : Filtre actif + badge "Trajet terminé" + tri dynamique. |
-| 6 | **Pas de KYC (identité)** | Les chauffeurs ne sont pas vérifiés officiellement par leur CIN. | Upload CIN + processus d'approbation admin. |
+| 6 | **Pas de KYC (identité)** | ~~Les chauffeurs ne sont pas vérifiés officiellement par leur CIN.~~ | **✅ RÉALISÉ** : Formulaire complet + Auto-validation instantanée. |
 | 7 | **Chat sans notifications sonores** | ~~Les messages reçus hors-app ne sont pas signalés.~~ | **✅ RÉALISÉ** : API Expo Push intégrée pour le Chat. |
 | 8 | **Pas de support multilingue** | L'application est 100% en français alors que la majorité des Malgaches parle malagasy. | Traduction malagasy officiel + dialectes. |
 | 9 | **Timeline trop large sur mobile** | La bande bleue verticale prenait trop de place (corrigé S21, reste à surveiller sur autres écrans). | Monitoring continu sur différentes tailles d'écran. |
@@ -109,9 +115,8 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 
 ## 🚀 6. Prochaines Étapes Recommandées
 1.  **Phase "Production Client"** : Lancer la phase de test utilisateur réel à grande échelle sur la version Vercel.
-2.  **Phase "Identité"** : Développer le téléversement de la CIN pour labelliser les "Super Drivers".
-3.  **Phase "Offline"** : Implémenter le cache local des billets validés pour les zones sans réseau (AsyncStorage / SQLite).
-4.  **Phase "Chat Push"** : Activer l'envoi de notification push lors de la réception de nouveaux messages dans le chat.
+2.  **Phase "Administration Kiosque KYC"** : (Optionnel plus tard) Développer l'interface admin pour révoquer les faux KYC.
+3.  **Phase "Paiement Séquestre"** : Protéger le chauffeur avec un système de paiement 100% à l'avance en in-app.
 
 ---
-*Audit mis à jour le **9 Juin 2026** par Antigravity à l'issue de la **Session 22** (Dashboard Admin Premium, Animations financières, Ajustement Desktop Hero).*
+*Audit mis à jour le **10 Juin 2026** par Antigravity à l'issue de la **Session 24** (Déploiement du système KYC).*
