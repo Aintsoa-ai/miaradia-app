@@ -95,10 +95,11 @@ miaradia-app/
 *   **Déploiement Web Vercel *(RÉALISÉ - S14)* :** Application en production sur https://miaradia-app.vercel.app avec CI/CD automatique (GitHub → Vercel) et gestion de l'historique de routage (S17).
 *   **Alertes Premium *(RÉALISÉ - S14)* :** Composant `CustomAlert` modal animé déployé sur toute l'application.
 *   **Notifications Push Expo *(AMÉLIORÉ - S21)* :** Intégration de `expo-notifications` (S20) + correction du `projectId` EAS officiel et ajout d'un écouteur global de clic sur notification (`addNotificationTapListener`) dans `_layout.tsx` redirigeant le passager vers le détail de son trajet validé.
-*   **Refonte UI Premium & Optimisations (S20/S22) ✨ :** Déploiement transversal d'un système de "Dark Hero Header", design aéré des cartes (`borderRadius: 24`), ajustement des densités sur écrans mobiles et optimisation de la hauteur Hero sur Desktop (`480px`) pour garantir la visibilité "above the fold" de la recherche.
+*   **Refonte UI Premium & Optimisations (S20/S22/S25) ✨ :** Déploiement transversal d'un système de "Dark Hero Header", design aéré des cartes (`borderRadius: 24`), ajustement des densités sur écrans mobiles et optimisation de la hauteur Hero sur Desktop (`480px`). Refonte en grille à 3 colonnes de la page Profil (S25) avec une barre d'actions responsive.
 *   **Dashboard Admin Exhaustif (S22) 📊 :** Création d'une interface d'administration ultra-premium avec animations de compteurs (style pompe à essence), ventilation par opérateur avec logos, et cartes d'analyse financière.
 *   **Onboarding Freemium (S23) 🎁 :** Implémentation d'un système de 5 crédits de bienvenue offerts (déblocage gratuit) aux nouveaux inscrits pour contourner le frein financier initial et booster l'acquisition client en démontrant instantanément la fiabilité de l'application sans solliciter la passerelle SMS.
 *   **Correctifs UI & Expiration Automatique des Trajets (S21) 🔧📅 :** Réduction de la timeline bleue verticale (`width: 56→44`) et augmentation du `paddingBottom` (`80→120`). Filtre `isRideExpired()` dans les résultats de recherche + badge "Trajet terminé" + tri dynamique dans l'onglet conducteur.
+*   **Rafraîchissement Mobile Instantané (S25) ⚡ :** Remplacement général des `useEffect` par `useFocusEffect` (notamment sur le Profil et Mes Trajets) pour assurer que l'application React Native web/mobile rafraîchisse instantanément les données dès la mise en focus d'un onglet.
 *   **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Obtenir un compte business Telma pour une validation encore plus fiable que la solution SMS Gateway.
 
 ### Phase 3 : Fiabilité & Mode Offline
@@ -123,4 +124,4 @@ miaradia-app/
 | **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
 | **SMS Gateway** | App Android sur téléphone admin | Gratuit |
 
-*Dernière mise à jour : **10 Juin 2026** — Session 24 : Système de Vérification d'Identité KYC.*
+*Dernière mise à jour : **10 Juin 2026** — Session 25 : Polissage UI & Optimisation Focus Mobile.*

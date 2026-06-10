@@ -7,6 +7,11 @@
 
 ## 📅 Historique des Audits & Résolutions
 
+### Session 25 (10 Juin 2026) : Polissage UI & Optimisation Focus Mobile
+*   **Correction Syntaxique JSX :** Résolution d'une anomalie bloquante de fermeture de balise (`</View>`) dans la grille à 3 colonnes du profil qui cassait l'arborescence DOM virtuelle.
+*   **Barre d'Actions Ergonomique :** Regroupement des boutons de sauvegarde, déconnexion et suppression au sein d'une barre d'outils dynamique positionnée sous le "Hero Header", parfaitement alignée avec le panneau d'administration.
+*   **Rafraîchissement Mobile Instantané :** Remplacement de la dépendance passive (`useEffect`) par une écoute active du focus (`useFocusEffect` d'Expo Router). Ce correctif majeur élimine le besoin de recharger manuellement la page Profil sur téléphone en garantissant que les données utilisateur et KYC sont resynchronisées instantanément à chaque visite de l'onglet.
+
 ### Session 24 (10 Juin 2026) : KYC & Identité Chauffeur
 *   **Vérification d'Identité :** Implémentation du système KYC (Know Your Customer) pour les chauffeurs.
 *   **Auto-Validation :** Stratégie de croissance rapide (zéro friction) avec mise à jour immédiate du statut "Identité Vérifiée" lors de la soumission du formulaire et de la CIN (Recto/Verso).
@@ -119,4 +124,4 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 3.  **Phase "Paiement Séquestre"** : Protéger le chauffeur avec un système de paiement 100% à l'avance en in-app.
 
 ---
-*Audit mis à jour le **10 Juin 2026** par Antigravity à l'issue de la **Session 24** (Déploiement du système KYC).*
+*Audit mis à jour le **10 Juin 2026** par Antigravity à l'issue de la **Session 25** (Polissage UI & Focus Mobile).*

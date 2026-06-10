@@ -1,0 +1,50 @@
+// PROVINCE TOAMASINA
+export const TOAMASINA_LOCATIONS: string[] = [
+  // ATSINANANA
+  "Atsinanana (Région)",
+  "Toamasina I (District)", "Toamasina II (District)", "Toamasina ville",
+  "Tanambao I (Toamasina I)", "Tanambao II (Toamasina I)", "Tanambao III (Toamasina I)", "Tanambao IV (Toamasina I)", "Tanambao V (Toamasina I)",
+  "Ambolomadinika (Toamasina I)", "Anjoma (Toamasina I)", "Bazar Be (Toamasina I)", "Bazar Kely (Toamasina I)",
+  "Beryl Rose (Toamasina I)", "Beryl Rouge (Toamasina I)", "Cite Canada (Toamasina I)", "Cite des Douanes (Toamasina I)",
+  "Cite des Maguiers (Toamasina I)", "Cite Marabout (Toamasina I)", "Cite Duplex (Toamasina I)", "Cite Nouvelle Ville (Toamasina I)",
+  "Depot Analankininina (Toamasina I)", "Mangarivotra (Toamasina I)", "Ankirihiry (Toamasina I)", "Mangarano (Toamasina I)",
+  "Morarano (Toamasina I)", "Ampasimazava (Toamasina I)", "Tanamborozano (Toamasina I)", "Androranga (Toamasina I)",
+  "Verrerie I (Toamasina I)", "Verrerie II (Toamasina I)", "Andranomadio (Toamasina I)", "Ambalamanasy (Toamasina I)",
+  "Ambalakisoa (Toamasina I)", "Analankininina (Toamasina I)", "Cite Immobiliere (Toamasina I)", "Ambol La Poudrette (Toamasina I)",
+  "Tanamakoa (Toamasina I)", "Valpinson (Toamasina I)",
+  "Toamasina Suburbs (Toamasina II)", "Ambodiriana", "Amboditandroho", "Ampasimadinika",
+  "Antenina", "Antetezambaro", "Fanandrana", "Foulpointe (Mahavelona)", "Ivoloina", "Toamasina Suburb",
+  "Brickaville (District)", "Brickaville (Ampasimanolotra)", "Ambalarondra", "Ambatoharanana",
+  "Andekaleka", "Andovoranto", "Fanasana", "Mahatsara", "Ranomafana (Brickaville)",
+  "Mahanoro (District)", "Mahanoro ville", "Ambohitsara", "Ambohimiadana", "Befotaka",
+  "Betsazarina", "Masomeloka", "Tsaravinany",
+  "Vatomandry (District)", "Vatomandry ville", "Ambalabe", "Ambatoharina", "Ampasimadinika",
+  "Antanambao Mahatsara", "Ilaka Est", "Maintinandry", "Niarovana Caroline",
+  "Marolambo (District)", "Marolambo ville", "Ambatofisaka", "Amboasary", "Ambodinonoka",
+  "Antanambao Manampotsy (District)", "Antanambao Manampotsy ville", "Antenina",
+
+  // ALAOTRA-MANGORO
+  "Alaotra-Mangoro (Région)",
+  "Ambatondrazaka (District)", "Ambatondrazaka ville", "Ambalavolo", "Tanambao (Ambatondrazaka)",
+  "Ampitatsimo", "Ambohimasina", "Imerimandroso", "Manakambahiny", "Ambandrika",
+  "Ambatosoratra", "Ambohitsilaozana", "Ampantsakana", "Andilanatoby", "Antenina", "Feramanga",
+  "Anosibe an'Ala (District)", "Anosibe an'Ala ville", "Ambatoharanana", "Ampasimaneva",
+  "Andilamena (District)", "Andilamena ville", "Bemaitso", "Maintsokely", "Marovato",
+  "Moramanga (District)", "Moramanga ville", "Moramanga Centre", "Ampandrandava", "Ambohibary",
+  "Beforona", "Ampitabe", "Ambatovola", "Andasibe", "Anosibe Ifody", "Antanandava",
+  "Mandailles", "Vodiriana",
+  "Amparafaravola (District)", "Amparafaravola ville", "Ambatomainty", "Vohidiala",
+  "Ambohitromby", "Andrebakely", "Beanana", "Morarano Chrome", "Tanambe",
+
+  // ANALANJIROFO
+  "Analanjirofo (Région)",
+  "Fenoarivo Atsinanana (District)", "Fenoarivo Atsinanana (Fenerive-Est)", "Ampasimpotsy",
+  "Betampona", "Mahambo", "Mahanoro", "Vohilengo",
+  "Vavatenina (District)", "Vavatenina ville", "Ambatoharanana", "Andasibe", "Miarinarivo",
+  "Soanierana Ivongo (District)", "Soanierana Ivongo ville", "Andapafito", "Antanifotsy",
+  "Mananara Avaratra (District)", "Mananara Avaratra ville", "Antanambe", "Imorona", "Sandrakatsy",
+  "Sainte-Marie (District - Accessible par bateau/avion)", "Sainte-Marie ville (Nosy Boraha)", 
+  "Ambodifotatra", "Anakao", "Loukintsy", "Sahasoa",
+  "Maroantsetra (District)", "Maroantsetra ville", "Ambanizana", "Andranofotsy",
+  "Antongil", "Anandrivola", "Antsirabe Sahatany", "Manambolo", "Volotara"
+];
