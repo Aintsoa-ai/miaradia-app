@@ -24,8 +24,11 @@ export default function ProfileScreen() {
   const [phoneError, setPhoneError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [kycStatus, setKycStatus] = useState('unverified');
+  const hasLoaded = React.useRef(false);
 
-  const fetchProfile = useCallback(async () => {
+  const fetchProfile = useCallback(async (forceRefresh = false) => {
+    // Ne pas refaire si les données existent (sauf forceRefresh)
+    if (hasLoaded.current && !forceRefresh) return;
     try {
       setLoadingProfile(true);
       const { data: authData, error } = await supabase.auth.getUser();
@@ -70,6 +73,7 @@ export default function ProfileScreen() {
           setIsAdmin(profileData.is_admin || false);
           setKycStatus(profileData.kyc_status || 'unverified');
         }
+        hasLoaded.current = true;
       }
     } catch (error: any) {
       console.error('Erreur fetchProfile:', error.message);
@@ -236,6 +240,24 @@ export default function ProfileScreen() {
   };
 
   const handleSignOut = async () => {
+    // Étape 1 : Déconnecter immédiatement sans attendre le CustomAlert
+    const doSignOut = async () => {
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {
+        console.log('SignOut error (non-blocking):', e);
+      }
+      hasLoaded.current = false;
+      // Sur web : rechargement complet vers /login
+      if (typeof window !== 'undefined' && window.location) {
+        window.location.href = '/login';
+        return;
+      }
+      // Sur mobile natif
+      try { router.replace('/login' as any); } catch (e) {}
+    };
+
+    // Étape 2 : Afficher la confirmation
     CustomAlert.alert(
       "Se déconnecter",
       "Voulez-vous vraiment vous déconnecter de Miara-Dia ?",
@@ -244,25 +266,7 @@ export default function ProfileScreen() {
         {
           text: "Se déconnecter",
           style: "destructive",
-          onPress: async () => {
-            try {
-              await supabase.auth.signOut();
-            } catch (e) {
-              console.log('SignOut error (non-blocking):', e);
-            } finally {
-              // Sur web : forcer un rechargement complet vers /login (vide le cache de session)
-              if (typeof window !== 'undefined') {
-                window.location.replace('/login');
-                return;
-              }
-              // Sur mobile natif : navigation Expo Router vers login
-              try {
-                router.replace('/login' as any);
-              } catch (e) {
-                console.log('Router fallback error:', e);
-              }
-            }
-          }
+          onPress: doSignOut
         }
       ]
     );
