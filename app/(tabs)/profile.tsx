@@ -250,14 +250,14 @@ export default function ProfileScreen() {
             } catch (e) {
               console.log('SignOut error (non-blocking):', e);
             } finally {
-              // Sur web : forcer un rechargement complet (vide le cache de session)
+              // Sur web : forcer un rechargement complet vers /login (vide le cache de session)
               if (typeof window !== 'undefined') {
-                window.location.replace('/');
+                window.location.replace('/login');
                 return;
               }
-              // Sur mobile natif : navigation Expo Router
+              // Sur mobile natif : navigation Expo Router vers login
               try {
-                router.replace('/(tabs)' as any);
+                router.replace('/login' as any);
               } catch (e) {
                 console.log('Router fallback error:', e);
               }
