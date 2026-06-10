@@ -550,53 +550,54 @@ export default function ProfileScreen() {
             </View>
           </View>
 
+          {/* ALERTE PHOTO RÉELLE */}
+          <View className="bg-red-50 border border-red-100 rounded-[24px] p-6 mb-8 w-full">
+            <View className="flex-row items-center mb-4">
+              <Ionicons name="shield-checkmark" size={24} color="#DC2626" />
+              <Text className="text-red-900 font-black text-sm ml-2 uppercase tracking-wide">Vérification de profil</Text>
+            </View>
+            
+            <View className="space-y-3">
+              <View className="flex-row items-start">
+                <Ionicons name="checkmark-circle" size={16} color="#059669" />
+                <Text className="text-red-800 text-xs ml-2 flex-1 font-semibold leading-relaxed">Le visage doit être <Text className="font-black">clair et net</Text>.</Text>
+              </View>
+              <View className="flex-row items-start">
+                <Ionicons name="close-circle" size={16} color="#DC2626" />
+                <Text className="text-red-800 text-xs ml-2 flex-1 font-semibold leading-relaxed">Pas de photo floue (sauf flou d'arrière-plan portrait).</Text>
+              </View>
+              <View className="flex-row items-start">
+                <Ionicons name="close-circle" size={16} color="#DC2626" />
+                <Text className="text-red-800 text-xs ml-2 flex-1 font-semibold leading-relaxed">Les photos de voitures ou paysages sont rejetées.</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Bouton Admin */}
+          {isAdmin && (
+            <TouchableOpacity 
+              onPress={() => router.push('/admin' as any)}
+              className="bg-slate-900 rounded-[24px] p-6 mb-8 flex-row items-center justify-between hover:bg-slate-800 transition-colors w-full"
+            >
+              <View className="flex-row items-center">
+                <View className="w-12 h-12 bg-white/10 rounded-2xl items-center justify-center mr-4">
+                  <Ionicons name="shield-checkmark" size={24} color="white" />
+                </View>
+                <View>
+                  <Text className="text-white font-black text-lg tracking-tight">Validation Kiosque</Text>
+                  <Text className="text-slate-400 text-xs font-bold mt-0.5">Vérifier les dépôts manuels</Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#94A3B8" />
+            </TouchableOpacity>
+          )}
+
           {/* GRILLE TROIS COLONNES SUR DESKTOP */}
           <View style={{ flexDirection: isDesktop ? 'row' : 'column', width: '100%', gap: 24 }}>
             
             {/* ================= COLONNE 1 ================= */}
             <View style={{ flex: 1, gap: 24 }}>
               
-              {/* ALERTE PHOTO RÉELLE */}
-              <View className="bg-red-50 border border-red-100 rounded-[24px] p-6">
-              <View className="flex-row items-center mb-4">
-                <Ionicons name="shield-checkmark" size={24} color="#DC2626" />
-                <Text className="text-red-900 font-black text-sm ml-2 uppercase tracking-wide">Vérification de profil</Text>
-              </View>
-              
-              <View className="space-y-3">
-                <View className="flex-row items-start">
-                  <Ionicons name="checkmark-circle" size={16} color="#059669" />
-                  <Text className="text-red-800 text-xs ml-2 flex-1 font-semibold leading-relaxed">Le visage doit être <Text className="font-black">clair et net</Text>.</Text>
-                </View>
-                <View className="flex-row items-start">
-                  <Ionicons name="close-circle" size={16} color="#DC2626" />
-                  <Text className="text-red-800 text-xs ml-2 flex-1 font-semibold leading-relaxed">Pas de photo floue (sauf flou d'arrière-plan portrait).</Text>
-                </View>
-                <View className="flex-row items-start">
-                  <Ionicons name="close-circle" size={16} color="#DC2626" />
-                  <Text className="text-red-800 text-xs ml-2 flex-1 font-semibold leading-relaxed">Les photos de voitures ou paysages sont rejetées.</Text>
-                </View>
-              </View>
-
-              {/* Bouton Admin */}
-              {isAdmin && (
-                <TouchableOpacity 
-                  onPress={() => router.push('/admin' as any)}
-                  className="bg-slate-900 rounded-[24px] p-6 flex-row items-center justify-between hover:bg-slate-800 transition-colors"
-                >
-                <View className="flex-row items-center">
-                  <View className="w-12 h-12 bg-white/10 rounded-2xl items-center justify-center mr-4">
-                    <Ionicons name="shield-checkmark" size={24} color="white" />
-                  </View>
-                  <View>
-                    <Text className="text-white font-black text-lg tracking-tight">Validation Kiosque</Text>
-                    <Text className="text-slate-400 text-xs font-bold mt-0.5">Vérifier les dépôts manuels</Text>
-                  </View>
-                </View>
-                <Ionicons name="chevron-forward" size={24} color="#94A3B8" />
-                </TouchableOpacity>
-              )}
-
               {/* Mes Informations */}
               <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
@@ -650,10 +651,6 @@ export default function ProfileScreen() {
               </View>
               {phoneError ? <Text style={{ color: '#EF4444', fontSize: 11, fontWeight: '700', marginTop: 6, marginLeft: 4 }}>{phoneError}</Text> : null}
             </View>
-          </View> {/* FIN COLONNE 1 */}
-
-          {/* ================= COLONNE 2 ================= */}
-          <View style={{ flex: 1, gap: 24 }}>
 
             {/* Ma Bio */}
             <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
@@ -675,6 +672,11 @@ export default function ProfileScreen() {
                 />
               </View>
             </View>
+
+          </View> {/* FIN COLONNE 1 */}
+
+          {/* ================= COLONNE 2 ================= */}
+          <View style={{ flex: 1, gap: 24 }}>
 
             {/* Mon Véhicule */}
             <View style={{ backgroundColor: 'white', borderRadius: 28, padding: 24, width: '100%', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 2 }}>
