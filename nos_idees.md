@@ -50,11 +50,14 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Dashboard Administrateur Exhaustif Premium (S22) 📊 :** Refonte totale du Kiosque avec un design SaaS "Glassmorphism/Neumorphism". Intégration d'animations fluides "façon pompe à essence" sur les compteurs financiers, de cartes de CA Global dégradées, d'un calendrier de simulation interactif, et de logos opérateurs (MVola, Airtel, Orange) pour le détail des transactions.
 - [x] **Optimisation Densité Mobile & Compression (S20) ⚡ :** Réduction fine des marges (`paddingTop`, `paddingBottom`, `marginTop`) des en-têtes "Dark Hero Header" sur les petits écrans (ex: iPhone SE) pour prioriser l'information vitale sans nécessiter de scroll excessif. Augmentation agressive de la compression des photos de profil (300px, 40% JPEG) pour une taille d'application et des temps de chargement records.
 - [x] **Crédits de Bienvenue / Freemium (S23) 🎁 :** Implémentation d'un système d'acquisition offrant 5 trajets gratuits aux nouveaux inscrits (`free_unlocks`). Contourne totalement la passerelle SMS et débloque le contact instantanément pour prouver la valeur de l'application sans friction.
+- [x] **Vérification d'Identité KYC (S24) 🛡️ :** Formulaire complet de téléversement des pièces d'identité (CIN malgache) avec auto-formatage des dates, auto-validation instantanée pour minimiser la friction d'acquisition, et sécurisation RLS sur Supabase.
+- [x] **Centre de Contrôle KYC Administrateur (S24) 📊 :** Tableau de bord Kiosque ultra-premium permettant à l'administrateur de visualiser et d'auditer toutes les demandes (photos recto/verso) avec possibilité de rejeter les faux profils.
 
 ### 🌟 Points Forts Actuels (Avantages Compétitifs)
 - **Zéro dépendance API payante** : Le système de validation SMS fait économiser les coûts B2B exorbitants des opérateurs à Madagascar.
 - **Onboarding Magique** : Grâce aux 5 crédits gratuits, l'utilisateur a une expérience instantanée et gratifiante dès sa première utilisation.
 - **Parité Totale Desktop/Mobile** : L'interface réagit parfaitement sur toutes les tailles d'écran avec un design premium (SaaS) très rare sur le marché local.
+- **Sécurité et Confiance KYC** : Le système de vérification d'identité avec badge de confiance protège la communauté tout en conservant une acquisition rapide.
 
 ### Technique & Admin
 - [x] **Système d'Avis & Réputation** : Permettre aux passagers de noter les chauffeurs.
@@ -88,7 +91,6 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Mode Hors-Ligne (Offline) *(RÉALISÉ)*** : Mise en cache via AsyncStorage des billets et du numéro du chauffeur pour consultation sécurisée sur les Routes Nationales (zones sans réseau) via `useMyRides` et `useRideDetails`.
 - [x] **Notifications Push du Chat *(RÉALISÉ)*** : Couplage du Token Expo pour envoyer une notification push au destinataire lorsqu'il reçoit un nouveau message dans le chat (via le hook `useChat`).
 - [ ] **🟠 IMPORTANT — Paiement "Gating" vs "Séquestre" :** Le voyageur paie 10% pour débloquer le contact, mais le reste est payé en main propre. Le chauffeur n'a aucune garantie financière de présence. *Solution future : Paiement total en séquestre in-app.*
-- [ ] **🟡 MODÉRÉ — Pas de KYC (Vérification d'Identité) :** Les conducteurs ne sont pas vérifiés officiellement par leur CIN. Un badge "Vérifié CIN" renforcerait la confiance. *Solution : Formulaire upload CIN + validation admin.*
 - [ ] **🟡 MODÉRÉ — Souscriptions WebSocket Multiples :** Chaque écran crée ses propres souscriptions Supabase Realtime sans centralisation. Risque de fuite mémoire sur des sessions longues. *Solution : Créer un Context React global pour gérer un seul canal Realtime partagé.*
 - [ ] **🟡 MODÉRÉ — Pas de Support Malagasy :** L'application est 100% en français. La majorité des utilisateurs potentiels (chauffeurs de brousse) parle malagasy. *Solution future : i18n avec les chaînes en malagasy officiel.*
 - [ ] **🟢 MINEUR — Surveillance Continue Responsive :** Après la réduction de la bande bleue timeline (S21), surveiller l'affichage sur d'autres tailles d'écran (Galaxy Fold, tablettes). *Solution : Tests visuels réguliers.*
@@ -116,7 +118,6 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Sortie en Famille / Voiture Privée :** Sous-catégorie spécifique pour les excursions ou sorties familiales privées (pas du covoiturage classique). Frais de publication 1 000 Ar. Le client intéressé paie de même pour obtenir le contact.
 
 ### 🤝 Communauté & Confiance
-- [ ] **Vérification d'Identité (KYC)** : Permettre aux utilisateurs d'uploader leur CIN pour obtenir un badge "Profil Vérifié par CIN".
 - [ ] **Groupes de Voyage** : Créer des groupes spécifiques (ex: "Voyageurs réguliers Tana-Antsirabe") pour fidéliser la clientèle.
 - [ ] **Avis Audio** : Permettre de laisser un petit message vocal en guise d'avis (très utilisé à Madagascar).
 

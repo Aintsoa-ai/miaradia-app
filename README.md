@@ -93,6 +93,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Compteurs Animés :** Effet "pompe à essence" (défilement rapide) sur tous les chiffres financiers lors du changement de sélection de date.
 - **Statistiques Utilisateurs :** Affichage RH (conducteurs, voyageurs) avec des composants visuels modernes.
 - **Ventilation Financière Dynamique :** Calendrier interactif qui, au clic, affiche instantanément le CA du jour sélectionné ventilé avec les logos opérateurs (MVola, Airtel, Orange) et le nombre de trajets publiés.
+- **Centre KYC Ultra-Premium *(NOUVEAU - S24)* :** Interface d'audit complète permettant de visualiser les cartes d'identité soumises (photos Recto/Verso, infos extraites) et de révoquer ou approuver manuellement les profils en un clic avec un design Glassmorphism.
 - **Widgets de Supervision :** Mini-widget de la passerelle SMS et carte complète d'utilisation de l'espace disque Supabase (barre de progression).
 - **Passerelle SMS Admin :** L'administrateur installe l'APK Android (EAS Build) SMS Gateway sur son téléphone personnel. Chaque SMS Mobile Money reçu est automatiquement lu et valide les trajets sans aucune action manuelle. Depuis S17, l'application implémente `PermissionsAndroid.request` pour afficher le pop-up obligatoire de permission système (Android >= 6.0), débloquant l'écoute SMS.
 - **Auto-Rafraîchissement Bilan Client & Admin :** Polling silencieux de sécurité toutes les 3 secondes côté passager et 5 secondes côté Kiosque.
@@ -108,7 +109,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Sélection de Rôle :** Choix explicite entre Voyageur et Conducteur lors de l'inscription.
 - **Politique "Vrai Visage" & Qualité :** Photo de profil obligatoire dès l'inscription. Le visage doit être clair, net et identifiable.
 - **Règles de Netteté :** Interdiction des photos floues (sauf flou artistique d'arrière-plan portrait). Rejet des photos de voitures, paysages ou masques.
-- **Vérification d'Identité :** Base technique prête pour le KYC (Know Your Customer).
+- **Vérification d'Identité (KYC) *(NOUVEAU - S24)* :** Formulaire de vérification (Recto/Verso CIN, Adresse, Profession) avec algorithme d'auto-formatage de la saisie des dates et auto-validation instantanée pour une acquisition rapide ("zéro friction"). Le conducteur validé reçoit un badge "Identité Vérifiée ✅" affiché publiquement.
 - **Algorithme Anti-Fraude (Bio) :** L'application analyse la biographie du conducteur lors de la sauvegarde du profil. L'algorithme convertit les mots textuels en chiffres (Français et Malgache : "zero", "trente", "telo", "efatra") et bloque instantanément l'enregistrement s'il détecte une tentative de dissimuler un numéro de téléphone Mobile Money (préfixes 03x et séquence > 9 chiffres) pour contourner le système de monétisation.
 
 ### 12. Messagerie Interne Temps Réel *(NOUVEAU - V2.0)*
@@ -191,4 +192,4 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 
 ---
 
-*Dernière mise à jour : **9 Juin 2026** — Session 22 : Dashboard Admin Ultra-Premium, Animations des chiffres, Redimensionnement Hero Desktop.*
+*Dernière mise à jour : **10 Juin 2026** — Session 24 : Kiosque KYC Administrateur et Vérification d'Identité.*

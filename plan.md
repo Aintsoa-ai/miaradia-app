@@ -61,7 +61,7 @@ graph TD
 miaradia-app/
 ├── app/                  # Dossier principal Expo Router
 │   ├── (tabs)/           # Onglets principaux (Accueil, Publier, Messages, Voyages, Profil)
-│   ├── admin/            # Espace de gestion des dépôts Kiosque et statistiques
+│   ├── admin/            # Espace Kiosque (Statistiques, Passerelle SMS, Modération KYC)
 │   ├── chat/             # Écran de discussion en temps réel
 │   ├── driver/           # Écran du profil public d'un conducteur
 │   ├── ride/             # Écran détaillé d'un trajet avec widget de réservation
@@ -103,7 +103,7 @@ miaradia-app/
 
 ### Phase 3 : Fiabilité & Mode Offline
 *   **Cache Local SQLite/AsyncStorage :** Mettre en cache local les détails du billet réservé et le contact du chauffeur pour y avoir accès sur la route nationale en zone d'ombre (sans réseau).
-*   **Vérification CIN (KYC) :** Formulaire de téléversement et processus d'approbation d'identité pour certifier officiellement les conducteurs.
+*   **Vérification CIN (KYC) *(RÉALISÉ - S24)* :** Formulaire de téléversement et processus d'approbation d'identité avec interface d'administration ultra-premium pour certifier officiellement les conducteurs.
 
 ### Phase 4 : Croissance & Diversification
 *   **Application Android native (APK) *(RÉALISÉ - S14)* :** Configuration `eas.json` et génération du fichier `.apk` via EAS Build pour distribution directe. Intègre les permissions `RECEIVE_SMS` et `READ_SMS` vitales.
@@ -123,4 +123,4 @@ miaradia-app/
 | **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
 | **SMS Gateway** | App Android sur téléphone admin | Gratuit |
 
-*Dernière mise à jour : **9 Juin 2026** - Session 22 (Dashboard Admin Premium + Optimisations Desktop/Signup)*
+*Dernière mise à jour : **10 Juin 2026** — Session 24 : Système de Vérification d'Identité KYC.*
