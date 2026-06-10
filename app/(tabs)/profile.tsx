@@ -240,34 +240,29 @@ export default function ProfileScreen() {
   };
 
   const handleSignOut = async () => {
-    // Étape 1 : Déconnecter immédiatement sans attendre le CustomAlert
-    const doSignOut = async () => {
-      try {
-        await supabase.auth.signOut();
-      } catch (e) {
-        console.log('SignOut error (non-blocking):', e);
-      }
+    // Sur WEB : utiliser window.confirm natif (synchrone, aucun délai React)
+    if (typeof window !== 'undefined' && window.confirm) {
+      const confirmed = window.confirm("Voulez-vous vraiment vous déconnecter de Miara-Dia ?");
+      if (!confirmed) return;
+      try { await supabase.auth.signOut(); } catch (e) {}
       hasLoaded.current = false;
-      // Sur web : rechargement complet vers /login
-      if (typeof window !== 'undefined' && window.location) {
-        window.location.href = '/login';
-        return;
-      }
-      // Sur mobile natif
+      window.location.href = '/login';
+      return;
+    }
+
+    // Sur MOBILE NATIF : utiliser CustomAlert
+    const doSignOut = async () => {
+      try { await supabase.auth.signOut(); } catch (e) {}
+      hasLoaded.current = false;
       try { router.replace('/login' as any); } catch (e) {}
     };
 
-    // Étape 2 : Afficher la confirmation
     CustomAlert.alert(
       "Se déconnecter",
       "Voulez-vous vraiment vous déconnecter de Miara-Dia ?",
       [
         { text: "Annuler", style: "cancel" },
-        {
-          text: "Se déconnecter",
-          style: "destructive",
-          onPress: doSignOut
-        }
+        { text: "Se déconnecter", style: "destructive", onPress: doSignOut }
       ]
     );
   };
