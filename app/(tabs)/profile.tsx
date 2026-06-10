@@ -240,20 +240,15 @@ export default function ProfileScreen() {
   };
 
   const handleSignOut = async () => {
-    // Sur WEB : utiliser window.confirm natif (synchrone, aucun délai React)
-    if (typeof window !== 'undefined' && window.confirm) {
-      const confirmed = window.confirm("Voulez-vous vraiment vous déconnecter de Miara-Dia ?");
-      if (!confirmed) return;
-      try { await supabase.auth.signOut(); } catch (e) {}
-      hasLoaded.current = false;
-      window.location.href = '/login';
-      return;
-    }
-
-    // Sur MOBILE NATIF : utiliser CustomAlert
     const doSignOut = async () => {
       try { await supabase.auth.signOut(); } catch (e) {}
       hasLoaded.current = false;
+      // Sur web : rechargement complet vers /login
+      if (typeof window !== 'undefined' && window.location) {
+        window.location.href = '/login';
+        return;
+      }
+      // Sur mobile natif
       try { router.replace('/login' as any); } catch (e) {}
     };
 

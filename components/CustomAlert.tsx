@@ -97,8 +97,10 @@ export const CustomAlertComponent = () => {
                 <TouchableOpacity
                   key={idx}
                   onPress={() => {
+                    // Appeler onPress IMMÉDIATEMENT (avant l'animation de fermeture)
+                    // pour que window.location.href fonctionne sans délai
+                    if (btn.onPress) btn.onPress();
                     close();
-                    if (btn.onPress) setTimeout(btn.onPress, 150);
                   }}
                   className={`flex-1 py-5 items-center justify-center ${idx > 0 ? 'border-l border-slate-100' : ''}`}
                   activeOpacity={0.7}
