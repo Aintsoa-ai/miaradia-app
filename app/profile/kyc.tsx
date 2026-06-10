@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useKyc } from '../../hooks/useKyc';
 import { CustomAlert } from '../../utils/alert';
 
@@ -30,42 +29,18 @@ export default function KycScreen() {
   const [rectoUri, setRectoUri] = useState<string | null>(null);
   const [versoUri, setVersoUri] = useState<string | null>(null);
 
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [activeDateField, setActiveDateField] = useState<'birth_date' | 'issue_date' | null>(null);
-
-  const showDatePicker = (field: 'birth_date' | 'issue_date') => {
-    setActiveDateField(field);
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-    setTimeout(() => setActiveDateField(null), 300);
-  };
-
-  const handleConfirm = (date: Date) => {
-    if (activeDateField) {
-      const formattedDate = date.toLocaleDateString('fr-FR');
-      setFormData(prev => ({ ...prev, [activeDateField]: formattedDate }));
+  const formatDateInput = (text: string) => {
+    // Ne garder que les chiffres
+    let cleaned = text.replace(/\D/g, '');
+    
+    // Auto-insérer les slashes
+    if (cleaned.length >= 5) {
+      cleaned = `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4, 8)}`;
+    } else if (cleaned.length >= 3) {
+      cleaned = `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
     }
-    hideDatePicker();
-  };
-
-  const handleWebDateChange = (dateString: string, field: 'birth_date' | 'issue_date') => {
-    if (dateString) {
-      const [year, month, day] = dateString.split('-');
-      setFormData(prev => ({ ...prev, [field]: `${day}/${month}/${year}` }));
-    }
-  };
-
-  const getWebDateValue = (field: 'birth_date' | 'issue_date') => {
-    const val = formData[field];
-    if (!val) return '';
-    const parts = val.split('/');
-    if (parts.length === 3) {
-      return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
-    return '';
+    
+    return cleaned;
   };
 
   const pickImage = async (side: 'recto' | 'verso') => {
@@ -172,28 +147,14 @@ export default function KycScreen() {
               <View className="flex-row gap-4">
                 <View className="flex-1">
                   <Text className="text-gray-500 text-xs font-bold mb-1.5 ml-1">TERAKA TAMIN' NY / Né(e) le*</Text>
-                  {Platform.OS === 'web' ? (
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl h-[52px] relative flex items-center px-4 overflow-hidden">
-                      <span className={`text-base font-medium ${formData.birth_date ? 'text-gray-900' : 'text-gray-400'}`}>
-                        {formData.birth_date || 'JJ/MM/AAAA'}
-                      </span>
-                      <input
-                        type="date"
-                        value={getWebDateValue('birth_date')}
-                        onChange={(e) => handleWebDateChange(e.target.value, 'birth_date')}
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
-                      />
-                    </div>
-                  ) : (
-                    <TouchableOpacity 
-                      onPress={() => showDatePicker('birth_date')}
-                      className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 h-[52px] justify-center"
-                    >
-                      <Text className={`text-base font-medium ${formData.birth_date ? 'text-gray-900' : 'text-gray-400'}`}>
-                        {formData.birth_date || 'JJ/MM/AAAA'}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                  <TextInput
+                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 h-[52px] text-base font-medium text-gray-900 focus:border-blue-500 focus:bg-white transition-colors"
+                    placeholder="JJ/MM/AAAA"
+                    keyboardType="number-pad"
+                    maxLength={10}
+                    value={formData.birth_date}
+                    onChangeText={(t) => setFormData({...formData, birth_date: formatDateInput(t)})}
+                  />
                 </View>
 
                 <View className="flex-1">
@@ -283,28 +244,14 @@ export default function KycScreen() {
 
                 <View className="flex-1">
                   <Text className="text-gray-500 text-xs font-bold mb-1.5 ml-1">TAMIN' NY / Le*</Text>
-                  {Platform.OS === 'web' ? (
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl h-[52px] relative flex items-center px-4 overflow-hidden">
-                      <span className={`text-base font-medium ${formData.issue_date ? 'text-gray-900' : 'text-gray-400'}`}>
-                        {formData.issue_date || 'JJ/MM/AAAA'}
-                      </span>
-                      <input
-                        type="date"
-                        value={getWebDateValue('issue_date')}
-                        onChange={(e) => handleWebDateChange(e.target.value, 'issue_date')}
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
-                      />
-                    </div>
-                  ) : (
-                    <TouchableOpacity 
-                      onPress={() => showDatePicker('issue_date')}
-                      className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 h-[52px] justify-center"
-                    >
-                      <Text className={`text-base font-medium ${formData.issue_date ? 'text-gray-900' : 'text-gray-400'}`}>
-                        {formData.issue_date || 'JJ/MM/AAAA'}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                  <TextInput
+                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 h-[52px] text-base font-medium text-gray-900 focus:border-blue-500 focus:bg-white"
+                    placeholder="JJ/MM/AAAA"
+                    keyboardType="number-pad"
+                    maxLength={10}
+                    value={formData.issue_date}
+                    onChangeText={(t) => setFormData({...formData, issue_date: formatDateInput(t)})}
+                  />
                 </View>
               </View>
             </View>
@@ -369,14 +316,6 @@ export default function KycScreen() {
         </View>
       </ScrollView>
 
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-        confirmTextIOS="Confirmer"
-        cancelTextIOS="Annuler"
-      />
     </View>
   );
 }
