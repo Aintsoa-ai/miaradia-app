@@ -8,10 +8,11 @@ export function useKyc() {
   const uploadImage = async (uri: string, path: string) => {
     const response = await fetch(uri);
     const blob = await response.blob();
+    const arrayBuffer = await new Response(blob).arrayBuffer();
     
     const { data, error } = await supabase.storage
       .from('avatars')
-      .upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+      .upload(path, arrayBuffer, { upsert: true, contentType: 'image/jpeg' });
       
     if (error) throw error;
     
@@ -67,7 +68,7 @@ export function useKyc() {
       return true;
     } catch (e: any) {
       console.error(e);
-      CustomAlert.alert("Erreur", "Une erreur est survenue lors de l'envoi. Veuillez réessayer.");
+      CustomAlert.alert("Erreur de sauvegarde", e.message || "Une erreur est survenue lors de l'envoi. Veuillez réessayer.");
       return false;
     } finally {
       setLoading(false);

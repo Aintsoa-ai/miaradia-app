@@ -63,8 +63,8 @@ export default function KycScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.cin_number || !formData.last_name || !formData.birth_date || !formData.issue_place) {
-      CustomAlert.alert("Formulaire incomplet", "Veuillez remplir au moins les champs obligatoires (*).");
+    if (!formData.cin_number || !formData.last_name || !formData.birth_date || !formData.issue_place || !formData.issue_date) {
+      CustomAlert.alert("Formulaire incomplet", "Veuillez remplir au moins tous les champs obligatoires (*).");
       return;
     }
     if (!rectoUri || !versoUri) {
