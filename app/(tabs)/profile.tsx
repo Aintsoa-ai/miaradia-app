@@ -573,24 +573,61 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Bouton Admin */}
-          {isAdmin && (
-            <TouchableOpacity 
-              onPress={() => router.push('/admin' as any)}
-              className="bg-slate-900 rounded-[24px] p-6 mb-8 flex-row items-center justify-between hover:bg-slate-800 transition-colors w-full"
-            >
-              <View className="flex-row items-center">
-                <View className="w-12 h-12 bg-white/10 rounded-2xl items-center justify-center mr-4">
-                  <Ionicons name="shield-checkmark" size={24} color="white" />
+          {/* BARRE D'ACTIONS (Boutons Profil + Admin) */}
+          <View style={{ flexDirection: isDesktop ? 'row' : 'column', width: '100%', gap: 24, marginBottom: 32, alignItems: 'center' }}>
+            
+            {/* Actions (Enregistrer, Déconnexion, Supprimer) */}
+            <View style={{ flex: 1, flexDirection: isDesktop ? 'row' : 'column', alignItems: 'center', gap: 16, width: isDesktop ? undefined : '100%' }}>
+              <TouchableOpacity 
+                onPress={handleSaveProfile}
+                style={{
+                  backgroundColor: '#2563EB', width: isDesktop ? undefined : '100%',
+                  paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center',
+                  shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 10,
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: '900', fontSize: 15, letterSpacing: 0.5 }}>Enregistrer le profil</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                onPress={handleSignOut}
+                style={{
+                  backgroundColor: 'white', width: isDesktop ? undefined : '100%',
+                  paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#FECACA',
+                }}
+              >
+                <Text style={{ color: '#DC2626', fontWeight: '800', fontSize: 15 }}>Se déconnecter</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                onPress={handleDeleteAccount}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, paddingHorizontal: 16 }}
+              >
+                <Ionicons name="trash-outline" size={16} color="#94A3B8" />
+                <Text style={{ color: '#94A3B8', fontWeight: '700', fontSize: 13, marginLeft: 8 }}>Supprimer mon compte</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Bouton Admin */}
+            {isAdmin && (
+              <TouchableOpacity 
+                onPress={() => router.push('/admin' as any)}
+                className="bg-slate-900 rounded-[24px] p-6 flex-row items-center justify-between hover:bg-slate-800 transition-colors"
+                style={{ width: isDesktop ? undefined : '100%' }}
+              >
+                <View className="flex-row items-center">
+                  <View className="w-12 h-12 bg-white/10 rounded-2xl items-center justify-center mr-4">
+                    <Ionicons name="shield-checkmark" size={24} color="white" />
+                  </View>
+                  <View>
+                    <Text className="text-white font-black text-lg tracking-tight">Validation Kiosque</Text>
+                    <Text className="text-slate-400 text-xs font-bold mt-0.5">Vérifier les dépôts manuels</Text>
+                  </View>
                 </View>
-                <View>
-                  <Text className="text-white font-black text-lg tracking-tight">Validation Kiosque</Text>
-                  <Text className="text-slate-400 text-xs font-bold mt-0.5">Vérifier les dépôts manuels</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={24} color="#94A3B8" />
-            </TouchableOpacity>
-          )}
+                <Ionicons name="chevron-forward" size={24} color="#94A3B8" />
+              </TouchableOpacity>
+            )}
+          </View>
 
           {/* GRILLE TROIS COLONNES SUR DESKTOP */}
           <View style={{ flexDirection: isDesktop ? 'row' : 'column', width: '100%', gap: 24 }}>
@@ -848,40 +885,7 @@ export default function ProfileScreen() {
 
         </View> {/* FIN GRILLE TROIS COLONNES */}
 
-        {/* Boutons (Sauvegarder & Déconnexion) */}
-        <View style={{ width: '100%', maxWidth: isDesktop ? 600 : '100%', paddingHorizontal: isDesktop ? 0 : 20, marginTop: 32, paddingBottom: 40, flexDirection: isDesktop ? 'row' : 'column', gap: 16 }}>
-              <TouchableOpacity 
-                onPress={handleSaveProfile}
-                style={{
-                  flex: isDesktop ? 1 : undefined,
-                  backgroundColor: '#2563EB',
-                  paddingVertical: 18, borderRadius: 20, alignItems: 'center',
-                  shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 10,
-                }}
-              >
-                <Text style={{ color: 'white', fontWeight: '900', fontSize: 15, letterSpacing: 0.5 }}>Enregistrer le profil</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                onPress={handleSignOut}
-                style={{
-                  flex: isDesktop ? 1 : undefined,
-                  backgroundColor: 'white', paddingVertical: 18, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#FECACA',
-                }}
-              >
-                <Text style={{ color: '#DC2626', fontWeight: '800', fontSize: 15 }}>Se déconnecter</Text>
-              </TouchableOpacity>
-
-              <View style={{ height: 1, backgroundColor: '#E2E8F0', marginVertical: 8 }} />
-
-              <TouchableOpacity 
-                onPress={handleDeleteAccount}
-                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12 }}
-              >
-                <Ionicons name="trash-outline" size={16} color="#94A3B8" />
-                <Text style={{ color: '#94A3B8', fontWeight: '700', fontSize: 13, marginLeft: 8 }}>Supprimer mon compte</Text>
-              </TouchableOpacity>
-            </View>
+        <View style={{ paddingBottom: 40 }} />
 
           </View>
         </KeyboardAwareScrollView>
