@@ -466,13 +466,27 @@ export default function AdminDashboard() {
             </View>
 
             {/* Passerelle SMS */}
-            <TouchableOpacity onPress={() => router.push('/admin/sms-gateway')} style={{ backgroundColor: 'white', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => router.push('/admin/sms-gateway' as any)} style={{ backgroundColor: 'white', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
               <View style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
                 <Ionicons name="phone-portrait" size={24} color="#3B82F6" />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 15, fontWeight: '800', color: '#1E293B', letterSpacing: -0.5 }}>Passerelle SMS</Text>
                 <Text style={{ fontSize: 12, color: '#64748B', marginTop: 2, fontWeight: '500' }}>Gérer les validations auto</Text>
+              </View>
+              <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#F8FAFC', alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="chevron-forward" size={16} color="#64748B" />
+              </View>
+            </TouchableOpacity>
+
+            {/* CENTRE KYC */}
+            <TouchableOpacity onPress={() => router.push('/admin/kyc' as any)} style={{ backgroundColor: 'white', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
+              <View style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: '#ECFDF5', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
+                <Ionicons name="id-card" size={24} color="#10B981" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 15, fontWeight: '800', color: '#1E293B', letterSpacing: -0.5 }}>Vérifications KYC</Text>
+                <Text style={{ fontSize: 12, color: '#64748B', marginTop: 2, fontWeight: '500' }}>Cartes d'identité Chauffeurs</Text>
               </View>
               <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#F8FAFC', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons name="chevron-forward" size={16} color="#64748B" />
