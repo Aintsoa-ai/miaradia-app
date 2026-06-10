@@ -246,13 +246,13 @@ export default function ProfileScreen() {
             } catch (e) {
               console.log('SignOut error (non-blocking):', e);
             } finally {
-              // Forcer la redirection vers login dans tous les cas
+              // Forcer la redirection vers l'accueil dans tous les cas
               try {
-                router.replace('/login' as any);
+                router.replace('/(tabs)' as any);
               } catch (e) {
-                // Fallback web : rechargement complet vers login
+                // Fallback web : rechargement complet vers l'accueil
                 if (typeof window !== 'undefined') {
-                  window.location.href = '/login';
+                  window.location.href = '/';
                 }
               }
             }

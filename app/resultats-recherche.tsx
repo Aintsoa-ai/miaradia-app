@@ -155,9 +155,10 @@ export default function SearchResultsScreen() {
   const isRideExpired = (rideDateStr: string): boolean => {
     if (!rideDateStr) return false;
     try {
-      // Extraire la partie date "DD-MM-YYYY"
+      // Extraire la partie date "DD-MM-YYYY" ou "DD/MM/YYYY"
       const datePart = rideDateStr.split(' à ')[0].trim();
-      const parts = datePart.split('-');
+      const sep = datePart.includes('-') ? '-' : '/';
+      const parts = datePart.split(sep);
       if (parts.length !== 3) return false;
       const [day, month, year] = parts;
       // Construire la date de départ à minuit

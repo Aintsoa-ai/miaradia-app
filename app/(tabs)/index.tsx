@@ -124,14 +124,16 @@ export default function SearchScreen() {
   };
 
   React.useEffect(() => {
+    if (depFocused || arrFocused) return; // Prevent lag while typing on mobile web
+
     const timer = setInterval(() => {
       const nextIndex = (activeIndex + 1) % CAROUSEL_DATA.length;
       scrollViewRef.current?.scrollTo({ x: nextIndex * width, animated: true });
       setActiveIndex(nextIndex);
-    }, 6000);
+    }, 8000);
 
     return () => clearInterval(timer);
-  }, [activeIndex, width]);
+  }, [activeIndex, width, depFocused, arrFocused]);
 
   React.useEffect(() => {
     if (Platform.OS !== 'web') return;

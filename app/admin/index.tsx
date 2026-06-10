@@ -72,17 +72,7 @@ const AnimatedSimpleNumber = ({ value }: { value: number }) => {
   return <>{displayValue}</>;
 };
 
-const DAILY_MOCK_DATA: Record<number, { total: number, mvola: number, airtel: number, orange: number, voyages: number }> = {
-  1: { total: 45000, mvola: 25000, airtel: 10000, orange: 10000, voyages: 5 },
-  2: { total: 32500, mvola: 20000, airtel: 7500, orange: 5000, voyages: 4 },
-  3: { total: 18000, mvola: 8000, airtel: 5000, orange: 5000, voyages: 2 },
-  4: { total: 55000, mvola: 30000, airtel: 15000, orange: 10000, voyages: 8 },
-  5: { total: 24000, mvola: 14000, airtel: 6000, orange: 4000, voyages: 3 },
-  6: { total: 42000, mvola: 22000, airtel: 12000, orange: 8000, voyages: 6 },
-  7: { total: 61000, mvola: 35000, airtel: 16000, orange: 10000, voyages: 9 },
-  8: { total: 19500, mvola: 10000, airtel: 6500, orange: 3000, voyages: 3 },
-  9: { total: 8500, mvola: 5000, airtel: 3500, orange: 0, voyages: 1 },
-};
+const DAILY_MOCK_DATA: Record<number, { total: number, mvola: number, airtel: number, orange: number, voyages: number }> = {};
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -162,7 +152,7 @@ export default function AdminDashboard() {
   };
 
   const generateDemoData = async () => {
-    CustomAlert.alert("Génération...", "Action de génération désactivée dans cet aperçu.");
+    // Action désactivée
   };
 
   if (!isAdmin && !loading) return null;
@@ -171,7 +161,7 @@ export default function AdminDashboard() {
     ? DAILY_MOCK_DATA[selectedDate] 
     : { total: 0, mvola: 0, airtel: 0, orange: 0, voyages: 0 };
 
-  const totalGlobalEarnings = Object.values(DAILY_MOCK_DATA).reduce((acc, curr) => acc + curr.total, 0) + 24500; // Adding a base to show a big number
+  const totalGlobalEarnings = Object.values(DAILY_MOCK_DATA).reduce((acc, curr) => acc + curr.total, 0);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
@@ -186,12 +176,7 @@ export default function AdminDashboard() {
           </View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          {isDesktop && (
-            <TouchableOpacity onPress={generateDemoData} style={{ backgroundColor: '#1E293B', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name="settings-outline" size={16} color="white" style={{ marginRight: 8 }} />
-              <Text style={{ color: 'white', fontWeight: '600', fontSize: 13 }}>Générer 10 Trajets</Text>
-            </TouchableOpacity>
-          )}
+          {/* Button removed */}
           <TouchableOpacity style={{ borderWidth: 1, borderColor: '#E2E8F0', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ color: '#0F172A', fontWeight: '600', fontSize: 13, marginRight: 8 }}>Outils</Text>
             <Ionicons name="chevron-down" size={14} color="#0F172A" />
@@ -299,7 +284,7 @@ export default function AdminDashboard() {
                 <Text style={{ position: 'absolute', bottom: 30, left: -10, fontSize: 12, color: '#94A3B8', fontWeight: '600' }}>0</Text>
 
                 {/* Mocked bars vertes du screenshot */}
-                {[0.5, 1.2, 2.8, 3.2, 2.1, 3.8, 4.0, 2.9, 3.5, 0.6].map((val, idx) => (
+                {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0].map((val, idx) => (
                   <View key={idx} style={{ alignItems: 'center', width: '8%', height: '100%', justifyContent: 'flex-end' }}>
                     <View style={{ width: '100%', height: `${(val/4)*100}%`, backgroundColor: '#10B981', borderTopLeftRadius: 4, borderTopRightRadius: 4 }} />
                     <Text style={{ fontSize: 10, color: '#64748B', marginTop: 12, textAlign: 'center', lineHeight: 14, fontWeight: '500' }}>

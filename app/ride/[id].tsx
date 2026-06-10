@@ -503,7 +503,7 @@ export default function RideDetailsScreen() {
               <Text style={{ fontSize: 10, fontWeight: '800', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>Votre Conducteur</Text>
               
               <TouchableOpacity 
-                onPress={() => router.push(`/driver/${ride.driver_id || 'e534ec44-538e-4abc-b296-74afb216bf90'}?price=${ride.price}&ride_id=${ride.id}`)}
+                onPress={() => ride.driver_id && router.push(`/driver/${ride.driver_id}?price=${ride.price}&ride_id=${ride.id}`)}
                 style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0' }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
