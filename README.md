@@ -70,12 +70,13 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Géo-Désambiguïsation :** Résolution intelligente des noms de quartiers identiques (ex: Tanambao) en utilisant le contexte du district (Arrondissements en chiffres romains : Antananarivo II, IV, etc.).
 - **Sélecteur de Date et Heure Adaptatif (Web & Mobile) *(NOUVEAU - SESSION 13)* :** Sur téléphone (application native), utilisation de DateTimePickerModal. Sur ordinateur/web de bureau, intégration d'un sélecteur date/heure natif HTML (`<input type="datetime-local">`) transparent, doté de `zIndex: 99999` pour une réactivité parfaite et immédiate au clic, sans gêner la disposition.
 
-### 7. Espace Conducteur & Profil *(AMÉLIORÉ - SESSION 25)*
+### 7. Espace Conducteur & Profil *(AMÉLIORÉ - SESSION 29)*
+- **Support Multi-langue / i18n *(NOUVEAU - S29)* 🇲🇬 :** Implémentation d'un système de traduction bilingue natif (Français ↔️ Malagasy Andavanandro). Bascule instantanée de toute l'application via le bouton de langue dans le profil, sans rechargement lourd (gestion par Context React + AsyncStorage), pour inclure tous les chauffeurs locaux.
 - **Modification Complète :** Nom, prénom, téléphone, photo de profil.
 - **Cache-Busting & Rafraîchissement Instantané (S25) :** La nouvelle photo de profil s'affiche immédiatement. Sur téléphone, l'utilisation de `useFocusEffect` garantit le rafraîchissement immédiat de toutes les données du profil dès l'ouverture de la page sans rechargement manuel.
 - **Détails Véhicule :** Choix (Voiture, 4x4, Minibus, Moto) et champ pour la marque.
 - **Préférences et Équipements :** Ajout de multiples options à cocher (Climatisation, Sièges Inclinables, Prises, etc.) qui s'enregistrent en base et pré-remplissent automatiquement chaque nouvelle annonce.
-- **Barre d'Actions Ergonomique (S25) :** Les boutons de sauvegarde, déconnexion et suppression sont regroupés intelligemment sous l'en-tête, formant une barre d'actions responsive parfaitement alignée avec les outils d'administration Kiosque.
+- **Barre d'Actions Ergonomique (S25) :** Les boutons de sauvegarde, déconnexion, changement de langue et suppression sont regroupés intelligemment sous l'en-tête, formant une barre d'actions responsive.
 - **Gestion des Annonces :** Sur la page de détail de *son propre trajet*, le chauffeur dispose d'un panneau pour ajuster les places en temps réel (boutons `+` et `-`) ou supprimer totalement l'annonce.
 - **Historique & Trajets Expirés :** Les trajets terminés/passés dans l'onglet "Je conduis" sont automatiquement détectés, grisés (opacité `0.7`), marqués d'un badge `"Trajet terminé"` et triés en bas de liste. L'historique du chauffeur est préservé tout en libérant l'espace supérieur pour les trajets actifs.
 

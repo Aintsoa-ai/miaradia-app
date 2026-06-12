@@ -2,6 +2,25 @@
 
 ## 📅 Historique des Audits & Résolutions
 
+### Session 29 (13 Juin 2026) : Localisation & i18n (Support Malagasy) 🇲🇬
+
+> **Contexte :** Adapter l'application à un usage national étendu en incluant le support du Malagasy Andavanandro pour supprimer les frictions d'interface.
+
+#### Fonctionnalités Ajoutées / Corrigées
+*   **Système i18n Natif Ultraléger :**
+    *   Création de `hooks/useTranslation.tsx` utilisant `LanguageContext` et `AsyncStorage` pour un système de traduction instantané sans le poids de `i18next`.
+    *   Création du dictionnaire bilingue (Français ↔️ Malagasy Andavanandro) dans `translations.ts` contenant le vocabulaire naturel (ex: "Ho aiza ianao ?", "Hitady", "Hizara dia").
+*   **Bascule Instantanée (Hot-Swap) :**
+    *   Bouton intégré dans `profile.tsx`. Un clic met à jour le contexte global.
+    *   Un `window.location.reload()` est forcé sur le client web pour s'assurer que tous les composants (y compris le Desktop Header et le TabBar natif) appliquent le re-rendu instantanément, évitant tout déphasage visuel.
+*   **Traductions Exhaustives Appliquées :**
+    *   Mise à jour complète de la barre de navigation.
+    *   Mise à jour de `index.tsx` (Recherche mobile et desktop).
+    *   Mise à jour de `publish.tsx` (Formulaire complet, y compris sélection véhicule et équipement).
+    *   Mise à jour des blocs dynamiques du profil ("Informations Personnelles", etc.).
+
+---
+
 ### Session 28 (12 Juin 2026) : UX, Code Splitting & Tarification Intelligente 🚀
 
 > **Contexte :** Poursuite de l'optimisation des performances sur 3G, finalisation de la boucle de rétroaction du paiement, et amélioration de l'UX de publication.

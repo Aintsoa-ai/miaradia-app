@@ -36,6 +36,9 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Suppression des Blocages (S27) :** `/publish` instantané sans spinner (auth asynchrone), Timeout sur API distance.
 - [x] **Code Splitting & Lazy Loading (S28) 📦 :** Allègement extrême du premier chargement sur 3G. `CustomAlert`, `DesktopHeader`, API Notifications, et les `DateTimePickerModal` sont désormais chargés *à la demande* via `React.lazy` et `Suspense`.
 
+### 🌍 Accessibilité & Traduction
+- [x] **Support Multi-langue / i18n (S29) 🇲🇬 :** Dictionnaire natif hyper-léger (zéro dépendance) basé sur le contexte React et `AsyncStorage`. Traduction complète en **Malagasy Andavanandro** (Ho aiza ianao, Hitady, etc.) avec bascule instantanée sans rechargement lourd.
+
 ---
 
 ## 🌟 Points Forts Actuels (Avantages Compétitifs)
@@ -49,6 +52,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 | 5 | **Temps Réel & Notifications** | `supabase_realtime` + Notifications Push automatiques au chauffeur lors d'un paiement. |
 | 6 | **Dictionnaire Madagascar Local** | Distances/durées pré-calculées pour toutes les RN sans dépendre du réseau. |
 | 7 | **Performance 3G Optimisée (S27/S28)** | Code Splitting (`React.lazy`), cache Vercel 1 an, rendus différés. |
+| 8 | **Localisation Parfaite (S29)** | Interface Bilingue ultra-fluide avec le "Malagasy Andavanandro" pour les chauffeurs. |
 
 ---
 
@@ -58,7 +62,6 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 |---|---|---|---|
 | 1 | **Dépendance téléphone admin** 🔴 | CRITIQUE | Si batterie vide → paiements non validés. Solution : API MVola Telma (B2B). |
 | 2 | **Paiement Gating (10%) pas Séquestre** 🟠 | IMPORTANT | Le chauffeur n'a aucune garantie financière de présence du client. Solution : paiement 100% in-app en séquestre. |
-| 3 | **Pas de support Malagasy** 🟡 | IMPORTANT | App 100% en français, inadapté pour les chauffeurs ruraux. Solution : i18n Vahinaly. |
 | 4 | **Bundle Central inévitable** 🟡 | MODÉRÉ | Le moteur React/Expo pèse ~2.3 MB malgré le lazy loading. Cache Vercel compense. |
 | 5 | **Souscriptions WebSocket multiples** 🟡 | MODÉRÉ | Risque de fuite mémoire longue session. Solution : Context global Realtime. |
 
@@ -84,7 +87,6 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Avis Audio** : Laisser un vocal en guise d'avis (culture malgache de l'oral).
 
 ### 📱 Expérience Utilisateur (UX)
-- [ ] **Support Multi-langue (Malagasy)** : Traduire l'interface en Malagasy Vahinaly / Ofisialy.
 - [ ] **Partage de Position Temps Réel** : Suivi de sécurité pour les proches.
 - [ ] **Micro-animations (Lottie)** : Célébrations visuelles au succès du paiement.
 
@@ -96,4 +98,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ---
 
-*Dernière mise à jour : 13 Juin 2026 - Session 28 : Alertes Embouteillages (Tana), Code Splitting (React.lazy), Notification Push au paiement, Tarification intelligente.*
+*Dernière mise à jour : 13 Juin 2026 - Session 29 : Implémentation du système Multi-langue (i18n) Malagasy Andavanandro, Code Splitting (S28), Alertes Embouteillages (S28).*
