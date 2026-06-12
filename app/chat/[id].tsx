@@ -86,9 +86,26 @@ export default function ChatScreen() {
   }, [recording]);
 
   // --- Audio Player Component ---
-  const AudioMessage = ({ uri, isMine }: { uri: string, isMine: boolean }) => {
+  const AudioMessage = ({ uri, isMine, createdAt, isRead }: { uri: string, isMine: boolean, createdAt: string, isRead: boolean }) => {
     const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [durationMillis, setDurationMillis] = useState(1);
+    const [positionMillis, setPositionMillis] = useState(0);
+
+    useEffect(() => {
+      // Preload to get duration
+      const loadAudio = async () => {
+        try {
+          const { sound: newSound, status } = await Audio.Sound.createAsync({ uri });
+          if (status.isLoaded && status.durationMillis) {
+            setDurationMillis(status.durationMillis);
+          }
+          setSound(newSound);
+        } catch (e) {}
+      };
+      loadAudio();
+      return sound ? () => { sound.unloadAsync(); } : undefined;
+    }, [uri]);
 
     const playSound = async () => {
       try {
@@ -97,42 +114,81 @@ export default function ChatScreen() {
             await sound.pauseAsync();
             setIsPlaying(false);
           } else {
+            // Setup playback status listener for progress
+            sound.setOnPlaybackStatusUpdate((status) => {
+              if (status.isLoaded) {
+                setPositionMillis(status.positionMillis);
+                if (status.didJustFinish) {
+                  setIsPlaying(false);
+                  setPositionMillis(0);
+                  sound.setPositionAsync(0);
+                }
+              }
+            });
             await sound.playAsync();
             setIsPlaying(true);
           }
-        } else {
-          const { sound: newSound } = await Audio.Sound.createAsync(
-            { uri },
-            { shouldPlay: true }
-          );
-          newSound.setOnPlaybackStatusUpdate((status) => {
-            if (status.isLoaded && status.didJustFinish) {
-              setIsPlaying(false);
-            }
-          });
-          setSound(newSound);
-          setIsPlaying(true);
         }
       } catch (error) {
         console.error("Error playing audio", error);
       }
     };
 
-    useEffect(() => {
-      return sound ? () => { sound.unloadAsync(); } : undefined;
-    }, [sound]);
+    const formatTime = (millis: number) => {
+      const totalSeconds = Math.floor(millis / 1000);
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
+      return `${m}:${s < 10 ? '0' + s : s}`;
+    };
+
+    const progressPercent = Math.min((positionMillis / durationMillis) * 100, 100);
 
     return (
-      <TouchableOpacity 
-        onPress={playSound}
-        className={`flex-row items-center w-40 px-3 py-2 rounded-[20px] ${isMine ? 'bg-blue-700' : 'bg-gray-100'}`}
-      >
-        <Ionicons name={isPlaying ? "pause" : "play"} size={20} color={isMine ? "white" : "#2563EB"} />
-        <View className="flex-1 mx-2 h-1 bg-white/30 rounded-full overflow-hidden">
-          <View className={`h-full ${isMine ? 'bg-white' : 'bg-blue-600'} w-1/2`} />
+      <View style={{ minWidth: 220 }}>
+        <View className="flex-row items-center pt-1 pb-2">
+          {/* Avatar Placeholder */}
+          <View className="relative mr-2">
+            <View className={`w-10 h-10 rounded-full items-center justify-center ${isMine ? 'bg-blue-500' : 'bg-gray-200'}`}>
+              <Ionicons name="person" size={20} color={isMine ? "white" : "#94A3B8"} />
+            </View>
+            <View className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+              <Ionicons name="mic" size={12} color={isMine ? "#2563EB" : "#10B981"} />
+            </View>
+          </View>
+
+          {/* Play Button */}
+          <TouchableOpacity onPress={playSound} className="mr-2">
+            <Ionicons name={isPlaying ? "pause" : "play"} size={28} color={isMine ? "white" : "#64748B"} />
+          </TouchableOpacity>
+
+          {/* Progress Bar & Duration */}
+          <View className="flex-1 justify-center relative h-6">
+            {/* Background Line */}
+            <View className={`absolute left-0 right-0 h-1 rounded-full ${isMine ? 'bg-blue-400' : 'bg-gray-200'}`} />
+            
+            {/* Active Line */}
+            <View className={`absolute left-0 h-1 rounded-full ${isMine ? 'bg-white' : 'bg-blue-500'}`} style={{ width: `${progressPercent}%` }} />
+            
+            {/* Dot Handle */}
+            <View className={`absolute w-3 h-3 rounded-full ${isMine ? 'bg-white' : 'bg-blue-500'}`} style={{ left: `${Math.max(0, progressPercent - 5)}%`, top: 10 }} />
+          </View>
         </View>
-        <Text className={`${isMine ? 'text-white' : 'text-gray-500'} text-xs font-bold`}>Vocal</Text>
-      </TouchableOpacity>
+
+        {/* Footer info (Timestamp & Ticks) */}
+        <View className="flex-row items-center justify-between mt-1">
+          <Text className={`${isMine ? 'text-blue-200' : 'text-gray-400'} text-[10px] font-bold`}>
+            {formatTime(positionMillis > 0 ? positionMillis : durationMillis)}
+          </Text>
+          <View className="flex-row items-center">
+            <Text className={`${isMine ? 'text-blue-200' : 'text-gray-400'} text-[10px] mr-1`}>
+              {new Date(createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Text>
+            {isMine && (
+              <Ionicons name="checkmark-done" size={14} color={isRead ? "#60A5FA" : "#93C5FD"} />
+            )}
+          </View>
+        </View>
+      </View>
     );
   };
 
@@ -143,15 +199,22 @@ export default function ChatScreen() {
 
     return (
       <View className={`mb-4 flex-row ${isMine ? 'justify-end' : 'justify-start'}`}>
-        <View className={`max-w-[80%] px-4 py-3 rounded-[24px] ${isMine ? 'bg-blue-600 rounded-tr-none' : 'bg-white rounded-tl-none border border-gray-100 shadow-sm'}`}>
+        <View className={`max-w-[85%] px-4 py-3 rounded-[24px] ${isMine ? 'bg-blue-600 rounded-tr-none' : 'bg-white rounded-tl-none border border-gray-100 shadow-sm'}`}>
           {isAudio ? (
-            <AudioMessage uri={audioUri} isMine={isMine} />
+            <AudioMessage uri={audioUri} isMine={isMine} createdAt={item.created_at} isRead={item.is_read} />
           ) : (
-            <Text className={`${isMine ? 'text-white' : 'text-gray-800'} text-[15px]`}>{item.content}</Text>
+            <>
+              <Text className={`${isMine ? 'text-white' : 'text-gray-800'} text-[15px]`}>{item.content}</Text>
+              <View className="flex-row items-center self-end mt-1">
+                <Text className={`text-[9px] ${isMine ? 'text-blue-100' : 'text-gray-400'} font-bold mr-1`}>
+                  {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </Text>
+                {isMine && (
+                  <Ionicons name="checkmark-done" size={12} color={item.is_read ? "#60A5FA" : "#93C5FD"} />
+                )}
+              </View>
+            </>
           )}
-          <Text className={`text-[9px] mt-1 ${isMine ? 'text-blue-100' : 'text-gray-400'} self-end font-bold`}>
-            {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </Text>
         </View>
       </View>
     );
