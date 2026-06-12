@@ -32,6 +32,11 @@ export const translations = {
     "profile_title": "Votre Profil",
     "profile_logout": "Se déconnecter",
     "profile_language": "Changer de langue",
+    "profile_save": "Enregistrer le profil",
+    "profile_delete": "Supprimer mon compte",
+    "profile_personal_info": "Informations Personnelles",
+    "profile_vehicle": "Mon Véhicule",
+    "profile_equipment": "Équipements & Règles",
   },
   mg: {
     // Onglets (Tabs) - Malagasy Andavanandro
@@ -64,6 +69,11 @@ export const translations = {
     "profile_title": "Mombamomba anao", // Votre profil
     "profile_logout": "Hiala", // Quitter / Se déconnecter
     "profile_language": "Hanova fiteny", // Changer de langue
+    "profile_save": "Hitehiriza ny mombamomba", // Enregistrer le profil
+    "profile_delete": "Hofafana ny kaonty", // Supprimer mon compte
+    "profile_personal_info": "Mombamomba ahy", // Informations Personnelles
+    "profile_vehicle": "Ny fiarako", // Mon Véhicule
+    "profile_equipment": "Fitaovana & Fitsipika", // Equipements & Règles
   }
 };
 

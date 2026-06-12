@@ -586,11 +586,16 @@ export default function ProfileScreen() {
                   shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 10,
                 }}
               >
-                <Text style={{ color: 'white', fontWeight: '900', fontSize: 15, letterSpacing: 0.5 }}>Enregistrer le profil</Text>
+                <Text style={{ color: 'white', fontWeight: '900', fontSize: 15, letterSpacing: 0.5 }}>{t('profile_save')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
-                onPress={() => setLanguage(language === 'fr' ? 'mg' : 'fr')}
+                onPress={async () => {
+                  await setLanguage(language === 'fr' ? 'mg' : 'fr');
+                  if (typeof window !== 'undefined') {
+                    window.location.reload();
+                  }
+                }}
                 style={{
                   backgroundColor: 'white', width: isDesktop ? undefined : '100%',
                   paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#BFDBFE',
@@ -614,7 +619,7 @@ export default function ProfileScreen() {
                 style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, paddingHorizontal: 16 }}
               >
                 <Ionicons name="trash-outline" size={16} color="#94A3B8" />
-                <Text style={{ color: '#94A3B8', fontWeight: '700', fontSize: 13, marginLeft: 8 }}>Supprimer mon compte</Text>
+                <Text style={{ color: '#9CA3AF', fontWeight: '700', fontSize: 13 }}>{t('profile_delete')}</Text>
               </TouchableOpacity>
             </View>
 
@@ -651,7 +656,7 @@ export default function ProfileScreen() {
                 <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                   <Ionicons name="person" size={16} color="#2563EB" />
                 </View>
-                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Informations Personnelles</Text>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>{t('profile_personal_info')}</Text>
               </View>
               
               <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: isDesktop ? 16 : 12, marginBottom: 16 }}>
@@ -730,7 +735,7 @@ export default function ProfileScreen() {
                 <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                   <Ionicons name="car-sport" size={16} color="#2563EB" />
                 </View>
-                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Mon Véhicule</Text>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>{t('profile_vehicle')}</Text>
               </View>
               
               <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>Type de véhicule</Text>
@@ -820,7 +825,7 @@ export default function ProfileScreen() {
                 <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                   <Ionicons name="options" size={16} color="#2563EB" />
                 </View>
-                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>Équipements & Règles</Text>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>{t('profile_equipment')}</Text>
               </View>
               
               <View style={{ gap: 4 }}>

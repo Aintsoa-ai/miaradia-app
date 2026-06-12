@@ -4,11 +4,13 @@ import { useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../hooks/useTranslation';
 
 export function DesktopHeader() {
   const { width } = useWindowDimensions();
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
   const isDesktop = width > 768;
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -150,7 +152,7 @@ export function DesktopHeader() {
               activeOpacity={0.75}
             >
               <Ionicons name="search" size={17} color={isActive('/(tabs)') ? '#60A5FA' : 'rgba(255,255,255,0.6)'} />
-              <Text style={navTextStyle('/(tabs)')}>Explorer</Text>
+              <Text style={navTextStyle('/(tabs)')}>{t('tab_search')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -159,7 +161,7 @@ export function DesktopHeader() {
               activeOpacity={0.75}
             >
               <Ionicons name="compass" size={17} color={isActive('/(tabs)/rides') ? '#60A5FA' : 'rgba(255,255,255,0.6)'} />
-              <Text style={navTextStyle('/(tabs)/rides')}>Mes Voyages</Text>
+              <Text style={navTextStyle('/(tabs)/rides')}>{t('tab_rides')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -182,7 +184,7 @@ export function DesktopHeader() {
                   </View>
                 )}
               </View>
-              <Text style={navTextStyle('/(tabs)/chat')}>Messages</Text>
+              <Text style={navTextStyle('/(tabs)/chat')}>{t('tab_chat')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -209,7 +211,7 @@ export function DesktopHeader() {
               >
                 <Ionicons name="add-circle" size={18} color="white" />
                 <Text style={{ color: 'white', fontWeight: '800', fontSize: 13.5, letterSpacing: -0.2 }}>
-                  Proposer un trajet
+                  {t('tab_publish')}
                 </Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -240,7 +242,7 @@ export function DesktopHeader() {
                 )}
               </View>
               <Text style={{ color: 'white', fontWeight: '700', fontSize: 13.5 }}>
-                {isLoggedIn ? 'Mon Profil' : 'Connexion'}
+                {isLoggedIn ? t('tab_profile') : 'Connexion'}
               </Text>
               <Ionicons name="chevron-down" size={14} color="rgba(255,255,255,0.4)" />
             </TouchableOpacity>
