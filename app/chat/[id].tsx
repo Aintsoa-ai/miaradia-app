@@ -46,7 +46,7 @@ export default function ChatScreen() {
         const newRecording = new Audio.Recording();
         await newRecording.prepareToRecordAsync({
           ...Audio.RecordingOptionsPresets.LOW_QUALITY,
-          isMeteringEnabled: true,
+          isMeteringEnabled: Platform.OS !== 'web',
         });
         
         newRecording.setOnRecordingStatusUpdate((status) => {
@@ -65,9 +65,12 @@ export default function ChatScreen() {
         setIsRecording(true);
         setRecordingDuration(0);
         setMeteringLevels(new Array(22).fill(-160));
+      } else {
+        alert("Permission refusée pour le microphone.");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to start recording', err);
+      alert("Erreur micro: " + err.message);
     }
   };
 
