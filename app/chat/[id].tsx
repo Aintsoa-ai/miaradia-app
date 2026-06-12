@@ -15,7 +15,7 @@ export default function ChatScreen() {
   const [recording, setRecording] = useState<Audio.Recording | undefined>();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
-  const recordingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [meteringLevels, setMeteringLevels] = useState<number[]>(new Array(22).fill(-160));
 
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
@@ -42,16 +42,29 @@ export default function ChatScreen() {
           allowsRecordingIOS: true,
           playsInSilentModeIOS: true,
         });
-        const { recording: newRecording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.LOW_QUALITY
-        );
+        
+        const newRecording = new Audio.Recording();
+        await newRecording.prepareToRecordAsync({
+          ...Audio.RecordingOptionsPresets.LOW_QUALITY,
+          isMeteringEnabled: true,
+        });
+        
+        newRecording.setOnRecordingStatusUpdate((status) => {
+          if (status.isRecording) {
+            setRecordingDuration(Math.floor(status.durationMillis / 1000));
+            if (status.metering !== undefined) {
+              setMeteringLevels(prev => [...prev.slice(1), status.metering!]);
+            }
+          }
+        });
+        await newRecording.setProgressUpdateIntervalAsync(100);
+
+        await newRecording.startAsync();
+        
         setRecording(newRecording);
         setIsRecording(true);
         setRecordingDuration(0);
-        
-        recordingTimer.current = setInterval(() => {
-          setRecordingDuration(prev => prev + 1);
-        }, 1000);
+        setMeteringLevels(new Array(22).fill(-160));
       }
     } catch (err) {
       console.error('Failed to start recording', err);
@@ -60,17 +73,16 @@ export default function ChatScreen() {
 
   const stopRecording = async (cancel = false) => {
     if (!recording) return;
-    const finalDuration = recordingDuration;
     setIsRecording(false);
-    if (recordingTimer.current) clearInterval(recordingTimer.current);
     
     try {
+      const status = await recording.getStatusAsync();
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
       setRecording(undefined);
       
       if (!cancel && uri) {
-        if (finalDuration < 1) {
+        if (status.durationMillis < 1000) {
           // Si l'enregistrement est trop court (< 1s), on annule sans envoyer
           return;
         }
@@ -86,7 +98,6 @@ export default function ChatScreen() {
       if (recording) {
         recording.stopAndUnloadAsync();
       }
-      if (recordingTimer.current) clearInterval(recordingTimer.current);
     };
   }, [recording]);
 
@@ -305,15 +316,18 @@ export default function ChatScreen() {
                     </Text>
                   </View>
                   
-                  {/* Simulation Waveform (Static animation for visual effect) */}
-                  <View className="flex-1 flex-row items-center overflow-hidden opacity-50 justify-center">
-                    {[...Array(22)].map((_, i) => (
-                      <View 
-                        key={i} 
-                        className="w-1 bg-gray-500 mx-0.5 rounded-full" 
-                        style={{ height: Math.random() > 0.4 ? 12 + Math.random() * 12 : 6 + Math.random() * 4 }} 
-                      />
-                    ))}
+                  {/* Dynamic Waveform (Synchronized with voice metering) */}
+                  <View className="flex-1 flex-row items-center overflow-hidden opacity-60 justify-center">
+                    {meteringLevels.map((level, i) => {
+                      const height = Math.max(4, 30 + level / 2);
+                      return (
+                        <View 
+                          key={i} 
+                          className="w-1 bg-gray-500 mx-0.5 rounded-full" 
+                          style={{ height }} 
+                        />
+                      );
+                    })}
                   </View>
                 </View>
               </View>
