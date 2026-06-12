@@ -79,7 +79,10 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Points de Repère** : "Arrêt devant Station Galana" au lieu du simple nom de ville.
 - [ ] **Trajets Courtes Distances / Intra-District** : Covoiturage domicile-travail.
 
-### 💰 Monétisation & Prix
+### 💰 Monétisation & Prix (Concept "Tickets")
+- [ ] **Refonte du Wording (Vocabulaire) :** Remplacer le terme anxiogène "Payer la somme de..." par "Acheter un ticket pour débloquer le numéro".
+- [ ] **7 Tickets Gratuits (Onboarding) :** Augmenter le bonus de bienvenue à 7 tickets (au lieu de 5). Un ticket débloque le contact d'un conducteur.
+- [ ] **Achat de Ticket (10%) :** Une fois les 7 tickets gratuits épuisés, le passager devra acheter un ticket (prix du ticket = 10% du prix du trajet via Mobile Money) pour voir le numéro.
 - [ ] **Paiement In-App complet (Séquestre)** : Passer d'un gating de contact à une réservation intégrale.
 - [ ] **Intégration API MVola Officielle *(EN PAUSE)* :** Remplacera la passerelle SMS à terme.
 - [ ] **Abonnement Premium Chauffeur** : Frais fixes mensuels pour zéro commission.
