@@ -59,6 +59,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 
 ### 6. Publication de Trajet *(AMÉLIORÉ - SESSION 28)*
 - **Tarification Intelligente *(NOUVEAU - S28)* :** Le système analyse la base de données en temps réel pour pré-remplir le prix suggéré en fonction de l'historique des trajets passés sur la même route, ou estime un tarif basé sur la distance (150 Ar/km).
+- **Alerte Trafic & Météo *(NOUVEAU - S28)* :** Détection automatique des heures de pointe (Matin/Soir) sur les goulots d'étranglement de la capitale (Anosizato, By-pass). Affichage d'une alerte au chauffeur et ajustement automatique de l'heure d'arrivée (+45min).
 - **Chargement Instantané (S27) :** Le formulaire s'affiche immédiatement sans spinner bloquant (auth asynchrone).
 - **Itinéraire Intelligent & Exhaustif :** L'application connaît toutes les Routes Nationales (RN1 à RN44) et suggère des villes escales.
 - **Gestion des Raccourcis (Transversales) :** Reconnaissance des routes transversales (ex: Faratsiho pour éviter Tana, Ambositra-Manja pour éviter Antsirabe).

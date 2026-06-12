@@ -20,6 +20,11 @@
     *   Si des historiques existent : Le champ "Prix par place" se pré-remplit automatiquement avec la moyenne du marché, arrondie à 1000 Ar.
     *   S'il n'y a pas d'historique : Estimation forfaitaire kilométrique (150 Ar * distance).
     *   Sécurité : Ne pré-remplit que si le champ prix est encore vide.
+*   **Alertes Trafic & Météo Intelligentes (`trafficService.ts`) :**
+    *   Création d'un dictionnaire heuristique ciblant les points noirs d'Antananarivo (Anosizato, Tsarasaotra, By-Pass) et les heures de pointe (6h-9h, 16h-20h).
+    *   Affichage d'un encart d'avertissement visuel immédiat sous le sélecteur de date lors de la publication d'un trajet.
+    *   Ajustement automatique de l'heure d'arrivée estimée en ajoutant le retard prévu (ex: +45 min pour l'Axe Sud).
+    *   Intégration d'une alerte "Saison des pluies" (Décembre-Mars) pour les routes difficiles (RN5).
 
 ---
 

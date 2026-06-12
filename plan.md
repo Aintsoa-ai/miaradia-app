@@ -73,6 +73,7 @@ miaradia-app/
 │   └── locations/
 ├── hooks/                # Hooks React réutilisables (sessions, requêtes)
 ├── lib/                  # Utilitaires (client Supabase, formateur de prix, OSM, suggestions d'itinéraires)
+│   ├── trafficService.ts # Algorithme d'Alerte Embouteillages (S28)
 ├── utils/                # alert.ts (intercepteur CustomAlert)
 ├── supabase/             # Edge Functions Supabase
 │   └── functions/

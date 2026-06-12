@@ -16,9 +16,12 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ## ✅ DÉJÀ RÉALISÉ
 
+### 🗺️ Géographie & Itinéraires
+- [x] **Alerte Embouteillages & Temps Supplémentaire (S28) 🚦 :** Reconnaissance automatique des goulots d'étranglement selon l'heure (ex: Anosizato, By-pass, Tsarasaotra) avec alerte visuelle pour le chauffeur et ajustement dynamique de l'heure d'arrivée. Alerte météo/saison des pluies intégrée.
+
 ### Monétisation & Prix
 - [x] **Validation Automatique SMS Mobile Money *(RÉALISÉ - S14-S19)* :** Détection automatique SMS MVola/Orange/Airtel via webhook. Matching des références, déverrouillage du contact.
-- [x] **Message & Notification Post-Validation *(RÉALISÉ - S28)* :** Dès la validation du paiement, un message In-App est généré ("Le passager va vous appeler...") ET le chauffeur reçoit instantanément une notification Push.
+- [x] **Message & Notification Post-Validation *(RÉALISÉ - S28)* :** Dès la validation du paiement, un message In-App est généré ET le chauffeur reçoit instantanément une notification Push.
 - [x] **Tarification Intelligente & Prédictive *(RÉALISÉ - S28)* :** Lors de la publication d'un trajet, l'application analyse les historiques réels de la route sélectionnée dans la DB pour pré-remplir un prix moyen, ou utilise une estimation de 150 Ar/km si la route est nouvelle.
 - [x] **Crédits de Bienvenue / Freemium (S23) 🎁 :** Implémentation d'un système d'acquisition offrant 5 trajets gratuits aux nouveaux inscrits (`free_unlocks`).
 
@@ -42,7 +45,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 | 1 | **Paiement Mobile Money Zéro-Clic** | Validation SMS Gateway entièrement automatique. Unique sur le marché malgache. |
 | 2 | **Onboarding Freemium (5 crédits)** | Expérience gratuite immédiate dès la 1ère inscription pour acquérir de la confiance. |
 | 3 | **Design Parité Desktop/Mobile** | Interface SaaS premium réactive sur toutes tailles d'écran (très rare localement). |
-| 4 | **Tarification Intelligente (S28)** | Prix suggéré automatiquement basé sur l'historique réel des trajets. |
+| 4 | **Tarification & Trafic Intelligents (S28)** | Prix suggéré selon l'historique et heure d'arrivée ajustée selon les embouteillages locaux (ex: Anosizato). |
 | 5 | **Temps Réel & Notifications** | `supabase_realtime` + Notifications Push automatiques au chauffeur lors d'un paiement. |
 | 6 | **Dictionnaire Madagascar Local** | Distances/durées pré-calculées pour toutes les RN sans dépendre du réseau. |
 | 7 | **Performance 3G Optimisée (S27/S28)** | Code Splitting (`React.lazy`), cache Vercel 1 an, rendus différés. |
@@ -55,20 +58,18 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 |---|---|---|---|
 | 1 | **Dépendance téléphone admin** 🔴 | CRITIQUE | Si batterie vide → paiements non validés. Solution : API MVola Telma (B2B). |
 | 2 | **Paiement Gating (10%) pas Séquestre** 🟠 | IMPORTANT | Le chauffeur n'a aucune garantie financière de présence du client. Solution : paiement 100% in-app en séquestre. |
-| 3 | **Bundle Central inévitable** 🟡 | MODÉRÉ | Le moteur React/Expo pèse ~2.3 MB malgré le lazy loading. Cache Vercel compense. |
-| 4 | **Souscriptions WebSocket multiples** 🟡 | MODÉRÉ | Risque de fuite mémoire longue session. Solution : Context global Realtime. |
-| 5 | **Pas de support Malagasy** 🟡 | MODÉRÉ | App 100% en français, inadapté pour les chauffeurs ruraux. Solution : i18n. |
+| 3 | **Pas de support Malagasy** 🟡 | IMPORTANT | App 100% en français, inadapté pour les chauffeurs ruraux. Solution : i18n Vahinaly. |
+| 4 | **Bundle Central inévitable** 🟡 | MODÉRÉ | Le moteur React/Expo pèse ~2.3 MB malgré le lazy loading. Cache Vercel compense. |
+| 5 | **Souscriptions WebSocket multiples** 🟡 | MODÉRÉ | Risque de fuite mémoire longue session. Solution : Context global Realtime. |
 
 ---
 
 ## ⏳ À ACCOMPLIR (Nos Idées)
 
 ### 🗺️ Géographie & Itinéraires
-- [ ] **Alerte Embouteillages (Tana)** : Estimation temps supplémentaire sur les axes saturés (ex: Anosizato).
 - [ ] **Axe Fluvial** : Ajouter trajets en bateau (Pangalanes / Nosy Be).
 - [ ] **Points de Repère** : "Arrêt devant Station Galana" au lieu du simple nom de ville.
 - [ ] **Trajets Courtes Distances / Intra-District** : Covoiturage domicile-travail.
-- [ ] **Météo des Pistes** : Alerte pluie/boue.
 
 ### 💰 Monétisation & Prix
 - [ ] **Paiement In-App complet (Séquestre)** : Passer d'un gating de contact à une réservation intégrale.
@@ -83,8 +84,8 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Avis Audio** : Laisser un vocal en guise d'avis (culture malgache de l'oral).
 
 ### 📱 Expérience Utilisateur (UX)
+- [ ] **Support Multi-langue (Malagasy)** : Traduire l'interface en Malagasy Vahinaly / Ofisialy.
 - [ ] **Partage de Position Temps Réel** : Suivi de sécurité pour les proches.
-- [ ] **Support Multi-langue** : Malagasy Vahinaly / Ofisialy.
 - [ ] **Micro-animations (Lottie)** : Célébrations visuelles au succès du paiement.
 
 ### 🏗️ Technique & Admin
@@ -95,4 +96,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ---
 
-*Dernière mise à jour : 12 Juin 2026 - Session 28 : Code Splitting (React.lazy), Notification Push au paiement, Tarification intelligente (Moyenne DB/Distance).*
+*Dernière mise à jour : 13 Juin 2026 - Session 28 : Alertes Embouteillages (Tana), Code Splitting (React.lazy), Notification Push au paiement, Tarification intelligente.*
