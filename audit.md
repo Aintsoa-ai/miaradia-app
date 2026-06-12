@@ -18,6 +18,11 @@
     *   Mise à jour de `index.tsx` (Recherche mobile et desktop).
     *   Mise à jour de `publish.tsx` (Formulaire complet, y compris sélection véhicule et équipement).
     *   Mise à jour des blocs dynamiques du profil ("Informations Personnelles", etc.).
+*   **Messages Vocaux Éphémères WhatsApp-like (Chat) 🎙️ :**
+    *   **Interface Intuitive :** Refonte du champ de texte avec remplacement dynamique (bouton texte vs. micro). Implémentation du *Waveform* animé (metering en temps réel) et d'une sécurité annulant l'envoi si le fichier fait moins de 1 seconde (anti-spam).
+    *   **Enregistrement Hybride (`expo-av`) :** Désactivation conditionnelle du *metering* sur navigateur (`Platform.OS === 'web'`) pour prévenir les crashs silencieux, garantissant un enregistrement transparent quel que soit l'appareil.
+    *   **Bucket Sécurisé :** Création du bucket `chat_audio` sur Supabase. Ajout des règles RLS SQL (`FOR INSERT`) permettant l'upload de `.m4a` ultra-compressés.
+    *   **Nettoyage Automatique 24h (Cron) :** Écriture et déploiement de la Edge Function `clean-audio-cron` qui scanne quotidiennement la DB et supprime physiquement les fichiers associés aux trajets terminés depuis 24h, remplaçant le texte par *"🎙️ Vocal expiré"*.
 
 ---
 

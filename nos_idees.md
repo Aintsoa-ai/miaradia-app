@@ -39,6 +39,9 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 ### 🌍 Accessibilité & Traduction
 - [x] **Support Multi-langue / i18n (S29) 🇲🇬 :** Dictionnaire natif hyper-léger (zéro dépendance) basé sur le contexte React et `AsyncStorage`. Traduction complète en **Malagasy Andavanandro** (Ho aiza ianao, Hitady, etc.) avec bascule instantanée sans rechargement lourd.
 
+### 🎙️ Communication & Culture Orale
+- [x] **Messages Vocaux Éphémères (S29) 🗣️ :** Système d'enregistrement ultra-optimisé avec waveform dynamique type WhatsApp. Parfaitement adapté à la culture orale de Madagascar. Sécurité anti-spam et nettoyage automatisé (Cron) des fichiers de plus de 24h pour préserver l'espace de stockage (500 Mo max).
+
 ---
 
 ## 🌟 Points Forts Actuels (Avantages Compétitifs)
@@ -53,6 +56,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 | 6 | **Dictionnaire Madagascar Local** | Distances/durées pré-calculées pour toutes les RN sans dépendre du réseau. |
 | 7 | **Performance 3G Optimisée (S27/S28)** | Code Splitting (`React.lazy`), cache Vercel 1 an, rendus différés. |
 | 8 | **Localisation Parfaite (S29)** | Interface Bilingue ultra-fluide avec le "Malagasy Andavanandro" pour les chauffeurs. |
+| 9 | **Communication Orale WhatsApp-like (S29)** | Messages vocaux dynamiques intégrés au chat pour l'inclusion numérique de ceux moins à l'aise avec l'écrit. |
 
 ---
 
@@ -63,7 +67,8 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 | 1 | **Dépendance téléphone admin** 🔴 | CRITIQUE | Si batterie vide → paiements non validés. Solution : API MVola Telma (B2B). |
 | 2 | **Paiement Gating (10%) pas Séquestre** 🟠 | IMPORTANT | Le chauffeur n'a aucune garantie financière de présence du client. Solution : paiement 100% in-app en séquestre. |
 | 4 | **Bundle Central inévitable** 🟡 | MODÉRÉ | Le moteur React/Expo pèse ~2.3 MB malgré le lazy loading. Cache Vercel compense. |
-| 5 | **Souscriptions WebSocket multiples** 🟡 | MODÉRÉ | Risque de fuite mémoire longue session. Solution : Context global Realtime. |
+| 5 | **Limites du Stockage Gratuit (500 Mo)** 🟡 | MODÉRÉ | Le tier gratuit Supabase impose une gestion rigoureuse. C'est pourquoi les vocaux doivent être purgés via le `clean-audio-cron`. |
+| 6 | **Souscriptions WebSocket multiples** 🟡 | MINEUR | Risque de fuite mémoire longue session. Solution : Context global Realtime. |
 
 ---
 
@@ -84,7 +89,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ### 🤝 Communauté & Confiance
 - [ ] **Groupes de Voyage** : Ex: "Voyageurs réguliers Tana-Antsirabe".
-- [ ] **Avis Audio** : Laisser un vocal en guise d'avis (culture malgache de l'oral).
+- [ ] **Sauvegarde Locale des Vocaux** : Proposer une option In-App pour télécharger les messages audios importants dans le téléphone avant leur suppression automatique.
 
 ### 📱 Expérience Utilisateur (UX)
 - [ ] **Partage de Position Temps Réel** : Suivi de sécurité pour les proches.
@@ -98,4 +103,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ---
 
-*Dernière mise à jour : 13 Juin 2026 - Session 29 : Implémentation du système Multi-langue (i18n) Malagasy Andavanandro, Code Splitting (S28), Alertes Embouteillages (S28).*
+*Dernière mise à jour : 13 Juin 2026 - Session 29 : Multi-langue (i18n) Malagasy, Messages Vocaux Éphémères WhatsApp-like.*

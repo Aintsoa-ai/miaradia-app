@@ -117,8 +117,13 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Vérification d'Identité (KYC) *(NOUVEAU - S24)* :** Formulaire de vérification (Recto/Verso CIN, Adresse, Profession) avec algorithme d'auto-formatage de la saisie des dates et auto-validation instantanée pour une acquisition rapide ("zéro friction"). Le conducteur validé reçoit un badge "Identité Vérifiée ✅" affiché publiquement.
 - **Algorithme Anti-Fraude (Bio) :** L'application analyse la biographie du conducteur lors de la sauvegarde du profil. L'algorithme convertit les mots textuels en chiffres (Français et Malgache : "zero", "trente", "telo", "efatra") et bloque instantanément l'enregistrement s'il détecte une tentative de dissimuler un numéro de téléphone Mobile Money (préfixes 03x et séquence > 9 chiffres) pour contourner le système de monétisation.
 
-### 12. Messagerie Interne Temps Réel *(NOUVEAU - V2.0)*
+### 12. Messagerie Interne Temps Réel *(AMÉLIORÉ - S29)*
 - **Chat Instantané :** Communication directe entre passager et conducteur via Supabase Realtime.
+- **Messages Vocaux Éphémères 🎙️ *(NOUVEAU - S29)* :**
+  - **Interface WhatsApp :** Bouton Micro adaptatif, graphique d'ondes dynamique (Waveform) réagissant à la voix, et chronomètre en temps réel.
+  - **Code Splitting / Optimisation Web :** Technologie d'enregistrement `expo-av` avec désactivation automatique du *metering* (analyse des décibels) sur navigateur Web pour empêcher les crashs silencieux de Chrome, garantissant un enregistrement parfait sur tous les supports.
+  - **Sécurité Anti-Spam :** Annulation automatique des enregistrements involontaires de moins de 1 seconde.
+  - **Nettoyage Automatique (Robot Cron) :** Une fonction *Edge Function* (`clean-audio-cron`) s'exécute chaque nuit pour supprimer physiquement tous les fichiers vocaux dont le trajet remonte à plus de 24h, garantissant que l'espace de stockage Supabase (500 Mo) ne soit jamais saturé.
 - **Accès Premium :** La messagerie est débloquée en même temps que le numéro de téléphone après validation du paiement.
 - **Badge de Notification :** Badge rouge dynamique sur l'onglet "Messages" indiquant le nombre de nouveaux messages reçus en temps réel.
 
