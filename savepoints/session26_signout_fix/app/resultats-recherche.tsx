@@ -1,7 +1,7 @@
 /// <reference types="nativewind/types" />
 import { CustomAlert } from '../utils/alert';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal, Switch, Linking, Alert, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -72,13 +72,10 @@ export default function SearchResultsScreen() {
     if (sortBy === 'shortest') return parseFloat(a.duration) - parseFloat(b.duration);
   });
 
-  // Memoïsé pour éviter de casser le React.memo de RideCard à chaque render
-  const handleBooking = useCallback((id: string) => {
-    router.push(`/ride/${id}`);
-  }, [router]);
+  console.log("[SearchResults] Render filteredRides count:", filteredRides.length, "filterType:", filterType, "verifiedOnly:", verifiedOnly, "rides total:", rides.length);
 
-  // Supprimé : console.log en production ralentit le thread JS sur mobile
 
+  // --- FETCH DATA ---
   React.useEffect(() => {
     fetchRides();
   }, [departure, arrival]);
@@ -179,7 +176,8 @@ export default function SearchResultsScreen() {
   const fetchRides = async () => {
     try {
       setLoading(true);
-
+      console.log("[SearchResults] fetchRides initiated with:", { departure, arrival, date });
+      
       let query = supabase.from('rides').select('*');
 
       if (departure) {
@@ -213,6 +211,8 @@ export default function SearchResultsScreen() {
         console.error("[SearchResults] Supabase error:", error);
         throw error;
       }
+      console.log("[SearchResults] Supabase raw count:", data ? data.length : 0);
+
       // Transformation pour l'UI avec vraies distances Madagascar
       const formatted = (data || [])
         // 🗓️ FILTRE EXPIRATION : Exclure les trajets dont la date est passée
@@ -251,12 +251,17 @@ export default function SearchResultsScreen() {
           };
         });
 
+      console.log("[SearchResults] After expiry filter:", formatted.length, "rides");
       setRides(formatted);
     } catch (e: any) {
       CustomAlert.alert("Erreur", e.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBooking = (id: string) => {
+    router.push(`/ride/${id}`);
   };
 
   /**

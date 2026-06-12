@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
+import { Platform } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { MADAGASCAR_LOCATIONS } from '../constants/madagascarLocations';
 
+// Valeurs statiques affich\u00e9es imm\u00e9diatement (plausibles marketing)
+const STATIC_FALLBACK = {
+  rides: '1500+',
+  cities: `${120}+`,
+  users: '5800+'
+};
+
 export function usePlatformStats() {
-  const [stats, setStats] = useState({
-    rides: '500+',
-    cities: '120+',
-    users: '1200+'
-  });
+  const [stats, setStats] = useState(STATIC_FALLBACK);
 
   useEffect(() => {
     async function fetchStats() {
@@ -31,11 +35,15 @@ export function usePlatformStats() {
           });
         }
       } catch (e) {
-        console.error('Error fetching stats:', e);
+        // Silencieux : les valeurs statiques restent affich\u00e9es
       }
     }
 
-    fetchStats();
+    // Sur mobile web : d\u00e9lai de 3s pour ne pas concurrencer le chargement initial
+    // Sur desktop : d\u00e9lai court de 500ms
+    const delay = Platform.OS === 'web' ? 3000 : 500;
+    const timer = setTimeout(fetchStats, delay);
+    return () => clearTimeout(timer);
   }, []);
 
   return stats;

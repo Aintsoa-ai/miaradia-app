@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { CustomAlert } from '../../utils/alert';
 
 import { View, Text, TextInput, TouchableOpacity, Alert, useWindowDimensions, Image, ScrollView, Platform } from 'react-native';
@@ -15,14 +15,12 @@ import { formatLocationSelection } from '../../lib/locationFormatter';
 import { findBestLocationMatch } from '../../lib/locationMatcher';
 import { usePlatformStats } from '../../hooks/usePlatformStats';
 
-// Statique hors composant : jamais recréé entre les renders
 const CAROUSEL_DATA = [
   { id: '1', source: require('../../assets/images/starex_comp.png') },
   { id: '2', source: require('../../assets/images/moto_comp.png') },
   { id: '3', source: require('../../assets/images/bmw_comp.png') },
   { id: '4', source: require('../../assets/images/hero_comp.png') },
 ];
-const CAROUSEL_LENGTH = CAROUSEL_DATA.length;
 
 export default function SearchScreen() {
   const router = useRouter();
@@ -38,14 +36,6 @@ export default function SearchScreen() {
   const [dateFormatted, setDateFormatted] = useState('');
   const [depFocused, setDepFocused] = useState(false);
   const [arrFocused, setArrFocused] = useState(false);
-  // Refs pour le timer stable
-  const activeIndexRef = React.useRef(0);
-  const widthRef = React.useRef(width);
-  widthRef.current = width;
-  const depFocusedRef = React.useRef(false);
-  const arrFocusedRef = React.useRef(false);
-  depFocusedRef.current = depFocused;
-  arrFocusedRef.current = arrFocused;
 
   const [passengers, setPassengers] = useState(1);
   const stats = usePlatformStats();
@@ -136,19 +126,16 @@ export default function SearchScreen() {
   };
 
   React.useEffect(() => {
-    // Timer stable avec refs : ne se recrée jamais, aucune dépendance variable
+    if (depFocused || arrFocused) return; // Prevent lag while typing on mobile web
+
     const timer = setInterval(() => {
-      // Pause pendant la frappe pour ne pas interférer
-      if (depFocusedRef.current || arrFocusedRef.current) return;
-      const nextIndex = (activeIndexRef.current + 1) % CAROUSEL_LENGTH;
-      scrollViewRef.current?.scrollTo({ x: nextIndex * widthRef.current, animated: true });
-      activeIndexRef.current = nextIndex;
+      const nextIndex = (activeIndex + 1) % CAROUSEL_DATA.length;
+      scrollViewRef.current?.scrollTo({ x: nextIndex * width, animated: true });
       setActiveIndex(nextIndex);
     }, 8000);
 
     return () => clearInterval(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Tableau vide : créé une seule fois
+  }, [activeIndex, width, depFocused, arrFocused]);
 
   React.useEffect(() => {
     if (Platform.OS !== 'web') return;

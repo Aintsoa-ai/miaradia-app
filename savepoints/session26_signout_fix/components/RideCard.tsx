@@ -10,9 +10,7 @@ interface RideCardProps {
   isDesktop?: boolean;
 }
 
-// React.memo : le composant ne se re-rend que si ses props changent vraiment
-// Essentiel pour les listes longues sur mobile
-const RideCardComponent: React.FC<RideCardProps> = ({ ride, onPress, isDesktop }) => {
+export const RideCard: React.FC<RideCardProps> = ({ ride, onPress, isDesktop }) => {
   const isFull = ride.seatsLeft <= 0;
   const isLow = ride.seatsLeft <= 2 && !isFull;
 
@@ -264,13 +262,3 @@ const RideCardComponent: React.FC<RideCardProps> = ({ ride, onPress, isDesktop }
     </TouchableOpacity>
   );
 };
-
-// Export memoïsé : React ne re-rend ce composant que si ride, onPress ou isDesktop changent
-export const RideCard = React.memo(RideCardComponent, (prev, next) => {
-  return (
-    prev.ride.id === next.ride.id &&
-    prev.ride.seatsLeft === next.ride.seatsLeft &&
-    prev.isDesktop === next.isDesktop &&
-    prev.onPress === next.onPress
-  );
-});

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, useWindowDimensions } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -6,14 +6,14 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { supabase } from "../lib/supabase";
 
-// Données statiques définies hors du composant pour éviter les re-créations
 const CAROUSEL_DATA = [
   { id: '1', source: require('../assets/images/starex_comp.png') },
   { id: '2', source: require('../assets/images/moto_comp.png') },
   { id: '3', source: require('../assets/images/bmw_comp.png') },
   { id: '4', source: require('../assets/images/hero_comp.png') },
 ];
-const CAROUSEL_LENGTH = CAROUSEL_DATA.length;
+
+import * as SplashScreen from 'expo-splash-screen';
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -21,34 +21,26 @@ export default function WelcomeScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const [session, setSession] = useState<any>(null);
-  // Ref pour éviter la re-création du timer à chaque render
-  const activeIndexRef = useRef(0);
-  const widthRef = useRef(width);
-  widthRef.current = width;
 
   useEffect(() => {
-    // Redirection immédiate pour Desktop
+    // Redirection automatique pour les utilisateurs Desktop vers l'interface Ultra-Pro
     if (width > 768) {
       router.replace('/(tabs)');
       return;
     }
 
-    // Vérification session non-bloquante (après le render initial)
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
-    // Timer stable : n'utilise que des refs, pas de dépendances variables
     const timer = setInterval(() => {
-      const nextIndex = (activeIndexRef.current + 1) % CAROUSEL_LENGTH;
-      scrollViewRef.current?.scrollTo({ x: nextIndex * widthRef.current, animated: true });
-      activeIndexRef.current = nextIndex;
+      const nextIndex = (activeIndex + 1) % CAROUSEL_DATA.length;
+      scrollViewRef.current?.scrollTo({ x: nextIndex * width, animated: true });
       setActiveIndex(nextIndex);
     }, 6000);
 
     return () => clearInterval(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // <-- Tableau vide : le timer ne se recrée JAMAIS
+  }, [activeIndex, width]);
 
   const handleAction = (route: string) => {
     try {
