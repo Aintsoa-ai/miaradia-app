@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
 import { supabase } from '../../lib/supabase';
 import { useChat } from '../../hooks/useChat';
 import { StatusBar } from 'expo-status-bar';
@@ -11,12 +12,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function ChatScreen() {
   const { id: ride_id, other_id, other_name } = useLocalSearchParams();
   const [newMessage, setNewMessage] = useState('');
+  const [recording, setRecording] = useState<Audio.Recording | undefined>();
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const recordingTimer = useRef<NodeJS.Timeout | null>(null);
+
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   // Custom Hook (Clean Architecture & Notifications Push)
-  const { messages, loading, currentUserId, sendMessage: sendChatMessage } = useChat(
+  const { messages, loading, currentUserId, sendMessage: sendChatMessage, sendAudioMessage } = useChat(
     ride_id as string, 
     other_id as string
   );
@@ -28,12 +34,121 @@ export default function ChatScreen() {
     await sendChatMessage(content);
   };
 
+  const startRecording = async () => {
+    try {
+      const permission = await Audio.requestPermissionsAsync();
+      if (permission.status === 'granted') {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+        const { recording: newRecording } = await Audio.Recording.createAsync(
+          Audio.RecordingOptionsPresets.LOW_QUALITY
+        );
+        setRecording(newRecording);
+        setIsRecording(true);
+        setRecordingDuration(0);
+        
+        recordingTimer.current = setInterval(() => {
+          setRecordingDuration(prev => prev + 1);
+        }, 1000);
+      }
+    } catch (err) {
+      console.error('Failed to start recording', err);
+    }
+  };
+
+  const stopRecording = async (cancel = false) => {
+    if (!recording) return;
+    setIsRecording(false);
+    if (recordingTimer.current) clearInterval(recordingTimer.current);
+    
+    try {
+      await recording.stopAndUnloadAsync();
+      const uri = recording.getURI();
+      setRecording(undefined);
+      
+      if (!cancel && uri) {
+        await sendAudioMessage(uri);
+      }
+    } catch (error) {
+      console.error('Failed to stop recording', error);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (recording) {
+        recording.stopAndUnloadAsync();
+      }
+      if (recordingTimer.current) clearInterval(recordingTimer.current);
+    };
+  }, [recording]);
+
+  // --- Audio Player Component ---
+  const AudioMessage = ({ uri, isMine }: { uri: string, isMine: boolean }) => {
+    const [sound, setSound] = useState<Audio.Sound | null>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    const playSound = async () => {
+      try {
+        if (sound) {
+          if (isPlaying) {
+            await sound.pauseAsync();
+            setIsPlaying(false);
+          } else {
+            await sound.playAsync();
+            setIsPlaying(true);
+          }
+        } else {
+          const { sound: newSound } = await Audio.Sound.createAsync(
+            { uri },
+            { shouldPlay: true }
+          );
+          newSound.setOnPlaybackStatusUpdate((status) => {
+            if (status.isLoaded && status.didJustFinish) {
+              setIsPlaying(false);
+            }
+          });
+          setSound(newSound);
+          setIsPlaying(true);
+        }
+      } catch (error) {
+        console.error("Error playing audio", error);
+      }
+    };
+
+    useEffect(() => {
+      return sound ? () => { sound.unloadAsync(); } : undefined;
+    }, [sound]);
+
+    return (
+      <TouchableOpacity 
+        onPress={playSound}
+        className={`flex-row items-center w-40 px-3 py-2 rounded-[20px] ${isMine ? 'bg-blue-700' : 'bg-gray-100'}`}
+      >
+        <Ionicons name={isPlaying ? "pause" : "play"} size={20} color={isMine ? "white" : "#2563EB"} />
+        <View className="flex-1 mx-2 h-1 bg-white/30 rounded-full overflow-hidden">
+          <View className={`h-full ${isMine ? 'bg-white' : 'bg-blue-600'} w-1/2`} />
+        </View>
+        <Text className={`${isMine ? 'text-white' : 'text-gray-500'} text-xs font-bold`}>Vocal</Text>
+      </TouchableOpacity>
+    );
+  };
+
   const renderMessage = ({ item }: { item: any }) => {
     const isMine = item.sender_id === currentUserId;
+    const isAudio = item.content.startsWith('[AUDIO]');
+    const audioUri = isAudio ? item.content.replace('[AUDIO]', '') : '';
+
     return (
       <View className={`mb-4 flex-row ${isMine ? 'justify-end' : 'justify-start'}`}>
         <View className={`max-w-[80%] px-4 py-3 rounded-[24px] ${isMine ? 'bg-blue-600 rounded-tr-none' : 'bg-white rounded-tl-none border border-gray-100 shadow-sm'}`}>
-          <Text className={`${isMine ? 'text-white' : 'text-gray-800'} text-[15px]`}>{item.content}</Text>
+          {isAudio ? (
+            <AudioMessage uri={audioUri} isMine={isMine} />
+          ) : (
+            <Text className={`${isMine ? 'text-white' : 'text-gray-800'} text-[15px]`}>{item.content}</Text>
+          )}
           <Text className={`text-[9px] mt-1 ${isMine ? 'text-blue-100' : 'text-gray-400'} self-end font-bold`}>
             {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </Text>
@@ -108,22 +223,51 @@ export default function ChatScreen() {
               <Ionicons name="add-circle-outline" size={28} color="#64748B" />
             </TouchableOpacity>
             
-            <TextInput
-              className="flex-1 bg-gray-50 rounded-3xl px-5 py-3 mx-2 text-gray-900 text-base max-h-32 border border-gray-100"
-              placeholder="Votre message..."
-              value={newMessage}
-              onChangeText={setNewMessage}
-              multiline
-              placeholderTextColor="#94A3B8"
-            />
+            {isRecording ? (
+              <View className="flex-1 bg-red-50 rounded-3xl px-5 py-3 mx-2 border border-red-100 flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  <View className="w-3 h-3 rounded-full bg-red-500 mr-2" style={{ opacity: recordingDuration % 2 === 0 ? 1 : 0.5 }} />
+                  <Text className="text-red-600 font-bold">
+                    00:{recordingDuration < 10 ? `0${recordingDuration}` : recordingDuration}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => stopRecording(true)}>
+                  <Text className="text-red-500 font-bold text-xs uppercase">Annuler</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TextInput
+                className="flex-1 bg-gray-50 rounded-3xl px-5 py-3 mx-2 text-gray-900 text-base max-h-32 border border-gray-100"
+                placeholder="Votre message..."
+                value={newMessage}
+                onChangeText={setNewMessage}
+                multiline
+                placeholderTextColor="#94A3B8"
+              />
+            )}
             
-            <TouchableOpacity 
-              onPress={sendMessage}
-              disabled={!newMessage.trim()}
-              className={`w-11 h-11 rounded-full items-center justify-center mb-1 ${!newMessage.trim() ? 'bg-gray-100' : 'bg-blue-600 shadow-lg shadow-blue-200'}`}
-            >
-              <Ionicons name="send" size={20} color="white" />
-            </TouchableOpacity>
+            {newMessage.trim().length > 0 ? (
+              <TouchableOpacity 
+                onPress={sendMessage}
+                className="w-11 h-11 rounded-full items-center justify-center mb-1 bg-blue-600 shadow-lg shadow-blue-200"
+              >
+                <Ionicons name="send" size={20} color="white" />
+              </TouchableOpacity>
+            ) : isRecording ? (
+              <TouchableOpacity 
+                onPress={() => stopRecording(false)}
+                className="w-11 h-11 rounded-full items-center justify-center mb-1 bg-green-500 shadow-lg shadow-green-200"
+              >
+                <Ionicons name="arrow-up" size={24} color="white" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity 
+                onPress={startRecording}
+                className="w-11 h-11 rounded-full items-center justify-center mb-1 bg-blue-50"
+              >
+                <Ionicons name="mic" size={24} color="#2563EB" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </KeyboardAvoidingView>

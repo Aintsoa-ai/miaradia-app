@@ -124,10 +124,41 @@ export function useChat(ride_id: string, other_id: string) {
     }
   };
 
+  const sendAudioMessage = async (uri: string) => {
+    if (!currentUserId || !uri) return;
+
+    try {
+      // 1. Convert URI to Blob
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      
+      // 2. Upload to Supabase Storage
+      const fileName = `${currentUserId}-${Date.now()}.m4a`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('chat_audio')
+        .upload(fileName, blob, { contentType: 'audio/m4a' });
+
+      if (uploadError) throw uploadError;
+
+      // 3. Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('chat_audio')
+        .getPublicUrl(fileName);
+
+      // 4. Send as message with [AUDIO] prefix
+      const audioMessage = `[AUDIO]${publicUrl}`;
+      await sendMessage(audioMessage);
+
+    } catch (error) {
+      console.error('Error uploading audio:', error);
+    }
+  };
+
   return {
     messages,
     loading,
     currentUserId,
-    sendMessage
+    sendMessage,
+    sendAudioMessage
   };
 }
