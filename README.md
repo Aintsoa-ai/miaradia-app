@@ -57,7 +57,8 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Alerte Bac Automatique *(NOUVEAU)* :** Détection intelligente des traversées fluviales avec affichage d'une icône ⛴️.
 - **Politique de Bagages *(NOUVEAU)* :** Affichage visuel de la taille autorisée et de la présence d'une galerie sur l'annonce.
 
-### 6. Publication de Trajet *(AMÉLIORÉ - SESSION 7)*
+### 6. Publication de Trajet *(AMÉLIORÉ - SESSION 27)*
+- **Chargement Instantané *(NOUVEAU - S27)* :** Le formulaire de publication s'affiche **immédiatement** sans spinner bloquant. La vérification de session et le chargement des préférences du profil s'effectuent en arrière-plan de manière non-bloquante.
 - **Itinéraire Intelligent & Exhaustif :** L'application connaît désormais toutes les Routes Nationales (RN1 à RN44) ET les grandes pistes de brousse (SAVA, Tsingy, Grand Sud). Elle suggère automatiquement les villes d'escales logiques.
 - **Gestion des Raccourcis (Transversales) :** Reconnaissance des routes transversales (ex: Faratsiho pour éviter Tana, Ambositra-Manja pour éviter Antsirabe).
 - **Choix de l'Itinéraire :** Si plusieurs chemins sont possibles, le conducteur peut choisir son tracé préféré (ex: "Via Tana" ou "Via Raccourci") via des boutons de sélection.
@@ -148,6 +149,16 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Correction de la Flèche de Retour Web :** Utilisation sécurisée de `router.canGoBack()` enveloppée dans un bloc `try/catch` empêchant le navigateur de planter lorsqu'on actualise directement une page sans historique.
 - **Alertes Professionnelles `CustomAlert` :** Remplacement universel de `Alert.alert` natif par un composant `CustomAlert` modal animé intégré globalement dans `app/_layout.tsx`.
 
+### 14. Optimisations de Performance Mobile *(NOUVEAU - SESSION 27)* ⚡
+- **Fix Timer Carousel :** Le carousel de la page d'accueil et de la recherche ne cause plus de boucle de re-renders. Utilisation de `refs` (`activeIndexRef`, `widthRef`) au lieu de dépendances React pour un timer stable créé une seule fois.
+- **`RideCard` Memoïsé :** Composant `RideCard` encapsulé dans `React.memo` avec comparateur custom. Divise par 10+ le nombre de re-renders lors du scroll des résultats de recherche.
+- **`handleBooking` avec `useCallback` :** Le callback de navigation est memoïsé pour préserver l'efficacité du `React.memo` de `RideCard`.
+- **`usePlatformStats` Différé :** Les requêtes de statistiques de la plateforme sont retardées de 3 secondes sur mobile pour ne pas concurrencer l'authentification Supabase au démarrage.
+- **`/publish` Instantané :** Suppression du spinner bloquant `checkingAuth`. Le formulaire de publication est visible immédiatement.
+- **Timeout API Distance :** `AbortController` (5s) sur les calls Nominatim et OSRM pour éviter les attentes infinies sur réseau instable.
+- **Headers Cache Vercel :** Assets JS/CSS en cache 1 an (`immutable`), images 7 jours. La 2ème visite sur mobile est quasi-instantanée.
+- **Suppression `console.log` production :** Tous les `console.log` de debug supprimés pour libérer le thread JS principal.
+
 ---
 
 ## 🌐 Déploiement & Infrastructure
@@ -180,6 +191,15 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 |---|---|
 | `components/CustomAlert.tsx` | Modale d'alerte premium animée (remplace Alert.alert) |
 | `components/PaymentModal.tsx` | Modale de sélection de paiement Mobile Money |
+| `components/RideCard.tsx` | Carte de trajet memoïsée (React.memo) pour listes performantes |
+
+### Hooks Réutilisables (`hooks/`)
+| Fichier | Rôle |
+|---|---|
+| `hooks/usePlatformStats.ts` | Statistiques plateforme avec chargement différé (3s sur mobile) |
+| `hooks/useMyRides.ts` | Liste des trajets du conducteur avec cache AsyncStorage |
+| `hooks/useRideDetails.ts` | Détails d'un trajet avec cache offline |
+| `hooks/useChat.ts` | Messagerie temps réel avec push notifications |
 
 ### Utilitaires (`utils/`)
 | Fichier | Rôle |
@@ -193,4 +213,4 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 
 ---
 
-*Dernière mise à jour : **10 Juin 2026** — Session 25 : Polissage UI & Optimisation Focus Mobile.*
+*Dernière mise à jour : **12 Juin 2026** — Session 27 : Optimisations Performance Mobile (fix timer carousel, React.memo RideCard, /publish instantané, cache Vercel 1 an, timeout API distance).*

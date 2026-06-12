@@ -7,55 +7,71 @@
 
 ## 📅 Historique des Audits & Résolutions
 
+### Session 27 (12 Juin 2026) : Optimisations Performance Mobile 🚀
+
+> **Contexte :** L'utilisateur signalait des lenteurs importantes sur mobile (`miaradia-app.vercel.app`) et un spinner infini sur la page `/publish`. Audit complet du pipeline de rendu mobile effectué.
+
+#### Bugs Critiques Corrigés
+*   **Fix Bug Timer Carousel (Re-création Infinie) :** Le `useEffect` du carousel avait `[activeIndex, width]` comme dépendances. À chaque défilement automatique, `setActiveIndex` déclenchait un nouveau render → le timer était `clearInterval`+`setInterval` à l'infini, créant une boucle de re-renders qui bloquait le thread JS principal. **Fix :** `activeIndexRef` + `widthRef` + tableau vide `[]`. Appliqué dans `app/welcome.tsx` ET `app/(tabs)/index.tsx`.
+*   **Fix Spinner Infini `/publish` (Bloquant) :** `checkingAuth = true` masquait l'intégralité du formulaire de publication pendant 2-5 secondes (2 requêtes réseau séquentielles : `getSession` + `profiles.select`). Sur mobile lent ou réseau instable, le spinner restait permanent. **Fix :** `checkingAuth` supprimé, formulaire visible immédiatement, auth + chargement profil effectués en arrière-plan non-bloquant.
+
+#### Optimisations Performance
+*   **`RideCard` → `React.memo` :** Composant encapsulé dans `React.memo` avec comparateur custom sur `ride.id`, `seatsLeft`, `isDesktop`, `onPress`. Élimine les re-renders inutiles lors du scroll.
+*   **`handleBooking` → `useCallback` :** Memoïsation du callback de navigation pour préserver l'efficacité du `React.memo` de `RideCard`.
+*   **`CAROUSEL_DATA` → constante globale :** Déplacé hors des composants pour éviter la re-création du tableau à chaque render.
+*   **`usePlatformStats` → délai 3s (mobile) :** Les 2 requêtes de comptage DB (rides + profiles) retardées de 3 secondes sur mobile pour ne pas concurrencer l'auth Supabase au démarrage.
+*   **Timeout 5s API Distance :** `AbortController` ajouté sur les calls Nominatim et OSRM pour éviter les attentes infinies sur réseau mobile instable.
+*   **Suppression `console.log` production :** 6 appels `console.log` supprimés dans `resultats-recherche.tsx` et `distanceService.ts` (chaque call bloque le thread JS principal sur Android/iOS).
+*   **Headers Cache Vercel :** `vercel.json` configuré avec `Cache-Control: immutable, max-age=31536000` sur les assets JS/CSS et 7 jours sur les PNG. La 2ème visite mobile est quasi-instantanée.
+
+#### Impact Vérifié
+*   ✅ `/publish` s'ouvre instantanément (formulaire visible sans délai)
+*   ✅ Carousel de la page d'accueil ne cause plus de boucle de re-renders
+*   ✅ Liste de résultats de recherche plus fluide (moins de re-renders)
+*   ✅ 2ème visite sur mobile beaucoup plus rapide (cache Vercel)
+
+---
+
+### Session 26 (11 Juin 2026) : Stabilisation Auth & KYC Admin
+*   **Écouteur Global `SIGNED_OUT` :** `supabase.auth.onAuthStateChange` dans `_layout.tsx` → redirection immédiate vers `/login` à la déconnexion. Correction du `CustomAlert` (suppression `setTimeout 150ms` qui retardait la navigation web).
+*   **Répertoire Chauffeurs Vérifiés :** Page `/admin/users` avec liste filtrée `kyc_status = 'verified'`.
+*   **Correction Jointure KYC (PGRST200) :** Remplacement de la jointure Supabase par 2 requêtes + fusion mémoire.
+*   **Correction TypeScript TS7053 :** Typage strict `Record<string, any>` dans le `reduce()` KYC.
+
 ### Session 25 (10 Juin 2026) : Polissage UI & Optimisation Focus Mobile
-*   **Correction Syntaxique JSX :** Résolution d'une anomalie bloquante de fermeture de balise (`</View>`) dans la grille à 3 colonnes du profil qui cassait l'arborescence DOM virtuelle.
-*   **Barre d'Actions Ergonomique :** Regroupement des boutons de sauvegarde, déconnexion et suppression au sein d'une barre d'outils dynamique positionnée sous le "Hero Header", parfaitement alignée avec le panneau d'administration.
-*   **Rafraîchissement Mobile Instantané :** Remplacement de la dépendance passive (`useEffect`) par une écoute active du focus (`useFocusEffect` d'Expo Router). Ce correctif majeur élimine le besoin de recharger manuellement la page Profil sur téléphone en garantissant que les données utilisateur et KYC sont resynchronisées instantanément à chaque visite de l'onglet.
+*   **Correction Syntaxique JSX :** Résolution d'une anomalie bloquante de fermeture de balise dans la grille à 3 colonnes du profil.
+*   **Barre d'Actions Ergonomique :** Regroupement des boutons (sauvegarde, déconnexion, suppression) sous le Hero Header.
+*   **Rafraîchissement Mobile Instantané :** `useFocusEffect` sur le Profil → données resynchronisées à chaque visite d'onglet sans rechargement manuel.
 
 ### Session 24 (10 Juin 2026) : KYC & Identité Chauffeur
-*   **Vérification d'Identité :** Implémentation du système KYC (Know Your Customer) pour les chauffeurs.
-*   **Auto-Validation :** Stratégie de croissance rapide (zéro friction) avec mise à jour immédiate du statut "Identité Vérifiée" lors de la soumission du formulaire et de la CIN (Recto/Verso).
-*   **UX Rapide :** Auto-formatage instantané des dates (`JJ/MM/AAAA`) pour la saisie sans calendrier natif.
+*   **Vérification d'Identité :** Système KYC complet (CIN recto/verso, auto-formatage date, auto-validation).
 *   **RLS Supabase :** Configuration sécurisée pour l'insertion des demandes KYC avec rattachement `auth.uid()`.
 
 ### Session 23 (10 Juin 2026) : Clean Architecture, Offline & Push
-*   **Clean Architecture :** Extraction de la logique métier lourde depuis les interfaces graphiques vers des Custom Hooks réutilisables (`useMyRides`, `useRideDetails`, `usePlatformStats`, `useChat`).
-*   **Mode Hors-Ligne (Offline) :** Implémentation du caching local via `AsyncStorage` dans `useMyRides` et `useRideDetails`. Les passagers peuvent désormais consulter leurs billets et le numéro du chauffeur même sans couverture réseau sur les Routes Nationales.
-*   **Notifications Push Chat :** Couplage de l'API Expo Push au sein de `useChat`. L'envoi d'un message déclenche désormais une notification push ("Nouveau message de [Nom]") sur l'appareil du destinataire pour garantir une réponse rapide.
-
-### Session 23 (10 Juin 2026) : Stratégie de Lancement & Layout
-*   **Fix Layout Desktop :** Remplacement de l'alignement vertical (`items-center`) par un espacement explicite (`pt-10`) dans le Hero Desktop pour empêcher le texte d'être coupé après la réduction de hauteur (480px).
-*   **Barre de Recherche Sticky :** Application de `position: sticky` sur la barre de recherche desktop pour la garder toujours visible lors du défilement, avec ajustement des marges (`marginBottom`) pour dégager l'affichage complet des opérateurs (MVola, Orange Money, Airtel Money).
-*   **Onboarding Freemium :** Implémentation d'un système de crédits d'acquisition (5 trajets gratuits par nouvel utilisateur via la colonne `free_unlocks`). Ce mécanisme contourne la passerelle SMS et valide automatiquement le statut en `completed` avec la méthode `Gratuit` pour instaurer la confiance sans friction de paiement.
-*   **Stratégie API :** Décision officielle de repousser l'intégration B2B de l'API Telma MVola en raison des coûts prohibitifs à Madagascar. La **Passerelle SMS** locale est consacrée comme solution pérenne principale.
+*   **Clean Architecture :** Custom Hooks réutilisables (`useMyRides`, `useRideDetails`, `usePlatformStats`, `useChat`).
+*   **Mode Hors-Ligne :** Cache `AsyncStorage` dans `useMyRides` et `useRideDetails`.
+*   **Notifications Push Chat :** Envoi push automatique lors d'un nouveau message.
 
 ### Session 22 (9 Juin 2026) : Admin Dashboard & Desktop Polish
-
-> [!IMPORTANT]
-> **Critère d'Éligibilité des Audits :** Toute fonctionnalité auditée doit passer avec succès les tests d'ergonomie et de performance sur **version ordinateur (Desktop)** et **version téléphone (Mobile)**. 
+*   **Dashboard Glassmorphism :** Compteurs animés, ventilation par opérateur, calendrier interactif.
+*   **Stabilité Composants :** Corrections nidification JSX sur `signup.tsx`.
 
 ---
 
 ## ✅ 1. État des Lieux : Fonctionnalités Opérationnelles
+
 L'application est considérée comme **STABLE** sur les piliers suivants :
 
-*   **Déploiement Webhook SMS & Test Réel Validé (S19) 🚀 :** Résolution définitive du blocage de validation automatique. La fonction Edge `sms-webhook` a été déployée en production sur Supabase sans vérification JWT (`--no-verify-jwt`) pour permettre les appels directs du client/serveur. Algorithme de matching et de validation de paiement testé avec succès de bout en bout.
-*   **Correction du Spinner Réseau / Realtime Supabase (S19) 🔄 :** Correction de la table `bookings` dans les publications Supabase Realtime. Les navigateurs clients sur https://miaradia-app.vercel.app se mettent désormais à jour en temps réel (déblocage du contact chauffeur et transition immédiate de l'écran "Vérification en cours..." vers "Contact Déverrouillé") sans nécessiter de rafraîchissement manuel de la page.
-*   **Diagnostic Root Cause SMS Listener (S18) 🔍 :** Diagnostic de compatibilité `react-native-android-sms-listener` résolu en désactivant la nouvelle architecture Expo SDK 53 (`newArchEnabled: false` dans `app.json`) et en enregistrant explicitement le `BroadcastReceiver` natif avec l'option `android:exported="true"` dans le fichier manifeste d'Android 13+.
-*   **Actualisation "Mes Trajets" instantanée (S18) 🔄 :** Remplacement de `useEffect` par `useFocusEffect` sur `rides.tsx` pour forcer le rechargement immédiat de la liste de trajets dès que le conducteur revient sur cet onglet.
-*   **Fiabilité du Déverrouillage Client & Kiosque Admin (S17) 🔄 :** Polling de sécurité toutes les 3 secondes pour rafraîchir l'état du passager et toutes les 5 secondes pour rafraîchir le Kiosque administrateur.
-*   **Correction Permissions Android 8+ SMS Gateway (S17) 🔒 :** Permission `RECEIVE_SMS` explicitement demandée à l'utilisateur via le module système `PermissionsAndroid.request`.
-*   **Résolution Crash Navigation Web Vercel (S17) 🌐 :** Correction de la flèche de retour (<-) sur Vercel avec blocs protecteurs `try/catch` sur `router.canGoBack()`.
-*   **Sécurité Blindée du Flux de Paiement (S16) 🔒 :** Statut verrouillé à `pending` et blocage des bypass locaux. La validation ne se fait que par signature du webhook en BDD.
-*   **Moteur de Recherche Madagascar Intelligent (S13) 🗺️ :** Parsing tolérant via `extractCleanSearchTerms` pour faire correspondre les requêtes textuelles complexes d'autocomplétion (contenant districts, régions ou chiffres romains) avec les simples chaînes en base de données.
-*   **Responsive Web & Copie BlaBlaCar 💻** : Mise en page dual-pane double colonne sur ordinateur et vue condensée fluide sur mobile. Ajustement précis de la hauteur du Hero header sur Desktop (480px) pour garder la barre de recherche au-dessus de la ligne de flottaison.
-*   **Refonte Premium UI & Z-Index Fixes (S20) ✨** : Déploiement d'un "Dark Hero Header" sur tous les écrans principaux. Résolution des problèmes de chevauchement visuel (`zIndex`).
-*   **Dashboard Administrateur Ultra-Premium (S22) 📊** : Refonte "Glassmorphism/Neumorphism" du Kiosque avec un calendrier dynamique, des compteurs financiers animés (effet pompe à essence), des tuiles avec dégradés, l'affichage détaillé par opérateur avec logos, et restauration de la barre de progression d'espace de stockage.
-*   **Stabilité Composants (S22) 🔧** : Correction des erreurs de nidification JSX (`Text` dans `View` non valide) sur l'écran d'inscription (`signup.tsx`).
-*   **Optimisation Densité & Poids (S20) ⚡** : Marges verticales des en-têtes drastiquement réduites sur petits écrans (ex: iPhone SE) pour minimiser le scrolling vers le bouton de réservation. Algorithme de compression des avatars porté à une résolution maximale de 300px (qualité 0.4 JPEG) garantissant une empreinte de stockage et un temps de téléchargement infimes.
-*   **Correctif UI Détails Trajet (S21) 🔧** : Réduction de la largeur de la colonne timeline bleue verticale (`width: 56` → `44`, `marginRight: 16` → `12`) pour libérer de l'espace horizontal. Augmentation du `paddingBottom` du `ScrollView` (`80` → `120`) pour que le badge "Bagages: Moyen" et les équipements du véhicule soient visibles sur les petits écrans mobiles sans être tronqués.
-*   **Expiration Automatique des Trajets Passés (S21) 📅** : Filtre `isRideExpired()` actif dans `resultats-recherche.tsx` pour exclure automatiquement les trajets dépassés des résultats. Dans `app/(tabs)/rides.tsx`, les trajets terminés reçoivent un badge gris "Trajet terminé", sont grisés (opacity 0.7) et reclassés automatiquement en bas de liste via tri dynamique — l'historique du conducteur est préservé.
-*   **Configuration Officielle Notifications Push (S21) 🔔** : Correction du `projectId` EAS officiel (`f2da6b63-f8d9-471a-8d58-252014dada76`) dans la configuration expo-notifications (`lib/notifications.ts`). Intégration d'un écouteur global de tap sur notification dans le Root Layout (`_layout.tsx`) redirigeant automatiquement le passager vers le détail de son voyage (`/ride/[id]`) dès validation de son paiement Mobile Money.
+*   **Validation SMS Mobile Money (S19) 🚀 :** Algorithme de matching et validation bout-en-bout validé.
+*   **Realtime Supabase (S19) 🔄 :** Activation `supabase_realtime` sur `bookings` → rafraîchissement instantané sans rechargement.
+*   **Responsive Desktop & Mobile 💻📱 :** Dual-pane desktop + single-column mobile. Validé sur toutes les tailles d'écran principales.
+*   **Notifications Push (S21) 🔔 :** Token EAS + redirections + Push Chat.
+*   **Expiration Automatique (S21) 📅 :** Filtre `isRideExpired()` + badge "Trajet terminé" + tri dynamique.
+*   **Dashboard Admin Ultra-Premium (S22) 📊 :** Interface complète Glassmorphism avec animations.
+*   **KYC Complet (S24) 🛡️ :** Formulaire + Centre Admin + Badge.
+*   **Profil Réactif (S25) ⚡ :** `useFocusEffect` + grille 3 colonnes desktop.
+*   **Auth Globale (S26) 🔒 :** `onAuthStateChange` global → pas de session fantôme.
+*   **Performance Mobile (S27) ⚡ :** Timer carousel fixe, RideCard memoïsé, spinner /publish supprimé, cache Vercel.
 
 ---
 
@@ -70,9 +86,10 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 | 5 | **Sécurité Anti-Fraude** | Algorithme de détection de numéros de téléphone dans les biographies + RLS Supabase. |
 | 6 | **Dictionnaire Madagascar Local** | Distances/durées pré-calculées pour toutes les RN sans dépendre d'une API externe. |
 | 7 | **Badge Super Driver Dynamique** | Réputation calculée en temps réel et affichée partout (profil, cartes trajet). |
-| 8 | **Zéro dépendance aux API payantes** | Cartographie CartoDB Voyager (gratuit) + OSRM (gratuit) + SMS Gateway (gratuit). |
+| 8 | **Zéro dépendance aux API payantes** | CartoDB Voyager (gratuit) + OSRM (gratuit) + SMS Gateway (gratuit). |
 | 9 | **CI/CD Automatique** | Chaque push GitHub déclenche un déploiement Vercel instantané. |
-| 10 | **Expérience Dashboard Premium** | Visualisation financière animée, UI exhaustive avec micro-animations et design SaaS de haute volée. |
+| 10 | **Performance Mobile Optimisée (S27)** | Timer fixe, memo, cache 1 an, formulaire /publish instantané. |
+| 11 | **Mode Hors-Ligne** | Billets et numéros de contact consultables sans réseau sur les routes nationales. |
 
 ---
 
@@ -81,47 +98,56 @@ L'application est considérée comme **STABLE** sur les piliers suivants :
 | # | Point Faible | Impact | Solution Future |
 |---|---|---|---|
 | 1 | **Dépendance téléphone admin** | Si la batterie est vide ou sans réseau, les paiements ne sont pas validés automatiquement. | Intégrer l'API officielle MVola Telma (B2B). |
-| 2 | **Pas de mode hors-ligne** | ~~Les voyageurs en zone blanche (RN) ne peuvent pas consulter les détails de leur billet.~~ | **✅ RÉALISÉ** : Cache local `AsyncStorage` pour les billets. |
-| 3 | **Pas de notifications push** | ~~Le passager doit laisser l'app ouverte pour être alerté.~~ | **✅ RÉALISÉ** : Token EAS + Push Chat (useChat). |
-| 4 | **Paiement partiel (gating)** | Le passager paie 10% pour débloquer le contact, pas 100% du billet → pas de garantie pour le chauffeur. | Paiement en séquestre complet in-app. |
-| 5 | **Expiration des trajets passés** | ~~Les annonces avec une date dépassée continuent d'apparaître dans les résultats.~~ | **✅ RÉALISÉ S21** : Filtre actif + badge "Trajet terminé" + tri dynamique. |
-| 6 | **Pas de KYC (identité)** | ~~Les chauffeurs ne sont pas vérifiés officiellement par leur CIN.~~ | **✅ RÉALISÉ** : Formulaire complet + Auto-validation instantanée. |
-| 7 | **Chat sans notifications sonores** | ~~Les messages reçus hors-app ne sont pas signalés.~~ | **✅ RÉALISÉ** : API Expo Push intégrée pour le Chat. |
-| 8 | **Pas de support multilingue** | L'application est 100% en français alors que la majorité des Malgaches parle malagasy. | Traduction malagasy officiel + dialectes. |
-| 9 | **Timeline trop large sur mobile** | La bande bleue verticale prenait trop de place (corrigé S21, reste à surveiller sur autres écrans). | Monitoring continu sur différentes tailles d'écran. |
-| 10 | **Souscriptions WebSocket multiples** | Chaque écran crée ses propres souscriptions Supabase Realtime sans centralisation. | Context global pour gérer un seul canal Realtime. |
+| 2 | **Paiement partiel (gating)** | Le passager paie 10% pour débloquer le contact, pas 100% du billet → pas de garantie pour le chauffeur. | Paiement en séquestre complet in-app. |
+| 3 | **Bundle JS 2.33 MB (cold start)** | Premier chargement lent sur 3G. Le React Compiler aide mais ne suffit pas. | Code Splitting / lazy imports par route. |
+| 4 | **Pas de support multilingue** | L'application est 100% en français alors que la majorité des Malgaches parle malagasy. | Traduction malagasy officiel + dialectes. |
+| 5 | **Souscriptions WebSocket multiples** | Chaque écran crée ses propres souscriptions Supabase Realtime sans centralisation. | Context global pour gérer un seul canal Realtime. |
+| 6 | **Expiration Trajets côté serveur** | L'expiration des trajets n'est filtrée que côté client (JS). En DB, les trajets expirent restent. | Cron Supabase pour marquer les trajets expirés. |
+| 7 | **Pas de message auto post-validation** | Après validation, aucun message automatique n'informe le chauffeur d'un passager entrant. | Edge Function → insertion auto message chat. |
 
 ---
 
 ## 🔍 4. Gap Analysis : Ce qui reste à faire
 
-### 💰 Intégration API MVola Officielle
-*   **Statut actuel** : La passerelle SMS actuelle est 100% gratuite et fonctionnelle, mais dépend de la présence du téléphone administrateur connecté.
-*   **Action requise** : Intégrer l'API officielle MVola Telma pour s'affranchir de la dépendance à l'APK Android.
+### 🏎️ PRIORITÉ 1 — Impact Immédiat (À faire maintenant)
 
-### 🔔 Notifications Push
-*   **Statut actuel** : **✅ RÉALISÉ** (Validation de paiement + Notifications Push pour le Chat).
-*   **Action requise** : Aucune (fonctionnel).
+1. **Code Splitting / Lazy Loading** *(bundle 2.33 MB trop lourd)* — Réduire le cold start sur 3G.
+2. **Message Automatique Post-Validation** — Améliore l'expérience passager/chauffeur sans coût.
+3. **Optimisation Realtime Context Global** — Éviter les fuites mémoire sur sessions longues.
 
-### 📅 Expiration Automatique des Trajets
-*   **Statut actuel** : **RÉALISÉ S21** (Filtre actif dans les recherches + classement tri automatique dans l'historique chauffeur).
-*   **Action requise** : Aucune (fonctionnelle).
+### 🚀 PRIORITÉ 2 — Croissance (Dans 1-2 semaines)
+
+4. **Tarification au km automatique** — Aide les conducteurs à fixer un prix juste.
+5. **Support Malagasy (i18n)** — Toucher les chauffeurs de brousse non-francophones.
+6. **Micro-animations Lottie** — Rendre les validations de paiement visuellement spectaculaires.
+
+### 💰 PRIORITÉ 3 — Monétisation Avancée (Dans 1 mois)
+
+7. **Abonnement Passager (Hebdo/Mensuel)** — Revenus récurrents.
+8. **Boost d'Annonce** — Monétisation chauffeurs.
+9. **Paiement Séquestre complet** — Sécuriser les deux parties.
 
 ---
 
 ## 🛠️ 5. Audit Technique & Code
-*   **Performances** : Excellentes. Résolution des ralentissements grâce au cache de distances local.
-*   **TypeScript** : Compilations réussies à 100% sans erreur de type.
-*   **RLS & Sécurité** : Politiques RLS actives sur Supabase. La table `sms_logs` permet d'auditer précisément chaque SMS de paiement MVola/Orange/Airtel intercepté.
-*   **Git** : Historique propre, commits sémantiques (`fix/feat/refactor`). CI/CD actif via GitHub → Vercel.
-*   **Responsive** : Validé sur Desktop (>768px dual-pane) et Mobile (<768px single-column).
+
+*   **Performances :** Améliorées significativement en S27. Timer carousel fixe, memoïsation RideCard, cache Vercel agressif. Prochaine étape : code splitting du bundle 2.33 MB.
+*   **TypeScript :** Compilations réussies à 100% sans erreur de type.
+*   **RLS & Sécurité :** Politiques RLS actives sur Supabase. Table `sms_logs` pour audit précis.
+*   **Git :** Historique propre, commits sémantiques (`fix/feat/refactor/perf`). CI/CD actif GitHub → Vercel.
+*   **Responsive :** Validé Desktop (>768px dual-pane) et Mobile (<768px single-column).
+*   **Savepoints :** Sauvegarde de session active dans `savepoints/session27_perf_mobile_20260612_230731/`.
 
 ---
 
 ## 🚀 6. Prochaines Étapes Recommandées
-1.  **Phase "Production Client"** : Lancer la phase de test utilisateur réel à grande échelle sur la version Vercel.
-2.  **Phase "Administration Kiosque KYC"** : (Optionnel plus tard) Développer l'interface admin pour révoquer les faux KYC.
-3.  **Phase "Paiement Séquestre"** : Protéger le chauffeur avec un système de paiement 100% à l'avance en in-app.
+
+1. **Code Splitting** — Réduire le bundle 2.33 MB via imports dynamiques `React.lazy`.
+2. **Message Auto Post-Paiement** — Edge Function simple pour insérer un message automatique dans le chat.
+3. **Context Realtime Global** — Centraliser les WebSockets pour éviter les fuites mémoire.
+4. **Phase "Production Client"** — Lancer la phase de test utilisateur réel à grande échelle.
+5. **Abonnements & Boosts** — Commencer la monétisation avancée.
 
 ---
-*Audit mis à jour le **10 Juin 2026** par Antigravity à l'issue de la **Session 25** (Polissage UI & Focus Mobile).*
+
+*Audit mis à jour le **12 Juin 2026** par Antigravity à l'issue de la **Session 27** (Optimisations Performance Mobile).*

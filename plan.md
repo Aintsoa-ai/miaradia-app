@@ -101,6 +101,7 @@ miaradia-app/
 *   **Correctifs UI & Expiration Automatique des Trajets (S21) 🔧📅 :** Réduction de la timeline bleue verticale (`width: 56→44`) et augmentation du `paddingBottom` (`80→120`). Filtre `isRideExpired()` dans les résultats de recherche + badge "Trajet terminé" + tri dynamique dans l'onglet conducteur.
 *   **Rafraîchissement Mobile Instantané (S25) ⚡ :** Remplacement général des `useEffect` par `useFocusEffect` (notamment sur le Profil et Mes Trajets) pour assurer que l'application React Native web/mobile rafraîchisse instantanément les données dès la mise en focus d'un onglet.
 *   **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Obtenir un compte business Telma pour une validation encore plus fiable que la solution SMS Gateway.
+*   **Optimisations Performance Mobile (S27) ⚡ :** Correction du bug de re-création infinie du timer carousel (refs au lieu de dépendances React), memoïsation de `RideCard` avec `React.memo`, suppression du spinner bloquant sur `/publish` (auth en arrière-plan), délai différé de 3s pour `usePlatformStats`, timeout `AbortController` 5s sur les APIs distance (Nominatim + OSRM), suppression de tous les `console.log` de production, et configuration de headers de cache Vercel agressifs (JS/CSS immutable 1 an, PNG 7 jours).
 
 ### Phase 3 : Fiabilité & Mode Offline
 *   **Cache Local SQLite/AsyncStorage :** Mettre en cache local les détails du billet réservé et le contact du chauffeur pour y avoir accès sur la route nationale en zone d'ombre (sans réseau).
@@ -124,4 +125,4 @@ miaradia-app/
 | **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
 | **SMS Gateway** | App Android sur téléphone admin | Gratuit |
 
-*Dernière mise à jour : **10 Juin 2026** — Session 25 : Polissage UI & Optimisation Focus Mobile.*
+*Dernière mise à jour : **12 Juin 2026** — Session 27 : Optimisations Performance Mobile (fix timer carousel, React.memo RideCard, /publish instantané, cache Vercel 1 an, timeout API distance).*
