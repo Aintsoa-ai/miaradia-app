@@ -263,16 +263,53 @@ Deno.serve(async (req) => {
           .eq('id', booking.ride_id);
       }
 
-      // 3. Envoyer une Alerte Message automatique au chauffeur
+      // 3. Envoyer une Alerte Message automatique au chauffeur + Notification Push
       if (booking.passenger_id && booking.rides?.driver_id) {
+        const messageContent = "✅ Paiement validé automatiquement via Mobile Money. Je vais vous appeler dans les minutes qui viennent pour confirmer les détails.";
+        
         await supabase
           .from('messages')
           .insert([{
             sender_id: booking.passenger_id,
             receiver_id: booking.rides.driver_id,
             ride_id: booking.ride_id,
-            content: "✅ Paiement validé automatiquement via Mobile Money. Je vais vous appeler dans les minutes qui viennent pour confirmer les détails."
+            content: messageContent
           }]);
+
+        // Notification Push pour alerter le chauffeur
+        const { data: driverProfile } = await supabase
+          .from('profiles')
+          .select('push_token')
+          .eq('id', booking.rides.driver_id)
+          .single();
+
+        const { data: passengerProfile } = await supabase
+          .from('profiles')
+          .select('first_name')
+          .eq('id', booking.passenger_id)
+          .single();
+
+        if (driverProfile?.push_token) {
+          const passengerName = passengerProfile?.first_name || 'Un passager';
+          try {
+            await fetch('https://exp.host/--/api/v2/push/send', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                to: driverProfile.push_token,
+                sound: 'default',
+                title: `🚗 Réservation validée par ${passengerName}`,
+                body: messageContent,
+                data: { rideId: booking.ride_id },
+              }),
+            });
+          } catch (e) {
+            console.error('Failed to send driver push notification', e);
+          }
+        }
       }
 
       // 4. Envoyer une notification Push au passager
