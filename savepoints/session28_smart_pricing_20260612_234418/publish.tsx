@@ -19,7 +19,6 @@ import { MADAGASCAR_LOCATIONS } from '../../constants/madagascarLocations';
 import { getMultipleSuggestedStopovers } from '../../lib/itinerarySuggestions';
 import { formatLocationSelection } from '../../lib/locationFormatter';
 import { findBestLocationMatch } from '../../lib/locationMatcher';
-import { getTrafficAlert, TrafficAlert } from '../../lib/trafficService';
 
 export default function PublishScreen() {
   const router = useRouter();
@@ -37,7 +36,6 @@ export default function PublishScreen() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [dateFormatted, setDateFormatted] = useState('');
   const [departureDate, setDepartureDate] = useState<Date | null>(null);
-  const [trafficAlert, setTrafficAlert] = useState<TrafficAlert | null>(null);
   
   // États pour le calcul de distance automatique
   const [routeDistance, setRouteDistance] = useState('');
@@ -218,16 +216,6 @@ export default function PublishScreen() {
       window.removeEventListener('click', handleGlobalClick, { capture: true });
     };
   }, []);
-
-  // Détection des embouteillages systématiques
-  React.useEffect(() => {
-    if (departure && departureDate) {
-      const alert = getTrafficAlert(departure, departureDate);
-      setTrafficAlert(alert.hasTraffic ? alert : null);
-    } else {
-      setTrafficAlert(null);
-    }
-  }, [departure, departureDate]);
 
   // Calcul automatique de distance dès que départ ET arrivée sont remplis
   React.useEffect(() => {
@@ -529,8 +517,7 @@ export default function PublishScreen() {
         if (timePart) {
           const parts = timePart.split(':');
           if (parts.length >= 2) {
-            const trafficMinutes = trafficAlert ? trafficAlert.additionalMinutes : 0;
-            const totalMinutes = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10) + routeDurationMin + trafficMinutes;
+            const totalMinutes = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10) + routeDurationMin;
             const arrHours = Math.floor(totalMinutes / 60) % 24;
             const arrMins = totalMinutes % 60;
             computedArrivalTime = `${String(arrHours).padStart(2, '0')}:${String(arrMins).padStart(2, '0')}`;
@@ -1043,15 +1030,6 @@ export default function PublishScreen() {
               />
             </View>
             <Text className="text-gray-400 text-xs italic ml-1 mt-2">Si vide, l'heure d'arrivée sera calculée selon la durée.</Text>
-            
-            {trafficAlert && (
-              <View className="bg-orange-50 rounded-2xl p-4 mt-3 border border-orange-200 flex-row items-start">
-                <Ionicons name="warning" size={20} color="#EA580C" style={{ marginRight: 8, marginTop: 2 }} />
-                <Text className="text-orange-800 font-bold text-sm flex-1 leading-5">
-                  {trafficAlert.message}
-                </Text>
-              </View>
-            )}
           </View>
 
           <View className="h-[1px] bg-gray-200 my-4" />
