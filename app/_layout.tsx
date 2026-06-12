@@ -1,10 +1,9 @@
 import "../global.css";
 import { Stack, useRouter } from "expo-router";
 import { Platform } from "react-native";
-import { useEffect, useRef } from "react";
-import { CustomAlertComponent } from "../components/CustomAlert";
-import { autoStartSmsListener } from "../lib/smsAutoStart";
-import { registerForPushNotificationsAsync, savePushToken, addNotificationTapListener } from "../lib/notifications";
+import React, { useEffect, useRef, Suspense } from "react";
+// Import lazy pour réduire le bundle initial
+const CustomAlertComponent = React.lazy(() => import("../components/CustomAlert").then(m => ({ default: m.CustomAlertComponent })));
 import { supabase } from "../lib/supabase";
 
 export default function Layout() {
@@ -30,11 +29,12 @@ export default function Layout() {
 
   useEffect(() => {
     // Démarrer le listener SMS automatiquement au lancement (Android uniquement)
-    autoStartSmsListener();
+    import("../lib/smsAutoStart").then(m => m.autoStartSmsListener());
 
     // Enregistrer pour les notifications push
     const initPushNotifications = async () => {
       try {
+        const { registerForPushNotificationsAsync, savePushToken } = await import("../lib/notifications");
         const token = await registerForPushNotificationsAsync();
         if (token) {
           const { data: { session } } = await supabase.auth.getSession();
@@ -48,9 +48,12 @@ export default function Layout() {
     };
     initPushNotifications();
 
+    let removeTapListener: (() => void) | undefined;
     // 🔔 Listener : redirige vers le trajet quand l'utilisateur tape sur une notification
-    const removeTapListener = addNotificationTapListener((rideId) => {
-      router.push(`/ride/${rideId}`);
+    import("../lib/notifications").then(m => {
+      removeTapListener = m.addNotificationTapListener((rideId) => {
+        router.push(`/ride/${rideId}`);
+      });
     });
 
     // Protection anti-inspection sur le Web
@@ -76,12 +79,12 @@ export default function Layout() {
       return () => {
         window.removeEventListener("keydown", disableInspect);
         window.removeEventListener("contextmenu", disableContextMenu);
-        removeTapListener();
+        if (removeTapListener) removeTapListener();
       };
     }
 
     return () => {
-      removeTapListener();
+      if (removeTapListener) removeTapListener();
     };
   }, []);
 
@@ -92,7 +95,9 @@ export default function Layout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ride/[id]" options={{ presentation: 'card' }} />
       </Stack>
-      <CustomAlertComponent />
+      <Suspense fallback={null}>
+        <CustomAlertComponent />
+      </Suspense>
     </>
   );
 }

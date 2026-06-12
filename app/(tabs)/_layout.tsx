@@ -4,7 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { Platform, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../../lib/supabase';
-import { DesktopHeader } from '../../components/DesktopHeader';
+import { Suspense } from 'react';
+
+const DesktopHeader = React.lazy(() => import('../../components/DesktopHeader').then(m => ({ default: m.DesktopHeader })));
 
 export default function TabLayout() {
   const { width } = useWindowDimensions();
@@ -53,7 +55,9 @@ export default function TabLayout() {
 
   return (
     <>
-      <DesktopHeader />
+      <Suspense fallback={null}>
+        <DesktopHeader />
+      </Suspense>
       <Tabs
         screenOptions={{
           headerShown: false,

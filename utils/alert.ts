@@ -1,5 +1,7 @@
+import React from 'react';
 import { Alert as RNAlert } from 'react-native';
-import { CustomAlertRef } from '../components/CustomAlert';
+
+export const CustomAlertRef = React.createRef<any>();
 
 export const CustomAlert = {
   alert: (title: string, message?: string, buttons?: any[], options?: any) => {

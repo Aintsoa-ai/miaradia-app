@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, Suspense } from 'react';
 import { CustomAlert } from '../../utils/alert';
 
 import { View, Text, TextInput, TouchableOpacity, Alert, useWindowDimensions, Image, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+const DateTimePickerModal = React.lazy(() => import('react-native-modal-datetime-picker').then(m => ({ default: m.default })));
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../lib/supabase';
@@ -799,14 +799,17 @@ export default function SearchScreen() {
       
       {width > 768 ? renderDesktopView() : renderMobileView()}
 
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-        confirmTextIOS="Confirmer"
-        cancelTextIOS="Annuler"
-      />
+      <Suspense fallback={null}>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+          confirmTextIOS="Confirmer"
+          cancelTextIOS="Annuler"
+          buttonTextColorIOS="#ef4444"
+        />
+      </Suspense>
     </View>
   );
 }

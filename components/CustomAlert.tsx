@@ -1,6 +1,7 @@
 import React, { useState, useImperativeHandle } from 'react';
 import { View, Text, TouchableOpacity, Modal, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { CustomAlertRef } from '../utils/alert';
 
 type ButtonConfig = {
   text: string;
@@ -14,8 +15,6 @@ type AlertConfig = {
   buttons?: ButtonConfig[];
   type?: 'success' | 'error' | 'info' | 'warning';
 };
-
-export const CustomAlertRef = React.createRef<any>();
 
 export const CustomAlertComponent = () => {
   const [visible, setVisible] = useState(false);

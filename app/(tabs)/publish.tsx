@@ -1,14 +1,15 @@
 /// <reference types="nativewind/types" />
 import { CustomAlert } from '../../utils/alert';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, Switch, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+// Lazy loading du composant lourd DatePicker
+const DateTimePickerModal = React.lazy(() => import('react-native-modal-datetime-picker').then(m => ({ default: m.default })));
 import * as ImagePicker from 'expo-image-picker';
 import { Image, ActivityIndicator, useWindowDimensions } from 'react-native';
 import * as Location from 'expo-location';
@@ -1202,15 +1203,17 @@ export default function PublishScreen() {
           )}
         </TouchableOpacity>
 
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="datetime"
-          onConfirm={handleConfirm}
-          onCancel={hideDatePicker}
-          confirmTextIOS="Confirmer"
-          cancelTextIOS="Annuler"
-          buttonTextColorIOS="#ef4444"
-        />
+        <Suspense fallback={null}>
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="datetime"
+            onConfirm={handleConfirm}
+            onCancel={hideDatePicker}
+            confirmTextIOS="Confirmer"
+            cancelTextIOS="Annuler"
+            buttonTextColorIOS="#ef4444"
+          />
+        </Suspense>
 
       </KeyboardAwareScrollView>
     </View>
