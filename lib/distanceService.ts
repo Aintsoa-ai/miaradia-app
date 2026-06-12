@@ -25,13 +25,17 @@ async function geocodeCity(cityName: string): Promise<GeoLocation | null> {
   try {
     const query = encodeURIComponent(`${cityName}, Madagascar`);
     const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=mg`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s max
 
     const response = await fetch(url, {
+      signal: controller.signal,
       headers: {
         'User-Agent': 'MiaraDiaApp/1.0 (contact@miaradia.mg)',
         'Accept-Language': 'fr'
       }
     });
+    clearTimeout(timeoutId);
 
     if (!response.ok) throw new Error('Erreur Nominatim');
 
@@ -45,7 +49,7 @@ async function geocodeCity(cityName: string): Promise<GeoLocation | null> {
     }
     return null;
   } catch (e) {
-    console.log('Geocoding error:', e);
+    // Silencieux : fallback vers les champs manuels
     return null;
   }
 }
@@ -57,8 +61,12 @@ async function geocodeCity(cityName: string): Promise<GeoLocation | null> {
 async function calculateRoute(from: GeoLocation, to: GeoLocation): Promise<{ distanceKm: number; durationMin: number } | null> {
   try {
     const url = `https://router.project-osrm.org/route/v1/driving/${from.lon},${from.lat};${to.lon},${to.lat}?overview=false`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s max
 
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
     if (!response.ok) throw new Error('Erreur OSRM');
 
     const data = await response.json();
@@ -71,7 +79,7 @@ async function calculateRoute(from: GeoLocation, to: GeoLocation): Promise<{ dis
     }
     return null;
   } catch (e) {
-    console.log('OSRM error:', e);
+    // Silencieux : l'utilisateur peut entrer manuellement
     return null;
   }
 }

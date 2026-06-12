@@ -32,7 +32,6 @@ export default function PublishScreen() {
   const [stopovers, setStopovers] = useState<{ city: string, price: string }[]>([]);
   const [rideImage, setRideImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [dateFormatted, setDateFormatted] = useState('');
   const [departureDate, setDepartureDate] = useState<Date | null>(null);
@@ -149,29 +148,35 @@ export default function PublishScreen() {
   };
 
   React.useEffect(() => {
+    // Auth en arrière-plan : le formulaire s'affiche immédiatement
+    // Si pas de session, redirection douce (sans spinner bloquant)
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace({
-          pathname: '/login',
-          params: { redirect: '/(tabs)/publish' }
-        });
-      } else {
-        // Pré-remplir avec les préférences du profil
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-        if (profile) {
-          setMax2Back(profile.max_2_back || false);
-          setInstantBooking(profile.instant_booking || false);
-          setAirConditioning(profile.air_conditioning || false);
-          setPowerOutlets(profile.power_outlets || false);
-          setRecliningSeats(profile.reclining_seats || false);
-          setToilet(profile.toilet || false);
-          setETicket(profile.e_ticket || false);
-          setAllowsSmoking(profile.prefers_smoking || false);
-          setAllowsPets(profile.prefers_pets || false);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          router.replace({
+            pathname: '/login',
+            params: { redirect: '/(tabs)/publish' }
+          });
+          return;
         }
+        // Charger les préférences du profil en arrière-plan (non bloquant)
+        supabase.from('profiles').select('*').eq('id', session.user.id).single().then(({ data: profile }) => {
+          if (profile) {
+            setMax2Back(profile.max_2_back || false);
+            setInstantBooking(profile.instant_booking || false);
+            setAirConditioning(profile.air_conditioning || false);
+            setPowerOutlets(profile.power_outlets || false);
+            setRecliningSeats(profile.reclining_seats || false);
+            setToilet(profile.toilet || false);
+            setETicket(profile.e_ticket || false);
+            setAllowsSmoking(profile.prefers_smoking || false);
+            setAllowsPets(profile.prefers_pets || false);
+          }
+        });
+      } catch (e) {
+        // Silencieux : l'utilisateur peut quand même remplir le formulaire
       }
-      setCheckingAuth(false);
     };
     checkUser();
   }, []);
@@ -288,13 +293,8 @@ export default function PublishScreen() {
     }
   }, [departureDate, routeDurationMin]);
 
-  if (checkingAuth) {
-    return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#2563EB" />
-      </View>
-    );
-  }
+  // Supprimé : le spinner bloquant n'existe plus
+  // Le formulaire est visible immédiatement
   
   const handlePriceChange = (text: string) => {
     // Garder seulement les chiffres, puis reformater avec espaces
