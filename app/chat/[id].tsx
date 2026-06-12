@@ -57,7 +57,10 @@ export default function ChatScreen() {
             }
           }
         });
-        await newRecording.setProgressUpdateIntervalAsync(100);
+        
+        if (Platform.OS !== 'web' && typeof newRecording.setProgressUpdateIntervalAsync === 'function') {
+          await newRecording.setProgressUpdateIntervalAsync(100);
+        }
 
         await newRecording.startAsync();
         
