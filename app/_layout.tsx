@@ -5,6 +5,7 @@ import React, { useEffect, useRef, Suspense } from "react";
 // Import lazy pour réduire le bundle initial
 const CustomAlertComponent = React.lazy(() => import("../components/CustomAlert").then(m => ({ default: m.CustomAlertComponent })));
 import { supabase } from "../lib/supabase";
+import { LanguageProvider } from "../hooks/useTranslation";
 
 export default function Layout() {
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function Layout() {
   }, []);
 
   return (
-    <>
+    <LanguageProvider>
       <Stack screenOptions={{ headerShown: false }} initialRouteName="welcome">
         <Stack.Screen name="welcome" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -98,6 +99,6 @@ export default function Layout() {
       <Suspense fallback={null}>
         <CustomAlertComponent />
       </Suspense>
-    </>
+    </LanguageProvider>
   );
 }

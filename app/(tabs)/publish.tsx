@@ -20,9 +20,11 @@ import { getMultipleSuggestedStopovers } from '../../lib/itinerarySuggestions';
 import { formatLocationSelection } from '../../lib/locationFormatter';
 import { findBestLocationMatch } from '../../lib/locationMatcher';
 import { getTrafficAlert, TrafficAlert } from '../../lib/trafficService';
+import { useTranslation } from '../../hooks/useTranslation';
 
 export default function PublishScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isDesktop = width > 768;
   const [departure, setDeparture] = useState('');
@@ -613,7 +615,7 @@ export default function PublishScreen() {
           <TouchableOpacity onPress={() => router.push('/(tabs)')} className="w-10 h-10 bg-white border border-slate-200 rounded-full items-center justify-center mr-4 shadow-xs">
             <Ionicons name="arrow-back" size={20} color="#00AFF5" />
           </TouchableOpacity>
-          <Text className="text-3xl font-extrabold text-[#054752]">Proposer un voyage</Text>
+          <Text className="text-3xl font-extrabold text-[#054752]">{t('publish_title')}</Text>
         </View>
           <Text className="text-[#707070] text-sm font-bold">Proposez vos places libres et partagez les frais.</Text>
         </View>
@@ -634,7 +636,7 @@ export default function PublishScreen() {
                   <TextInput
                     ref={depInputRef}
                     className="w-full text-lg font-medium min-h-[48px] outline-none"
-                    placeholder="Ville de départ"
+                    placeholder={t('publish_departure')}
                     value={departure}
                     onChangeText={(t) => handleLocationSearch(t, 'dep')}
                     onFocus={() => {
@@ -871,7 +873,7 @@ export default function PublishScreen() {
                   <TextInput
                     ref={arrInputRef}
                     className="w-full text-lg font-medium min-h-[48px] outline-none"
-                    placeholder="Ville d'arrivée"
+                    placeholder={t('publish_arrival')}
                     value={arrival}
                     onChangeText={(t) => handleLocationSearch(t, 'arr')}
                     onFocus={() => {
@@ -999,7 +1001,7 @@ export default function PublishScreen() {
               >
                 <Ionicons name="time-outline" size={24} color={dateFormatted ? "#EF4444" : "gray"} style={{ marginRight: 12 }} />
                 <span className={`flex-1 text-lg font-medium ${dateFormatted ? 'text-black' : 'text-gray-400'}`}>
-                  {dateFormatted || "Date et heure de départ"}
+                  {dateFormatted || t('publish_date')}
                 </span>
                 <input
                   id="web-publish-date-input"
@@ -1026,7 +1028,7 @@ export default function PublishScreen() {
                 <View className="bg-gray-50 rounded-2xl p-4 flex-row items-center border border-gray-200 mb-3">
                   <Ionicons name="time-outline" size={24} color={dateFormatted ? "#EF4444" : "gray"} style={{ marginRight: 12 }} />
                   <Text className={`flex-1 text-lg font-medium ${dateFormatted ? 'text-black' : 'text-gray-400'}`}>
-                    {dateFormatted || "Date et heure de départ"}
+                    {dateFormatted || t('publish_date')}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -1058,19 +1060,19 @@ export default function PublishScreen() {
 
           {/* Section Véhicule Automatisée */}
           <View>
-            <Text className="text-gray-600 font-semibold mb-3 ml-1">Votre Véhicule</Text>
+            <Text className="text-gray-600 font-semibold mb-3 ml-1">{t('publish_vehicle')}</Text>
             <View className="flex-row bg-gray-100 p-1 rounded-2xl mb-4">
               <TouchableOpacity 
                 onPress={() => setIsMoto(false)}
                 className={`flex-1 py-3 rounded-xl items-center ${!isMoto ? 'bg-white shadow-sm' : ''}`}
               >
-                <Text className={`font-bold ${!isMoto ? 'text-blue-600' : 'text-gray-500'}`}>🚗 Véhicule</Text>
+                <Text className={`font-bold ${!isMoto ? 'text-blue-600' : 'text-gray-500'}`}>🚗 {t('publish_car')}</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 onPress={() => { setIsMoto(true); setSeats(1); }}
                 className={`flex-1 py-3 rounded-xl items-center ${isMoto ? 'bg-white shadow-sm' : ''}`}
               >
-                <Text className={`font-bold ${isMoto ? 'text-blue-600' : 'text-gray-500'}`}>🏍️ Moto</Text>
+                <Text className={`font-bold ${isMoto ? 'text-blue-600' : 'text-gray-500'}`}>🏍️ {t('publish_moto')}</Text>
               </TouchableOpacity>
             </View>
 
@@ -1116,7 +1118,7 @@ export default function PublishScreen() {
 
             <View className="flex-row justify-between">
               <View className="flex-[1.2] mr-2">
-                <Text className="text-gray-600 font-semibold mb-2 ml-1 text-xs">Prix trajet (Ar)</Text>
+                <Text className="text-gray-600 font-semibold mb-2 ml-1 text-xs">{t('publish_price')}</Text>
                 <View className="bg-gray-50 rounded-2xl h-14 px-3 flex-row items-center border border-gray-200 overflow-hidden">
                   <TextInput
                     className="flex-1 min-w-0 text-base font-bold text-center h-full outline-none"
@@ -1131,7 +1133,7 @@ export default function PublishScreen() {
               </View>
 
               <View className="flex-1 ml-2">
-                <Text className="text-gray-600 font-semibold mb-2 ml-1 text-xs text-center">Places libres</Text>
+                <Text className="text-gray-600 font-semibold mb-2 ml-1 text-xs text-center">{t('publish_seats')}</Text>
                 <View className="bg-gray-50 rounded-2xl h-14 px-2 flex-row items-center justify-between border border-gray-200">
                   <TouchableOpacity onPress={() => seats > 1 && setSeats(seats - 1)} className="p-1">
                     <Ionicons name="remove-circle-outline" size={26} color={seats > 1 ? "#2563EB" : "gray"} />
@@ -1255,7 +1257,7 @@ export default function PublishScreen() {
           {isUploading ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text className="text-white font-bold text-xl">Publier mon annonce</Text>
+            <Text className="text-white font-bold text-xl">{t('publish_button')}</Text>
           )}
         </TouchableOpacity>
 

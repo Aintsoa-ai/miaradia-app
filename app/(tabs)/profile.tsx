@@ -9,9 +9,11 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { useTranslation } from '../../hooks/useTranslation';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { t, language, setLanguage } = useTranslation();
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -588,13 +590,23 @@ export default function ProfileScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity 
+                onPress={() => setLanguage(language === 'fr' ? 'mg' : 'fr')}
+                style={{
+                  backgroundColor: 'white', width: isDesktop ? undefined : '100%',
+                  paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#BFDBFE',
+                }}
+              >
+                <Text style={{ color: '#2563EB', fontWeight: '800', fontSize: 15 }}>{t('profile_language')} : {language === 'fr' ? '🇫🇷 FR' : '🇲🇬 MG'}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
                 onPress={handleSignOut}
                 style={{
                   backgroundColor: 'white', width: isDesktop ? undefined : '100%',
                   paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#FECACA',
                 }}
               >
-                <Text style={{ color: '#DC2626', fontWeight: '800', fontSize: 15 }}>Se déconnecter</Text>
+                <Text style={{ color: '#DC2626', fontWeight: '800', fontSize: 15 }}>{t('profile_logout')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 

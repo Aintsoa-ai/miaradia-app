@@ -5,6 +5,7 @@ import { Platform, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../../lib/supabase';
 import { Suspense } from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const DesktopHeader = React.lazy(() => import('../../components/DesktopHeader').then(m => ({ default: m.DesktopHeader })));
 
@@ -13,6 +14,7 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const isDesktop = width > 768;
   const [unreadCount, setUnreadCount] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchUnreadCount();
@@ -74,7 +76,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Explorer',
+          title: t('tab_search'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" size={size} color={color} />
           ),
@@ -83,7 +85,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="publish"
         options={{
-          title: 'Publier',
+          title: t('tab_publish'),
           tabBarIcon: ({ color, size }) => (
             <View className="bg-blue-600 w-12 h-12 rounded-full items-center justify-center -mt-4 border-4 border-white shadow-sm">
               <Ionicons name="add" size={28} color="white" />
@@ -94,7 +96,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="rides"
         options={{
-          title: 'Voyages',
+          title: t('tab_rides'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="car-sport" size={size} color={color} />
           ),
@@ -103,7 +105,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chat"
         options={{
-          title: 'Messages',
+          title: t('tab_chat'),
           tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubble-ellipses" size={size} color={color} />
@@ -113,7 +115,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Mon Profil',
+          title: t('tab_profile'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-circle" size={size} color={color} />
           ),

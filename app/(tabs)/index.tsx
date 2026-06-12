@@ -12,8 +12,8 @@ import { supabase } from '../../lib/supabase';
 import * as Location from 'expo-location';
 import { MADAGASCAR_LOCATIONS } from '../../constants/madagascarLocations';
 import { formatLocationSelection } from '../../lib/locationFormatter';
-import { findBestLocationMatch } from '../../lib/locationMatcher';
 import { usePlatformStats } from '../../hooks/usePlatformStats';
+import { useTranslation } from '../../hooks/useTranslation';
 
 // Statique hors composant : jamais recréé entre les renders
 const CAROUSEL_DATA = [
@@ -26,6 +26,7 @@ const CAROUSEL_LENGTH = CAROUSEL_DATA.length;
 
 export default function SearchScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [departure, setDeparture] = useState('');
   const [arrival, setArrival] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -286,14 +287,14 @@ export default function SearchScreen() {
       {/* FORMULAIRE MOBILE */}
       <View className="px-6 -mt-10">
         <View className="mb-6">
-          <Text className="text-4xl font-black text-gray-900 tracking-tighter">Où allez-vous ?</Text>
-          <Text className="text-gray-500 font-bold text-sm uppercase tracking-widest mt-1">Trouvez votre trajet idéal</Text>
+          <Text className="text-4xl font-black text-gray-900 tracking-tighter">{t('search_title')}</Text>
+          <Text className="text-gray-500 font-bold text-sm uppercase tracking-widest mt-1">{t('search_subtitle')}</Text>
         </View>
 
         <View className="bg-white rounded-[40px] p-6 shadow-sm shadow-gray-200 border border-gray-100 mb-8 space-y-4">
           
           <View className="relative z-50">
-            <Text className="text-gray-600 font-semibold mb-2 ml-1">Départ</Text>
+            <Text className="text-gray-600 font-semibold mb-2 ml-1">{t('search_departure')}</Text>
             <View className="bg-gray-50 rounded-2xl p-4 flex-row items-center border border-gray-200 min-h-[64px]">
               <Ionicons name="location-outline" size={24} color="#2563EB" style={{ marginRight: 12 }} />
               
@@ -362,7 +363,7 @@ export default function SearchScreen() {
           </View>
 
           <View className="relative z-40">
-            <Text className="text-gray-600 font-semibold mb-2 ml-1">Arrivée</Text>
+            <Text className="text-gray-600 font-semibold mb-2 ml-1">{t('search_arrival')}</Text>
             <View className="bg-gray-50 rounded-2xl p-4 flex-row items-center border border-gray-200 min-h-[64px]">
               <Ionicons name="flag-outline" size={24} color="#16A34A" style={{ marginRight: 12 }} />
               
@@ -426,7 +427,7 @@ export default function SearchScreen() {
           <View className="h-[1px] bg-gray-100 my-4" />
 
           <View>
-            <Text className="text-gray-600 font-semibold mb-2 ml-1">Date du voyage</Text>
+            <Text className="text-gray-600 font-semibold mb-2 ml-1">{t('search_date')}</Text>
             {Platform.OS === 'web' ? (
               <div 
                 data-date-picker-trigger="web-mobile-date-input"
@@ -462,7 +463,7 @@ export default function SearchScreen() {
                 <View className="bg-gray-50 rounded-2xl p-4 flex-row items-center border border-gray-200">
                   <Ionicons name="calendar-outline" size={24} color={dateFormatted ? "#EF4444" : "gray"} style={{ marginRight: 12 }} />
                   <Text className={`flex-1 text-lg font-medium ${dateFormatted ? 'text-black' : 'text-gray-400'}`}>
-                    {dateFormatted || "Départ"}
+                    {dateFormatted || t('search_date')}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -474,7 +475,7 @@ export default function SearchScreen() {
           onPress={handleSearch}
           className="w-full bg-blue-600 py-5 rounded-[25px] items-center shadow-lg shadow-blue-300"
         >
-          <Text className="text-white font-black text-xl tracking-tighter">TROUVER UN TRAJET</Text>
+          <Text className="text-white font-black text-xl tracking-tighter uppercase">{t('search_button')}</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAwareScrollView>
