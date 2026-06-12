@@ -247,6 +247,40 @@ export default function PublishScreen() {
         setRouteDistance(result.distance);
         setRouteDuration(result.duration);
         setRouteDurationMin(result.durationMin);
+
+        // --- Prédiction automatique du prix (Tarification Intelligente) ---
+        const depSearch = departure.trim().split(/[\s,]/)[0]; 
+        const arrSearch = arrival.trim().split(/[\s,]/)[0];
+
+        if (depSearch && arrSearch) {
+          const { data: pastRides } = await supabase
+            .from('rides')
+            .select('price_per_seat')
+            .or(`and(departure_city.ilike.%${depSearch}%,arrival_city.ilike.%${arrSearch}%),and(departure_city.ilike.%${arrSearch}%,arrival_city.ilike.%${depSearch}%)`)
+            .limit(10);
+            
+          let suggestedPrice = 0;
+          
+          if (pastRides && pastRides.length > 0) {
+            const validPrices = pastRides.map(r => r.price_per_seat).filter(p => p && p > 0);
+            if (validPrices.length > 0) {
+              const total = validPrices.reduce((acc, val) => acc + val, 0);
+              suggestedPrice = total / validPrices.length;
+            }
+          }
+          
+          if (suggestedPrice === 0) {
+            const km = parseFloat(result.distance.replace(/[^\d.]/g, ''));
+            if (!isNaN(km) && km > 0) {
+              suggestedPrice = km * 150; 
+            }
+          }
+          
+          if (suggestedPrice > 0) {
+            const roundedPrice = Math.round(suggestedPrice / 1000) * 1000;
+            setPrice(prev => prev === '' ? formatPrice(roundedPrice.toString()) : prev);
+          }
+        }
       }
     }, 1500);
 
