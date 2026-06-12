@@ -60,6 +60,7 @@ export default function ChatScreen() {
 
   const stopRecording = async (cancel = false) => {
     if (!recording) return;
+    const finalDuration = recordingDuration;
     setIsRecording(false);
     if (recordingTimer.current) clearInterval(recordingTimer.current);
     
@@ -69,6 +70,10 @@ export default function ChatScreen() {
       setRecording(undefined);
       
       if (!cancel && uri) {
+        if (finalDuration < 1) {
+          // Si l'enregistrement est trop court (< 1s), on annule sans envoyer
+          return;
+        }
         await sendAudioMessage(uri);
       }
     } catch (error) {
@@ -287,16 +292,30 @@ export default function ChatScreen() {
             </TouchableOpacity>
             
             {isRecording ? (
-              <View className="flex-1 bg-red-50 rounded-3xl px-5 py-3 mx-2 border border-red-100 flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                  <View className="w-3 h-3 rounded-full bg-red-500 mr-2" style={{ opacity: recordingDuration % 2 === 0 ? 1 : 0.5 }} />
-                  <Text className="text-red-600 font-bold">
-                    00:{recordingDuration < 10 ? `0${recordingDuration}` : recordingDuration}
-                  </Text>
-                </View>
-                <TouchableOpacity onPress={() => stopRecording(true)}>
-                  <Text className="text-red-500 font-bold text-xs uppercase">Annuler</Text>
+              <View className="flex-1 bg-gray-50 rounded-3xl px-3 py-1.5 mx-2 border border-gray-100 flex-row items-center justify-between shadow-sm">
+                <TouchableOpacity onPress={() => stopRecording(true)} className="w-10 h-10 items-center justify-center">
+                  <Ionicons name="trash-outline" size={24} color="#EF4444" />
                 </TouchableOpacity>
+                
+                <View className="flex-1 flex-row items-center px-2">
+                  <View className="flex-row items-center mr-3">
+                    <View className={`w-2 h-2 rounded-full bg-red-500 mr-2 ${recordingDuration % 2 === 0 ? 'opacity-100' : 'opacity-50'}`} />
+                    <Text className="text-gray-900 font-bold text-sm">
+                      {Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}
+                    </Text>
+                  </View>
+                  
+                  {/* Simulation Waveform (Static animation for visual effect) */}
+                  <View className="flex-1 flex-row items-center overflow-hidden opacity-50 justify-center">
+                    {[...Array(22)].map((_, i) => (
+                      <View 
+                        key={i} 
+                        className="w-1 bg-gray-500 mx-0.5 rounded-full" 
+                        style={{ height: Math.random() > 0.4 ? 12 + Math.random() * 12 : 6 + Math.random() * 4 }} 
+                      />
+                    ))}
+                  </View>
+                </View>
               </View>
             ) : (
               <TextInput
@@ -319,9 +338,9 @@ export default function ChatScreen() {
             ) : isRecording ? (
               <TouchableOpacity 
                 onPress={() => stopRecording(false)}
-                className="w-11 h-11 rounded-full items-center justify-center mb-1 bg-green-500 shadow-lg shadow-green-200"
+                className="w-11 h-11 rounded-full items-center justify-center mb-1 bg-[#128C7E] shadow-lg shadow-green-200"
               >
-                <Ionicons name="arrow-up" size={24} color="white" />
+                <Ionicons name="send" size={18} color="white" />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity 
