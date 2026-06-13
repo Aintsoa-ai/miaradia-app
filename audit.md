@@ -2,6 +2,28 @@
 
 ## 📅 Historique des Audits & Résolutions
 
+### Session 30 (13 Juin 2026) : Sécurité Physique et Informatique (Trust Factor) 🛡️
+
+> **Contexte :** Renforcer drastiquement la sécurité de l'application pour rassurer les passagers ("Mpanendaka") et blinder la base de données contre les faux profils.
+
+#### Fonctionnalités Ajoutées / Corrigées
+*   **Tracker GPS Virtuel (Share My Ride) 📍 :** 
+    *   Intégration de `expo-location` pour lancer un tracking en arrière-plan (mise à jour toutes les 15s).
+    *   Création dynamique d'une URL Google Maps pointant vers les coordonnées GPS exactes du téléphone.
+    *   Bouton WhatsApp permettant au passager d'envoyer instantanément à ses proches un message contenant la plaque d'immatriculation, le nom du chauffeur, et le lien GPS en direct.
+*   **Plaque d'Immatriculation & S.O.S 🚨 :** 
+    *   Affichage obligatoire de la plaque d'immatriculation dans les détails du trajet.
+    *   Bouton rouge d'urgence composant directement le "117" (Police) depuis la page de trajet.
+*   **Intégrité de la Base de Données (SQL Unique Indexes) 🔐 :** 
+    *   Mise en place de contraintes SQL strictes pour empêcher la création de comptes en double.
+    *   1 Numéro de téléphone = 1 Compte (sauf pour l'Admin).
+    *   1 Numéro CIN = 1 Seule demande KYC possible dans la table `kyc_applications`.
+*   **UI/UX Profil et Dashboard Admin 🎨 :** 
+    *   Redesign de la grille de boutons du Profil (Séparation des actions dangereuses sur une deuxième ligne).
+    *   Refonte du calendrier du Kiosque Admin (Thème clair, design compact et carré, légende claire).
+
+---
+
 ### Session 29 (13 Juin 2026) : Localisation & i18n (Support Malagasy) 🇲🇬
 
 > **Contexte :** Adapter l'application à un usage national étendu en incluant le support du Malagasy Andavanandro pour supprimer les frictions d'interface.
@@ -102,4 +124,4 @@ L'application est **STABLE** et prête pour la production avec les atouts suivan
 
 ---
 
-*Audit mis à jour le **12 Juin 2026** par Antigravity à l'issue de la **Session 28**.*
+*Audit mis à jour le **13 Juin 2026** par Antigravity à l'issue de la **Session 30**.*

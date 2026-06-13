@@ -105,7 +105,7 @@ miaradia-app/
 *   **Messages Vocaux Éphémères WhatsApp-like (S29) 🎙️ :** Enregistrement audio (`expo-av`) natif et web avec *waveform* dynamique et timer synchronisés, annulation de sécurité pour micro-taps, stockage sécurisé via Supabase Storage (bucket public avec politique RLS), et Edge Function de nettoyage quotidien (`clean-audio-cron`).
 *   **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Obtenir un compte business Telma pour une validation encore plus fiable que la solution SMS Gateway.
 *   **Optimisations Performance Mobile (S27) ⚡ :** Correction du bug de re-création infinie du timer carousel (refs au lieu de dépendances React), memoïsation de `RideCard` avec `React.memo`, suppression du spinner bloquant sur `/publish` (auth en arrière-plan), délai différé de 3s pour `usePlatformStats`, timeout `AbortController` 5s sur les APIs distance (Nominatim + OSRM), suppression de tous les `console.log` de production, et configuration de headers de cache Vercel agressifs (JS/CSS immutable 1 an, PNG 7 jours).
-
+*   **Sécurité & Trust Factor (S30) 🛡️ :** Déploiement d'une politique de transparence extrême avec Tracker GPS Virtuel envoyant les coordonnées via Google Maps (`expo-location`) sur WhatsApp, obligation d'afficher la plaque d'immatriculation, et intégration d'un bouton S.O.S "117". Verrouillage total de la base de données via des index SQL Uniques (1 téléphone = 1 compte, 1 CIN = 1 KYC) empêchant techniquement la création de faux profils. Refonte UI/UX Profil et Dashboard Kiosque.
 ### Phase 3 : Fiabilité & Mode Offline
 *   **Cache Local SQLite/AsyncStorage :** Mettre en cache local les détails du billet réservé et le contact du chauffeur pour y avoir accès sur la route nationale en zone d'ombre (sans réseau).
 *   **Vérification CIN (KYC) *(RÉALISÉ - S24)* :** Formulaire de téléversement et processus d'approbation d'identité avec interface d'administration ultra-premium pour certifier officiellement les conducteurs.
@@ -128,4 +128,4 @@ miaradia-app/
 | **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
 | **SMS Gateway** | App Android sur téléphone admin | Gratuit |
 
-*Dernière mise à jour : **13 Juin 2026** — Session 29 : Traduction (i18n) et Messages Vocaux Éphémères (WhatsApp-like).*
+*Dernière mise à jour : **13 Juin 2026** — Session 30 : Sécurité Physique (Tracker GPS), Base de données verrouillée.*

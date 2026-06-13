@@ -18,10 +18,16 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 
 ## 🚀 Fonctionnalités Opérationnelles (État : Stable ✅)
 
-### 1. Authentification & Sécurité
+### 1. Authentification & Sécurité *(AMÉLIORÉ - S30)*
 - **Gating Strict :** Accès aux trajets et à la publication réservé aux membres.
 - **Redirection Intelligente :** L'utilisateur est renvoyé automatiquement vers sa destination après connexion.
 - **Zéro Espaces :** Nettoyage automatique (`.trim()`) des champs pour éviter les erreurs.
+- **Intégrité Base de Données (S30) :** Contraintes d'unicité SQL sur les numéros de téléphone (1 compte = 1 numéro) et sur les pièces d'identité CIN pour bloquer la création de faux profils.
+
+### 1.bis Sécurité Physique & Confiance (Trust Factor) *(NOUVEAU - S30)* 🛡️
+- **Tracker GPS Virtuel (Share My Ride) :** En un clic, le passager génère un lien de suivi dynamique Google Maps mis à jour toutes les 15s (`expo-location`) qu'il peut envoyer à ses proches sur WhatsApp, incluant le nom du chauffeur et la plaque d'immatriculation.
+- **Transparence Totale :** Affichage obligatoire de la plaque d'immatriculation du véhicule sur la carte détaillée du trajet.
+- **Numéro d'Urgence (S.O.S) :** Intégration d'un bouton d'urgence pointant directement vers la Police (117) sur l'écran du trajet.
 
 ### 2. Moteur de Recherche Madagascar *(AMÉLIORÉ)*
 - **Nomenclature Technique *(NOUVEAU)* :** Formatage automatique des sélections au format pro : `RN.Ville-Quartier` (ex: `RN1.Antananarivo-Alasora`).
@@ -102,6 +108,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Widgets de Supervision :** Mini-widget de la passerelle SMS et carte complète d'utilisation de l'espace disque Supabase (barre de progression).
 - **Passerelle SMS Admin :** L'administrateur installe l'APK Android (EAS Build) SMS Gateway sur son téléphone personnel. Chaque SMS Mobile Money reçu est automatiquement lu et valide les trajets sans aucune action manuelle. Depuis S17, l'application implémente `PermissionsAndroid.request` pour afficher le pop-up obligatoire de permission système (Android >= 6.0), débloquant l'écoute SMS.
 - **Auto-Rafraîchissement Bilan Client & Admin :** Polling silencieux de sécurité toutes les 3 secondes côté passager et 5 secondes côté Kiosque.
+- **Design du Calendrier *(AMÉLIORÉ - S30)* :** Calendrier Kiosque entièrement repensé avec un design compact, carré, et un code couleur clair (Rouge: activité, Bleu: aujourd'hui) tout en respectant le thème clair.
 
 ### 10. Système de Réputation & Avis *(NOUVEAU - V2.0)*
 - **Notation 5 Étoiles :** Les passagers peuvent noter les chauffeurs après chaque trajet terminé.
@@ -218,4 +225,4 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 
 ---
 
-*Dernière mise à jour : **12 Juin 2026** — Session 28 : Code Splitting (React.lazy), Notification Push au paiement, Tarification intelligente.*
+*Dernière mise à jour : **13 Juin 2026** — Session 30 : Sécurité Physique (Trust Factor, Tracker GPS), Unicité SQL, UI Profil et Admin.*

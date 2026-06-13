@@ -40,7 +40,14 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 ### ⚡ Optimisations de Performance & Infrastructure
 - [x] **Fix Boucles de Rendu & Memoïsation (S27) :** Timer carousel fixe, `RideCard` sous `React.memo`, callbacks memoïsés.
 - [x] **Suppression des Blocages (S27) :** `/publish` instantané sans spinner (auth asynchrone), Timeout sur API distance.
-- [x] **Code Splitting & Lazy Loading (S28) 📦 :** Allègement extrême du premier chargement sur 3G. `CustomAlert`, `DesktopHeader`, API Notifications, et les `DateTimePickerModal` sont désormais chargés *à la demande* via `React.lazy` et `Suspense`.
+- [x] **Code Splitting & Lazy Loading (S28) 📦 :** Allègement extrême du premier chargement sur 3G. `CustomAlert`, `DesktopHeader`, API Notifications, et les `DateTimePickerModal` sont chargés à la demande.
+- [x] **Intégrité des Données Base de données (S30) 🔒 :** Contraintes d'unicité SQL (Unique Index) dans Supabase pour interdire les doublons de numéros de téléphone et de numéros CIN.
+
+### 🛡️ Sécurité & Confiance (Trust Factor)
+- [x] **Partage de Position Temps Réel / Tracker GPS Virtuel (S30) 📍 :** Bouton "Share My Ride" générant un lien dynamique Google Maps via `expo-location` (15s update) à envoyer aux proches via WhatsApp.
+- [x] **Plaque d'Immatriculation Obligatoire (S30) 🚗 :** Transparence totale. Le passager peut vérifier la plaque avant de monter.
+- [x] **Bouton S.O.S (S30) 🚨 :** Bouton d'urgence "117" visible tout au long du trajet.
+- [x] **Double Numéro de Téléphone Chauffeur (S30) :** Ajout du champ `secondary_phone` pour limiter les risques d'injoignabilité.
 
 ### 🌍 Accessibilité & Traduction
 - [x] **Support Multi-langue / i18n (S29) 🇲🇬 :** Dictionnaire natif hyper-léger (zéro dépendance) basé sur le contexte React et `AsyncStorage`. Traduction complète en **Malagasy Andavanandro** (Ho aiza ianao, Hitady, etc.) avec bascule instantanée sans rechargement lourd.
@@ -63,6 +70,8 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 | 7 | **Performance 3G Optimisée (S27/S28)** | Code Splitting (`React.lazy`), cache Vercel 1 an, rendus différés. |
 | 8 | **Localisation Parfaite (S29)** | Interface Bilingue ultra-fluide avec le "Malagasy Andavanandro" pour les chauffeurs. |
 | 9 | **Communication Orale WhatsApp-like (S29)** | Messages vocaux dynamiques intégrés au chat pour l'inclusion numérique de ceux moins à l'aise avec l'écrit. |
+| 10 | **Tracker GPS Virtuel Inclus (S30)** | Sécurise les proches (Lien WhatsApp auto). Résout la peur des "Mpanendaka". |
+| 11 | **Prévention des Faux Profils (S30)** | Base de données verrouillée SQL : 1 Téléphone = 1 Compte, 1 CIN = 1 Profil KYC. |
 
 ---
 
@@ -101,7 +110,6 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Sauvegarde Locale des Vocaux** : Proposer une option In-App pour télécharger les messages audios importants dans le téléphone avant leur suppression automatique.
 
 ### 📱 Expérience Utilisateur (UX)
-- [ ] **Partage de Position Temps Réel** : Suivi de sécurité pour les proches.
 - [ ] **Micro-animations (Lottie)** : Célébrations visuelles au succès du paiement.
 
 ### 🏗️ Technique & Admin
@@ -113,4 +121,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ---
 
-*Dernière mise à jour : 13 Juin 2026 - Session 29 : Multi-langue (i18n) Malagasy, Messages Vocaux Éphémères WhatsApp-like.*
+*Dernière mise à jour : 13 Juin 2026 - Session 30 : Sécurité Physique et Informatique (Trust Factor, Tracker GPS, Unicité Base de données, UI Profil).*
