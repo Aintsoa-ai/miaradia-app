@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { CustomAlert } from '../../utils/alert';
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Image, Modal, Linking, useWindowDimensions, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Image, Modal, Linking, useWindowDimensions, Switch, Share } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import * as Location from 'expo-location';
 import { supabase } from '../../lib/supabase';
 import { useRideDetails } from '../../hooks/useRideDetails';
 import PaymentModal from '../../components/PaymentModal';
@@ -27,6 +28,17 @@ export default function RideDetailsScreen() {
   const [isPhotoVisible, setIsPhotoVisible] = useState(false);
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
+
+  // GPS Tracking States
+  const [isTracking, setIsTracking] = useState(false);
+  const [locationSubscription, setLocationSubscription] = useState<Location.LocationSubscription | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (locationSubscription) locationSubscription.remove();
+    };
+  }, [locationSubscription]);
 
   // Calcul du montant dynamique (10% du prix, min 1000, max 5000)
   const calculateUnlockFee = (price: number) => {
@@ -83,6 +95,67 @@ export default function RideDetailsScreen() {
         }
       ]
     );
+  };
+
+  const handleShareRide = async () => {
+    try {
+      let message = `Je voyage avec Miara-Dia. Chauffeur: ${ride.driver_name} (${driverProfile?.is_super_driver ? 'Vérifié ✅' : 'Non Vérifié'}). Voiture: ${ride.vehicle_brand}, Immatriculation: ${ride.license_plate || 'Non renseignée'}. Destination: ${ride.arrival}.`;
+      
+      if (currentLocation) {
+        message += `\n\n📍 Ma position actuelle en direct : https://www.google.com/maps/search/?api=1&query=${currentLocation.lat},${currentLocation.lng}`;
+      } else if (isTracking) {
+        message += `\n\n📍 (Acquisition GPS en cours...)`;
+      }
+
+      await Share.share({
+        message: message,
+        title: "Suivre mon trajet"
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const toggleTracking = async () => {
+    if (isTracking) {
+      if (locationSubscription) {
+        locationSubscription.remove();
+        setLocationSubscription(null);
+      }
+      setIsTracking(false);
+      CustomAlert.alert("Suivi désactivé", "Votre position n'est plus actualisée.");
+      return;
+    }
+
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        CustomAlert.alert("Permission refusée", "L'accès au GPS est requis pour le suivi de sécurité.");
+        return;
+      }
+
+      setIsTracking(true);
+      CustomAlert.alert("Tracker GPS Activé 📍", "Votre position est maintenant lue en direct. Appuyez sur 'Partager mon trajet' pour envoyer votre localisation exacte à vos proches.");
+
+      const sub = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 15000, // Update every 15s
+          distanceInterval: 100, // Or every 100 meters
+        },
+        async (loc) => {
+          const lat = loc.coords.latitude;
+          const lng = loc.coords.longitude;
+          setCurrentLocation({ lat, lng });
+          
+          // L'idée complète backend serait de faire un push vers Supabase ici :
+          // await supabase.from('bookings').update({ current_lat: lat, current_lng: lng }).eq('passenger_id', currentUserId);
+        }
+      );
+      setLocationSubscription(sub);
+    } catch (e: any) {
+      CustomAlert.alert("Erreur GPS", "Impossible d'activer le GPS.");
+    }
   };
 
   const handleBooking = async () => {
@@ -537,6 +610,14 @@ export default function RideDetailsScreen() {
                       <View style={{ backgroundColor: '#ECFDF5', borderWidth: 1, borderColor: '#A7F3D0', borderRadius: 16, padding: 16 }}>
                         <Text style={{ color: '#047857', fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'center', marginBottom: 6 }}>Contact Déverrouillé</Text>
                         <Text style={{ color: '#065F46', fontWeight: '900', fontSize: 20, textAlign: 'center', letterSpacing: 0.5 }}>{driverProfile?.phone || 'Non disponible'}</Text>
+                        {driverProfile?.secondary_phone && (
+                          <Text style={{ color: '#059669', fontWeight: '800', fontSize: 16, textAlign: 'center', marginTop: 4 }}>ou {driverProfile.secondary_phone}</Text>
+                        )}
+                        {ride.license_plate && (
+                          <View style={{ backgroundColor: '#D1FAE5', paddingVertical: 4, paddingHorizontal: 12, borderRadius: 8, alignSelf: 'center', marginTop: 8 }}>
+                            <Text style={{ color: '#065F46', fontSize: 13, fontWeight: '900', letterSpacing: 1 }}>PLAQUE: {ride.license_plate}</Text>
+                          </View>
+                        )}
                         <Text style={{ color: '#047857', fontSize: 10, fontWeight: '700', textAlign: 'center', marginTop: 8, lineHeight: 14 }}>Réservation validée ! Vous pouvez appeler ou envoyer un SMS.</Text>
                       </View>
 
@@ -566,6 +647,34 @@ export default function RideDetailsScreen() {
                       >
                         <Ionicons name="chatbubbles" size={16} color="#0F172A" />
                         <Text style={{ color: '#0F172A', fontWeight: '800', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>Messagerie interne</Text>
+                      </TouchableOpacity>
+
+                      <View style={{ height: 1, backgroundColor: '#E2E8F0', marginVertical: 4 }} />
+
+                      <TouchableOpacity 
+                        onPress={handleShareRide}
+                        style={{ width: '100%', backgroundColor: '#EFF6FF', borderWidth: 1, borderColor: '#BFDBFE', paddingVertical: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Ionicons name="share-social" size={16} color="#2563EB" />
+                        <Text style={{ color: '#2563EB', fontWeight: '800', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>Partager mon trajet (Sécurité)</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity 
+                        onPress={toggleTracking}
+                        style={{ width: '100%', backgroundColor: isTracking ? '#ECFCCB' : '#F1F5F9', borderWidth: 1, borderColor: isTracking ? '#BEF264' : '#E2E8F0', paddingVertical: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Ionicons name="location" size={16} color={isTracking ? "#4D7C0F" : "#475569"} />
+                        <Text style={{ color: isTracking ? '#4D7C0F' : '#475569', fontWeight: '800', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>
+                          {isTracking ? "🟢 Suivi GPS Actif" : "Démarrer mon Tracker GPS"}
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity 
+                        onPress={() => Linking.openURL('tel:117')}
+                        style={{ width: '100%', backgroundColor: '#FEF2F2', borderWidth: 1, borderColor: '#FECACA', paddingVertical: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Ionicons name="warning" size={16} color="#DC2626" />
+                        <Text style={{ color: '#DC2626', fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>S.O.S URGENCE (117)</Text>
                       </TouchableOpacity>
                     </View>
                   ) : isPendingVerification ? (

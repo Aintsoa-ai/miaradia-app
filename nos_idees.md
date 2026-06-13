@@ -103,6 +103,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Appels In-App (VoIP)** : Bouton d'appel internet direct via l'app pour économiser du crédit appel.
 - [ ] **Dashboard Admin Mobile** : Une App simplifiée pour le Kiosque sur téléphone.
 - [ ] **Cron Expiration Trajets** : Edge Function quotidienne nettoyant les trajets expirés en base.
+- [ ] **Système Anti-Vol / Tracker Forcé (Étude de faisabilité)** : Créer un mini-programme en arrière-plan qui envoie la position GPS par e-mail (via Resend) dès qu'il y a internet, incrusté dans le téléphone pour résister au vol (nécessite l'email/mot de passe pour désinstaller). *Note : techniquement très complexe et limité par les OS mobiles.*
 
 ---
 

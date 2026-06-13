@@ -24,6 +24,7 @@ export default function ProfileScreen() {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
+  const [secondaryPhone, setSecondaryPhone] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [kycStatus, setKycStatus] = useState('unverified');
   const hasLoaded = React.useRef(false);
@@ -61,6 +62,7 @@ export default function ProfileScreen() {
         if (profileData) {
           setBio(profileData.bio || '');
           setPhone(profileData.phone || '');
+          setSecondaryPhone(profileData.secondary_phone || '');
           setVehicleModel(profileData.vehicle_model || '');
           setVehicleSpecificType(profileData.vehicle_type || '');
           setSmokeAllowed(profileData.prefers_smoking || false);
@@ -241,6 +243,15 @@ export default function ProfileScreen() {
     setPhoneError(validatePhone(formatted));
   };
 
+  const formatSecondaryPhoneInput = (text: string) => {
+    const raw = text.replace(/\D/g, '');
+    let formatted = raw;
+    if (raw.length > 3) formatted = raw.substring(0, 3) + ' ' + raw.substring(3);
+    if (raw.length > 5) formatted = formatted.substring(0, 6) + ' ' + raw.substring(5);
+    if (raw.length > 8) formatted = formatted.substring(0, 10) + ' ' + raw.substring(8);
+    setSecondaryPhone(formatted.substring(0, 13));
+  };
+
   const handleSignOut = async () => {
     const doSignOut = async () => {
       try { await supabase.auth.signOut(); } catch (e) {}
@@ -412,6 +423,7 @@ export default function ProfileScreen() {
         full_name: `${firstName} ${lastName}`,
         bio: bio,
         phone: phone.replace(/\s/g, ''),
+        secondary_phone: secondaryPhone.replace(/\s/g, ''),
         vehicle_model: vehicleModel,
         vehicle_type: vehicleSpecificType,
         prefers_smoking: smokeAllowed,
@@ -701,6 +713,20 @@ export default function ProfileScreen() {
                 />
               </View>
               {phoneError ? <Text style={{ color: '#EF4444', fontSize: 11, fontWeight: '700', marginTop: 6, marginLeft: 4 }}>{phoneError}</Text> : null}
+
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginTop: 16, marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Téléphone secondaire (Optionnel)</Text>
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="call-outline" size={18} color="#94A3B8" style={{ marginRight: 10 }} />
+                <TextInput
+                  style={{ flex: 1, fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
+                  value={secondaryPhone}
+                  onChangeText={formatSecondaryPhoneInput}
+                  placeholder="034 00 000 00"
+                  placeholderTextColor="#94A3B8"
+                  keyboardType="phone-pad"
+                  maxLength={13}
+                />
+              </View>
             </View>
 
             {/* Ma Bio */}

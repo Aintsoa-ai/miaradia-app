@@ -18,6 +18,7 @@ export const translations = {
     "search_button": "Rechercher un trajet",
     
     // Page de Publication
+    "publish_title": "Publier un trajet",
     "publish_departure": "D'où partez-vous ?",
     "publish_arrival": "Où allez-vous ?",
     "publish_price": "Prix trajet (Ar)",
@@ -55,6 +56,7 @@ export const translations = {
     "search_button": "Hitady fiara", // Chercher une voiture
     
     // Page de Publication
+    "publish_title": "Hizara dia",
     "publish_departure": "Miainga avy aiza ?", // D'où partez-vous ?
     "publish_arrival": "Ho aiza ny dia ?", // Où allez-vous ?
     "publish_price": "Saran-dalana (Ar)", // Frais de route / Prix

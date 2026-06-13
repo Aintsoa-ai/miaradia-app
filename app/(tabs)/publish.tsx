@@ -33,6 +33,7 @@ export default function PublishScreen() {
   const [seats, setSeats] = useState(4);
   const [isMoto, setIsMoto] = useState(false);
   const [brand, setBrand] = useState('');
+  const [licensePlate, setLicensePlate] = useState('');
   const [stopovers, setStopovers] = useState<{ city: string, price: string }[]>([]);
   const [rideImage, setRideImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -501,8 +502,8 @@ export default function PublishScreen() {
   };
 
   const handlePublish = async () => {
-    if (!departure || !arrival || !price || !dateFormatted || (!isMoto && !brand)) {
-      CustomAlert.alert("Erreur", "Veuillez remplir tous les champs (ville, prix, date et infos véhicule).");
+    if (!departure || !arrival || !price || !dateFormatted || (!isMoto && !brand) || !licensePlate) {
+      CustomAlert.alert("Erreur", "Veuillez remplir tous les champs (y compris la plaque d'immatriculation).");
       return;
     }
 
@@ -556,6 +557,7 @@ export default function PublishScreen() {
           driver_id: user.id,
           stopovers: stopovers,
           vehicle_brand: brand,
+          license_plate: licensePlate.toUpperCase().trim(),
           vehicle_type: currentCategory,
           is_moto: isMoto,
           driver_name: user.user_metadata?.first_name || 'Anonyme',
@@ -1095,6 +1097,18 @@ export default function PublishScreen() {
                     value={brand}
                     onChangeText={setBrand}
                     onFocus={() => setExpandedStopIndex(null)}
+                    style={{ outlineStyle: 'none' } as any}
+                  />
+                </View>
+
+                <View className="bg-blue-50/50 rounded-2xl p-4 border border-blue-100 mb-4 flex-row items-center">
+                  <Ionicons name="card-outline" size={20} color="#2563EB" style={{ marginRight: 12 }} />
+                  <TextInput
+                    className="flex-1 text-lg font-bold text-blue-900 outline-none"
+                    placeholder="Plaque d'immatriculation (Obligatoire)"
+                    value={licensePlate}
+                    onChangeText={setLicensePlate}
+                    autoCapitalize="characters"
                     style={{ outlineStyle: 'none' } as any}
                   />
                 </View>

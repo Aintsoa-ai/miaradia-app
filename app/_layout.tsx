@@ -77,9 +77,16 @@ export default function Layout() {
       window.addEventListener("keydown", disableInspect);
       window.addEventListener("contextmenu", disableContextMenu);
 
+      // 🛑 Piège à DevTools : Si l'inspecteur est ouvert, l'app se fige constamment
+      const debuggerTrap = setInterval(() => {
+        // eslint-disable-next-line no-debugger
+        debugger;
+      }, 100);
+
       return () => {
         window.removeEventListener("keydown", disableInspect);
         window.removeEventListener("contextmenu", disableContextMenu);
+        clearInterval(debuggerTrap);
         if (removeTapListener) removeTapListener();
       };
     }
