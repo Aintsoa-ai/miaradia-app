@@ -585,64 +585,51 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* BARRE D'ACTIONS (Boutons Profil + Admin) */}
-          <View style={{ flexDirection: isDesktop ? 'row' : 'column', width: '100%', gap: 24, marginBottom: 32, alignItems: 'center' }}>
-            
-            {/* Actions (Enregistrer, Déconnexion, Supprimer) */}
-            <View style={{ flex: 1, flexDirection: isDesktop ? 'row' : 'column', alignItems: 'center', gap: 16, width: isDesktop ? undefined : '100%' }}>
-              <TouchableOpacity 
-                onPress={handleSaveProfile}
-                style={{
-                  backgroundColor: '#2563EB', width: isDesktop ? undefined : '100%',
-                  paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center',
-                  shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 10,
-                }}
-              >
-                <Text style={{ color: 'white', fontWeight: '900', fontSize: 15, letterSpacing: 0.5 }}>{t('profile_save')}</Text>
-              </TouchableOpacity>
+          {/* BARRE D'ACTIONS PRIMAIRES */}
+          <View style={{ flexDirection: isDesktop ? 'row' : 'column', width: '100%', gap: 16, marginBottom: 16, alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <TouchableOpacity 
+              onPress={handleSaveProfile}
+              style={{
+                backgroundColor: '#2563EB', width: isDesktop ? undefined : '100%',
+                paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center',
+                shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 10,
+              }}
+            >
+              <Text style={{ color: 'white', fontWeight: '900', fontSize: 15, letterSpacing: 0.5 }}>{t('profile_save')}</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity 
-                onPress={async () => {
-                  await setLanguage(language === 'fr' ? 'mg' : 'fr');
-                  if (typeof window !== 'undefined') {
-                    window.location.reload();
-                  }
-                }}
-                style={{
-                  backgroundColor: 'white', width: isDesktop ? undefined : '100%',
-                  paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#BFDBFE',
-                }}
-              >
-                <Text style={{ color: '#2563EB', fontWeight: '800', fontSize: 15 }}>{t('profile_language')} : {language === 'fr' ? '🇫🇷 FR' : '🇲🇬 MG'}</Text>
-              </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={async () => {
+                await setLanguage(language === 'fr' ? 'mg' : 'fr');
+                if (typeof window !== 'undefined') {
+                  window.location.reload();
+                }
+              }}
+              style={{
+                backgroundColor: 'white', width: isDesktop ? undefined : '100%',
+                paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#BFDBFE',
+              }}
+            >
+              <Text style={{ color: '#2563EB', fontWeight: '800', fontSize: 15 }}>{t('profile_language')} : {language === 'fr' ? '🇫🇷 FR' : '🇲🇬 MG'}</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity 
-                onPress={handleSignOut}
-                style={{
-                  backgroundColor: 'white', width: isDesktop ? undefined : '100%',
-                  paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#FECACA',
-                }}
-              >
-                <Text style={{ color: '#DC2626', fontWeight: '800', fontSize: 15 }}>{t('profile_logout')}</Text>
-              </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={handleSignOut}
+              style={{
+                backgroundColor: 'white', width: isDesktop ? undefined : '100%',
+                paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#FECACA',
+              }}
+            >
+              <Text style={{ color: '#DC2626', fontWeight: '800', fontSize: 15 }}>{t('profile_logout')}</Text>
+            </TouchableOpacity>
+          </View>
 
-              <TouchableOpacity 
-                onPress={handleDeleteAccount}
-                style={{
-                  backgroundColor: 'white', width: isDesktop ? undefined : '100%',
-                  paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#F3F4F6', flexDirection: 'row', justifyContent: 'center'
-                }}
-              >
-                <Ionicons name="trash-outline" size={18} color="#6B7280" style={{ marginRight: 8 }} />
-                <Text style={{ color: '#4B5563', fontWeight: '800', fontSize: 15 }}>{t('profile_delete')}</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Bouton Admin */}
+          {/* BARRE D'ACTIONS SECONDAIRES (Admin & Danger) */}
+          <View style={{ flexDirection: isDesktop ? 'row' : 'column', width: '100%', gap: 16, marginBottom: 32, alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
             {isAdmin && (
               <TouchableOpacity 
                 onPress={() => router.push('/admin' as any)}
-                className="bg-slate-900 rounded-2xl p-4 flex-row items-center justify-between hover:bg-slate-800 transition-colors mt-2"
+                className="bg-slate-900 rounded-2xl p-4 flex-row items-center justify-between hover:bg-slate-800 transition-colors"
                 style={{ width: isDesktop ? undefined : '100%' }}
               >
                 <View className="flex-row items-center">
@@ -654,9 +641,20 @@ export default function ProfileScreen() {
                     <Text className="text-slate-400 text-xs font-bold mt-0.5">Vérifier les dépôts</Text>
                   </View>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
+                <Ionicons name="chevron-forward" size={20} color="#94A3B8" style={{ marginLeft: 16 }} />
               </TouchableOpacity>
             )}
+
+            <TouchableOpacity 
+              onPress={handleDeleteAccount}
+              style={{
+                backgroundColor: 'white', width: isDesktop ? undefined : '100%',
+                paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#F3F4F6', flexDirection: 'row', justifyContent: 'center'
+              }}
+            >
+              <Ionicons name="trash-outline" size={18} color="#6B7280" style={{ marginRight: 8 }} />
+              <Text style={{ color: '#4B5563', fontWeight: '800', fontSize: 15 }}>{t('profile_delete')}</Text>
+            </TouchableOpacity>
           </View>
 
           {/* GRILLE TROIS COLONNES SUR DESKTOP */}

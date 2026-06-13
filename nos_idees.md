@@ -2,6 +2,12 @@
 
 ---
 
+> [!IMPORTANT]
+> ## ⭐ RÈGLE D'OR ABSOLUE DU PROJET
+> **L'application, que ce soit sur ordinateur ou sur téléphone, doit être TOUJOURS super fluide et très rapide, quel que soit le volume de code ajouté.** (Tolérance zéro sur la lenteur et les bugs d'affichage).
+
+---
+
 > [!CAUTION]
 > ## 🚫 ZONE INTOUCHABLE — MOTEUR DE PAIEMENT SMS AUTOMATIQUE
 > **NE JAMAIS MODIFIER les fichiers suivants sans autorisation explicite du chef de projet :**
