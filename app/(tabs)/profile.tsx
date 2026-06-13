@@ -628,10 +628,13 @@ export default function ProfileScreen() {
 
               <TouchableOpacity 
                 onPress={handleDeleteAccount}
-                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, paddingHorizontal: 16 }}
+                style={{
+                  backgroundColor: 'white', width: isDesktop ? undefined : '100%',
+                  paddingVertical: 18, paddingHorizontal: 28, borderRadius: 20, alignItems: 'center', borderWidth: 2, borderColor: '#F3F4F6', flexDirection: 'row', justifyContent: 'center'
+                }}
               >
-                <Ionicons name="trash-outline" size={16} color="#94A3B8" />
-                <Text style={{ color: '#9CA3AF', fontWeight: '700', fontSize: 13 }}>{t('profile_delete')}</Text>
+                <Ionicons name="trash-outline" size={18} color="#6B7280" style={{ marginRight: 8 }} />
+                <Text style={{ color: '#4B5563', fontWeight: '800', fontSize: 15 }}>{t('profile_delete')}</Text>
               </TouchableOpacity>
             </View>
 
@@ -639,19 +642,19 @@ export default function ProfileScreen() {
             {isAdmin && (
               <TouchableOpacity 
                 onPress={() => router.push('/admin' as any)}
-                className="bg-slate-900 rounded-[24px] p-6 flex-row items-center justify-between hover:bg-slate-800 transition-colors"
+                className="bg-slate-900 rounded-2xl p-4 flex-row items-center justify-between hover:bg-slate-800 transition-colors mt-2"
                 style={{ width: isDesktop ? undefined : '100%' }}
               >
                 <View className="flex-row items-center">
-                  <View className="w-12 h-12 bg-white/10 rounded-2xl items-center justify-center mr-4">
-                    <Ionicons name="shield-checkmark" size={24} color="white" />
+                  <View className="w-10 h-10 bg-white/10 rounded-xl items-center justify-center mr-3">
+                    <Ionicons name="shield-checkmark" size={20} color="white" />
                   </View>
                   <View>
-                    <Text className="text-white font-black text-lg tracking-tight">Validation Kiosque</Text>
-                    <Text className="text-slate-400 text-xs font-bold mt-0.5">Vérifier les dépôts manuels</Text>
+                    <Text className="text-white font-black text-base tracking-tight">Validation Kiosque</Text>
+                    <Text className="text-slate-400 text-xs font-bold mt-0.5">Vérifier les dépôts</Text>
                   </View>
                 </View>
-                <Ionicons name="chevron-forward" size={24} color="#94A3B8" />
+                <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
               </TouchableOpacity>
             )}
           </View>
