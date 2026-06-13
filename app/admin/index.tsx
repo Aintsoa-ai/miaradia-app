@@ -296,35 +296,35 @@ export default function AdminDashboard() {
             </View>
 
             {/* Calendrier interactif Juin 2026 */}
-            <View style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 4, borderWidth: 1, borderColor: '#F1F5F9' }}>
-              <View style={{ flexDirection: isDesktop ? 'row' : 'column', justifyContent: 'space-between', alignItems: isDesktop ? 'center' : 'flex-start', marginBottom: 28, gap: 16 }}>
+            <View style={{ backgroundColor: 'white', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 4, borderWidth: 1, borderColor: '#F1F5F9' }}>
+              <View style={{ flexDirection: isDesktop ? 'row' : 'column', justifyContent: 'space-between', alignItems: isDesktop ? 'center' : 'flex-start', marginBottom: 20, gap: 12 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Ionicons name="calendar-outline" size={28} color="#3B82F6" style={{ marginRight: 16 }} />
-                  <Text style={{ fontSize: 20, fontWeight: '900', color: '#0F172A', letterSpacing: -0.5, lineHeight: 24 }}>Historique{"\n"}d'Activité</Text>
+                  <Ionicons name="calendar-outline" size={24} color="#3B82F6" style={{ marginRight: 12 }} />
+                  <Text style={{ fontSize: 16, fontWeight: '900', color: '#0F172A', letterSpacing: -0.5, lineHeight: 20 }}>Historique{"\n"}d'Activité</Text>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 12, padding: 4 }}>
-                  <TouchableOpacity style={{ width: 36, height: 36, backgroundColor: 'white', borderRadius: 8, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 }}>
-                    <Ionicons name="chevron-back" size={18} color="#0F172A" />
+                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 10, padding: 4 }}>
+                  <TouchableOpacity style={{ width: 28, height: 28, backgroundColor: 'white', borderRadius: 6, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 }}>
+                    <Ionicons name="chevron-back" size={16} color="#0F172A" />
                   </TouchableOpacity>
-                  <Text style={{ fontSize: 15, fontWeight: '800', color: '#0F172A', minWidth: 100, textAlign: 'center' }}>Juin 2026</Text>
-                  <TouchableOpacity style={{ width: 36, height: 36, backgroundColor: 'white', borderRadius: 8, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 }}>
-                    <Ionicons name="chevron-forward" size={18} color="#0F172A" />
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: '#0F172A', minWidth: 80, textAlign: 'center' }}>Juin 2026</Text>
+                  <TouchableOpacity style={{ width: 28, height: 28, backgroundColor: 'white', borderRadius: 6, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 }}>
+                    <Ionicons name="chevron-forward" size={16} color="#0F172A" />
                   </TouchableOpacity>
                 </View>
               </View>
 
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
                 {['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'].map(d => (
-                  <Text key={d} style={{ width: '14%', textAlign: 'center', fontSize: 13, fontWeight: '800', color: '#94A3B8' }}>{d}</Text>
+                  <Text key={d} style={{ width: '14%', textAlign: 'center', fontSize: 12, fontWeight: '800', color: '#94A3B8' }}>{d}</Text>
                 ))}
               </View>
 
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 12 }}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 8 }}>
                 {/* Mois précédent (mai) */}
                 {[27, 28, 29, 30, 31].map(day => (
                   <View key={`prev-${day}`} style={{ width: '14%', alignItems: 'center' }}>
-                    <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F8FAFC', borderRadius: 12 }}>
-                      <Text style={{ color: '#CBD5E1', fontWeight: '700', fontSize: 15 }}>{day}</Text>
+                    <View style={{ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F8FAFC', borderRadius: 8 }}>
+                      <Text style={{ color: '#CBD5E1', fontWeight: '700', fontSize: 13 }}>{day}</Text>
                     </View>
                   </View>
                 ))}
@@ -359,10 +359,10 @@ export default function AdminDashboard() {
                         onMouseEnter={() => setHoveredDate(day)}
                         onMouseLeave={() => setHoveredDate(null)}
                         style={{ 
-                          width: 44,
-                          height: 44, 
+                          width: 34,
+                          height: 34, 
                           backgroundColor: bgColor, 
-                          borderRadius: 12, 
+                          borderRadius: 8, 
                           alignItems: 'center', 
                           justifyContent: 'center',
                           shadowColor: isSelected ? '#000' : 'transparent',
@@ -372,7 +372,7 @@ export default function AdminDashboard() {
                           elevation: isSelected ? 4 : 0,
                         }}
                       >
-                        <Text style={{ color: textColor, fontWeight: '800', fontSize: 15 }}>{day}</Text>
+                        <Text style={{ color: textColor, fontWeight: '800', fontSize: 13 }}>{day}</Text>
                       </TouchableOpacity>
 
                       {/* Info-bulle (Tooltip) */}
@@ -393,14 +393,14 @@ export default function AdminDashboard() {
               </View>
 
               {/* Légende du calendrier */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 32, paddingTop: 24, borderTopWidth: 1, borderTopColor: '#F1F5F9', gap: 24 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 24, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#F1F5F9', gap: 16 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#3B82F6', marginRight: 8 }} />
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#64748B' }}>Aujourd'hui</Text>
+                  <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#3B82F6', marginRight: 6 }} />
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#64748B' }}>Aujourd'hui</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#EF4444', marginRight: 8 }} />
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#64748B' }}>Jours d'utilisation</Text>
+                  <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#EF4444', marginRight: 6 }} />
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#64748B' }}>Activité</Text>
                 </View>
               </View>
             </View>
