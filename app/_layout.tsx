@@ -18,8 +18,8 @@ export default function Layout() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
         isSigningOut.current = true;
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        if (Platform.OS === 'web') {
+          if (typeof window !== 'undefined') window.location.href = '/login';
         } else {
           try { router.replace('/login' as any); } catch (e) {}
         }
