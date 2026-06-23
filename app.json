@@ -63,11 +63,8 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "f2da6b63-f8d9-471a-8d58-252014dada76"
-      }
+      "router": {}
     },
-    "owner": "miaradias-team"
+    "owner": "nyrnoxs-team"
   }
 }
