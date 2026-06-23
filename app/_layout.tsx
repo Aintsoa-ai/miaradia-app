@@ -6,6 +6,7 @@ import React, { useEffect, useRef, Suspense } from "react";
 const CustomAlertComponent = React.lazy(() => import("../components/CustomAlert").then(m => ({ default: m.CustomAlertComponent })));
 import { supabase } from "../lib/supabase";
 import { LanguageProvider } from "../hooks/useTranslation";
+import * as Updates from 'expo-updates';
 
 export default function Layout() {
   const router = useRouter();
@@ -29,6 +30,29 @@ export default function Layout() {
   }, []);
 
   useEffect(() => {
+    // 🔄 Vérification des mises à jour OTA (Over-The-Air)
+    async function onFetchUpdateAsync() {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          import("../utils/alert").then(({ CustomAlert }) => {
+            CustomAlert.alert(
+              "Mise à jour disponible 🚀",
+              "Une nouvelle version de l'application vient d'être téléchargée. L'application va redémarrer pour l'appliquer.",
+              [{ text: "Redémarrer", onPress: () => Updates.reloadAsync() }]
+            );
+          });
+        }
+      } catch (error) {
+        console.log(`Error fetching latest Expo update: ${error}`);
+      }
+    }
+    
+    if (Platform.OS !== "web" && !__DEV__) {
+      onFetchUpdateAsync();
+    }
+
     // Démarrer le listener SMS automatiquement au lancement (Android uniquement)
     import("../lib/smsAutoStart").then(m => m.autoStartSmsListener());
 

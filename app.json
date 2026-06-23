@@ -7,7 +7,12 @@
     "icon": "./assets/images/icon.png",
     "scheme": "miaradiaapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "updates": {
+      "url": "https://u.expo.dev/f2da6b63-f8d9-471a-8d58-252014dada76"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.aintsoa.miaradia"
@@ -20,7 +25,6 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.RECEIVE_SMS",

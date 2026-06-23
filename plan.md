@@ -36,8 +36,8 @@ graph TD
 1. **Custom Hooks :** Toute logique de base de données (Supabase) ou d'état complexe est extraite dans des hooks (ex: `useChat.ts`, `useMyRides.ts`).
 2. **Modularité :** Les composants (pages) ne doivent pas dépasser 150-200 lignes. Ils doivent être découpés en sous-composants (ex: `RideCard.tsx`, `PaymentModal.tsx`).
 3. **Styles :** Privilégier Tailwind via NativeWind, éviter les gros objets `const styles = {}` en ligne.
-4. **Typage :** TypeScript strict avec interfaces (`src/types/`). **Le type `any` est formellement interdit.**
-5. **Boy Scout Rule :** Avant d'ajouter une nouveauté dans un fichier surchargé, celui-ci doit d'abord être refactorisé.
+4. **Typage :** TypeScript strict avec interfaces (`src/types/`). **Le type `any` est formellement interdit** (Éradiqué lors de l'Audit S31).
+5. **Boy Scout Rule :** Avant d'ajouter une nouveauté dans un fichier surchargé, celui-ci doit d'abord être refactorisé (Règle appliquée drastiquement sur les Top 5 fichiers centraux).
 
 ---
 

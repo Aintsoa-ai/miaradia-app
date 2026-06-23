@@ -15,11 +15,11 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 > Aucun compromis n'est accepté : la perfection visuelle doit être absolue sur les deux résolutions.
 
 > [!IMPORTANT]
-> **Règles d'Architecture (Clean Architecture) :**
-> 1. **Séparation des préoccupations (Custom Hooks)** : Extraction de la logique métier hors de l'interface.
-> 2. **Composants Modulaires** : Maximum 150-200 lignes par fichier.
+> **Règles d'Architecture (Clean Architecture) (Statut : RESPECTÉES ✅) :**
+> 1. **Séparation des préoccupations (Custom Hooks)** : Extraction de la logique métier hors de l'interface (`usePublishLogic`, `useSearchLogic`, etc.).
+> 2. **Composants Modulaires** : Tous les gros fichiers du Top 5 ont été modularisés sous 200 lignes.
 > 3. **Styles Propres** : Pas de gros blocs inline, utilisation de Tailwind/fichiers séparés.
-> 4. **Typage Strict** : Utilisation stricte de TypeScript, aucun type `any` toléré.
+> 4. **Typage Strict** : Utilisation stricte de TypeScript, le type `any` a été éradiqué (Audit S31).
 > 5. **Boy Scout Rule** : Refactorisation continue des fichiers lors de chaque nouvelle implémentation.
 
 ---
