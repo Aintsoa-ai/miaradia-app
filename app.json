@@ -8,7 +8,7 @@
     "scheme": "miaradiaapp",
     "userInterfaceStyle": "automatic",
     "updates": {
-      "url": "https://u.expo.dev/f2da6b63-f8d9-471a-8d58-252014dada76"
+      "url": "https://u.expo.dev/d300c17d-203a-4e91-94d4-a3f2f77045a5"
     },
     "runtimeVersion": {
       "policy": "appVersion"
@@ -63,7 +63,10 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "d300c17d-203a-4e91-94d4-a3f2f77045a5"
+      }
     },
     "owner": "nyrnoxs-team"
   }

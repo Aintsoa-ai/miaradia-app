@@ -81,7 +81,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 | # | Point Faible | Priorité | Solution Future |
 |---|---|---|---|
 | 1 | **Dépendance téléphone admin** 🔴 | CRITIQUE | Si batterie vide → paiements non validés. Solution : API MVola Telma (B2B). |
-| 2 | **Paiement Gating (10%) pas Séquestre** 🟠 | IMPORTANT | Le chauffeur n'a aucune garantie financière de présence du client. Solution : paiement 100% in-app en séquestre. |
+| 2 | **Paiement Gating (10%) maintenu** 🟢 | STRATÉGIQUE | Décision de maintenir la commission de 10% pour débloquer le contact au lieu d'un paiement 100%. Adapté au marché malgache (besoin de créer la confiance). |
 | 4 | **Bundle Central inévitable** 🟡 | MODÉRÉ | Le moteur React/Expo pèse ~2.3 MB malgré le lazy loading. Cache Vercel compense. |
 | 5 | **Limites du Stockage Gratuit (500 Mo)** 🟡 | MODÉRÉ | Le tier gratuit Supabase impose une gestion rigoureuse. C'est pourquoi les vocaux doivent être purgés via le `clean-audio-cron`. |
 | 6 | **Souscriptions WebSocket multiples** 🟡 | MINEUR | Risque de fuite mémoire longue session. Solution : Context global Realtime. |
@@ -99,7 +99,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [ ] **Refonte du Wording (Vocabulaire) :** Remplacer le terme anxiogène "Payer la somme de..." par "Acheter un ticket pour débloquer le numéro".
 - [ ] **7 Tickets Gratuits (Onboarding) :** Augmenter le bonus de bienvenue à 7 tickets (au lieu de 5). Un ticket débloque le contact d'un conducteur.
 - [ ] **Achat de Ticket (10%) :** Une fois les 7 tickets gratuits épuisés, le passager devra acheter un ticket (prix du ticket = 10% du prix du trajet via Mobile Money) pour voir le numéro.
-- [ ] **Paiement In-App complet (Séquestre)** : Passer d'un gating de contact à une réservation intégrale.
+- [x] **Paiement In-App (Commission 10%)** : Le modèle actuel (déblocage du contact après paiement des frais de mise en relation) est conservé et acté comme la meilleure stratégie d'acquisition pour Madagascar.
 - [ ] **Intégration API MVola Officielle *(EN PAUSE)* :** Remplacera la passerelle SMS à terme.
 - [ ] **Abonnement Premium Chauffeur** : Frais fixes mensuels pour zéro commission.
 - [ ] **Pass Voyageur (Accès Illimité)** : Abo hebdo/mensuel pour débloquer les numéros.

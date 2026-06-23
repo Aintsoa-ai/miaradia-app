@@ -5,9 +5,9 @@ import { MADAGASCAR_LOCATIONS } from '../constants/madagascarLocations';
 
 // Valeurs statiques affich\u00e9es imm\u00e9diatement (plausibles marketing)
 const STATIC_FALLBACK = {
-  rides: '1500+',
-  cities: `${120}+`,
-  users: '5800+'
+  rides: '0',
+  cities: `${MADAGASCAR_LOCATIONS.length}`,
+  users: '0'
 };
 
 export function usePlatformStats() {
@@ -27,11 +27,11 @@ export function usePlatformStats() {
           .select('*', { count: 'exact', head: true });
 
         if (!ridesError && !usersError) {
-          // Ajout d'un offset marketing pour ne pas afficher des chiffres trop bas au lancement
+          // Affichage des vrais chiffres réels (reset usine)
           setStats({
-            rides: ridesCount ? `${ridesCount + 1540}+` : '1500+',
-            cities: `${MADAGASCAR_LOCATIONS.length}+`,
-            users: usersCount ? `${usersCount + 5800}+` : '5800+'
+            rides: ridesCount ? `${ridesCount}` : '0',
+            cities: `${MADAGASCAR_LOCATIONS.length}`,
+            users: usersCount ? `${usersCount}` : '0'
           });
         }
       } catch (e) {
