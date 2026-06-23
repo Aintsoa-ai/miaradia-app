@@ -51,11 +51,6 @@ export default function LoginScreen() {
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: focused ? '#3B82F6' : '#E2E8F0',
-    shadowColor: focused ? '#3B82F6' : 'transparent',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: focused ? 0.15 : 0,
-    shadowRadius: 12,
-    elevation: focused ? 2 : 0,
   });
 
   const renderForm = () => (
