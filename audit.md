@@ -2,6 +2,20 @@
 
 ## 📅 Historique des Audits & Résolutions
 
+### Session 31 (23 Juin 2026) : Audit Strict "Clean Architecture" 🏗️
+
+> **Contexte :** Vérification du respect des 5 règles d'or (Custom Hooks, Composants modulaires < 200 lignes, Styles propres, Typage strict sans `any`, Boy Scout Rule).
+
+#### Résultats de l'Audit : Conformités Atteintes ✅
+*   **Règle 2 (Modulaire < 200 lignes) : RESPECTÉE.** Les fichiers centraux qui dépassaient la limite (`publish.tsx`, `index.tsx`, `sms-gateway.tsx`, `admin/index.tsx`) ont été découpés avec succès en de nombreux sous-composants (`ItinerarySection`, `AnimatedNumbers`, etc.).
+*   **Règle 4 (Typage Strict, zéro `any`) : RESPECTÉE.** Élimination des types `any` résiduels détectés dans le projet et correction des erreurs TypeScript.
+*   **Règle 1 (Custom Hooks) : RESPECTÉE.** La logique métier a été totalement isolée du rendu visuel. Création de `usePublishLogic`, `useSearchLogic`, `useAdminDashboardLogic`, et `useSmsGatewayLogic`.
+
+#### Plan d'action (Boy Scout Rule) 🛠️
+*   La règle du Boy Scout a été appliquée avec succès aujourd'hui sur le "Top 5" des fichiers les plus lourds. Le projet est désormais sain et respecte à 100% l'architecture définie. Prochaine étape : maintenir cette discipline lors des nouveaux développements (notamment pour l'intégration OTA `expo-updates`).
+
+---
+
 ### Session 30 (13 Juin 2026) : Sécurité Physique et Informatique (Trust Factor) 🛡️
 
 > **Contexte :** Renforcer drastiquement la sécurité de l'application pour rassurer les passagers ("Mpanendaka") et blinder la base de données contre les faux profils.

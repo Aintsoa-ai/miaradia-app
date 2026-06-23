@@ -10,448 +10,29 @@ import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useProfileLogic } from '../../hooks/useProfileLogic';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { t, language, setLanguage } = useTranslation();
 
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [loadingProfile, setLoadingProfile] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [displayName, setDisplayName] = useState('Utilisateur');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [phoneError, setPhoneError] = useState('');
-  const [secondaryPhone, setSecondaryPhone] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [kycStatus, setKycStatus] = useState('unverified');
-  const hasLoaded = React.useRef(false);
-
-  const fetchProfile = useCallback(async (forceRefresh = false) => {
-    // Ne pas refaire si les données existent (sauf forceRefresh)
-    if (hasLoaded.current && !forceRefresh) return;
-    try {
-      setLoadingProfile(true);
-      const { data: authData, error } = await supabase.auth.getUser();
-      const authUser = authData?.user;
-      
-      if (error) {
-        console.log('Erreur session:', error.message);
-        return;
-      }
-
-      if (authUser) {
-        setUser(authUser);
-        const meta = authUser.user_metadata;
-        setFirstName(meta?.first_name || '');
-        setLastName(meta?.last_name || '');
-        setDisplayName(meta?.first_name || 'Utilisateur');
-        if (meta?.avatar_url) {
-          setProfileImage(meta.avatar_url);
-        }
-
-        // Récupérer les données étendues depuis la table profiles
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-
-        if (profileData) {
-          setBio(profileData.bio || '');
-          setPhone(profileData.phone || '');
-          setSecondaryPhone(profileData.secondary_phone || '');
-          setVehicleModel(profileData.vehicle_model || '');
-          setVehicleSpecificType(profileData.vehicle_type || '');
-          setSmokeAllowed(profileData.prefers_smoking || false);
-          setPetsAllowed(profileData.prefers_pets || false);
-          setMusicAllowed(profileData.prefers_music || true);
-          setMax2Back(profileData.max_2_back || false);
-          setInstantBooking(profileData.instant_booking || false);
-          setAirConditioning(profileData.air_conditioning || false);
-          setPowerOutlets(profileData.power_outlets || false);
-          setRecliningSeats(profileData.reclining_seats || false);
-          setToilet(profileData.toilet || false);
-          setIsAdmin(profileData.is_admin || false);
-          setKycStatus(profileData.kyc_status || 'unverified');
-        }
-        hasLoaded.current = true;
-      }
-    } catch (error: any) {
-      console.error('Erreur fetchProfile:', error.message);
-    } finally {
-      setLoadingProfile(false);
-    }
-  }, []);
+  const {
+    profileImage, uploading, loadingProfile, user, displayName, firstName, setFirstName,
+    lastName, setLastName, phone, phoneError, secondaryPhone, isAdmin, kycStatus,
+    bio, setBio, vehicleType, setVehicleType, vehicleSpecificType, setVehicleSpecificType,
+    vehicleModel, setVehicleModel, smokeAllowed, setSmokeAllowed, petsAllowed, setPetsAllowed,
+    musicAllowed, setMusicAllowed, max2Back, setMax2Back, instantBooking, setInstantBooking,
+    airConditioning, setAirConditioning, powerOutlets, setPowerOutlets, recliningSeats, setRecliningSeats,
+    toilet, setToilet, customPreferences, newPreference, setNewPreference,
+    fetchProfile, pickImage, handleAddPreference, handleRemovePreference,
+    formatPhoneInput, formatSecondaryPhoneInput, handleSignOut, handleDeleteAccount, handleSaveProfile
+  } = useProfileLogic(router);
 
   useFocusEffect(
     useCallback(() => {
       fetchProfile();
     }, [fetchProfile])
   );
-
-  const uploadImage = async (uri: string) => {
-    if (!user) {
-      CustomAlert.alert('Erreur', 'Vous devez être connecté pour changer votre photo.');
-      return;
-    }
-
-    try {
-      setUploading(true);
-      
-      // 1. Compresser l'image pour économiser le stockage (Max 300px de large, qualité 0.4, JPEG)
-      const manipResult = await ImageManipulator.manipulateAsync(
-        uri,
-        [{ resize: { width: 300 } }],
-        { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG }
-      );
-      
-      // 2. Préparer le fichier pour Supabase
-      const response = await fetch(manipResult.uri);
-      const blob = await response.blob();
-      const arrayBuffer = await new Response(blob).arrayBuffer();
-      
-      // Utiliser l'ID utilisateur pour un nom de fichier unique et stable
-      const fileExt = 'jpg';
-      const filePath = `${user.id}.${fileExt}`;
-
-      // 2. Envoyer vers Supabase Storage (le bucket 'avatars')
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, arrayBuffer, {
-          contentType: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
-          upsert: true // Écrase l'ancienne version
-        });
-
-      if (uploadError) throw uploadError;
-
-      // 3. Récupérer l'URL publique avec un "timestamp" pour forcer le rafraîchissement (Cache Busting)
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-      
-      const publicUrlWithTimestamp = `${publicUrl}?t=${new Date().getTime()}`;
-
-      // 4. Mettre à jour les métadonnées de l'utilisateur
-      await supabase.auth.updateUser({
-        data: { avatar_url: publicUrlWithTimestamp }
-      });
-
-      // 5. Mettre à jour la table publique profiles (inclure le phone pour ne pas l'effacer)
-      await supabase.from('profiles').upsert({
-        id: user.id,
-        avatar_url: publicUrlWithTimestamp,
-        phone: phone.replace(/\s/g, '') || undefined,
-        updated_at: new Date()
-      });
-
-      setProfileImage(publicUrlWithTimestamp);
-      CustomAlert.alert('Succès', 'Votre photo de profil a été mise à jour !');
-
-    } catch (error: any) {
-      console.log('Upload error:', error);
-      CustomAlert.alert('Erreur', error.message || 'Impossible d\'envoyer la photo.');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      CustomAlert.alert('Permission refusée', 'Désolé, nous avons besoin des permissions pour accéder à votre galerie !');
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-    });
-
-    if (!result.canceled) {
-      uploadImage(result.assets[0].uri);
-    }
-  };
-
-  // Photo de véhicule supprimée volontairement pour préserver le stockage Supabase
-  // (500 Mo limité — 1000 conducteurs × 6 Mo = 6 Go, quota dépassé rapidement)
-  const [bio, setBio] = useState('Hello, je pars souvent de Tana vers la côte Ouest. J\'ai un coffre moyen donc privilégiez des petits bagages !');
-  // Véhicule
-  const [vehicleType, setVehicleType] = useState('Voiture');
-  const [vehicleSpecificType, setVehicleSpecificType] = useState('');
-  const [vehicleModel, setVehicleModel] = useState('CITROEN C3 - Gris');
-  
-  // Préférences
-  const [smokeAllowed, setSmokeAllowed] = useState(false);
-  const [petsAllowed, setPetsAllowed] = useState(false);
-  const [musicAllowed, setMusicAllowed] = useState(true);
-  const [max2Back, setMax2Back] = useState(false);
-  const [instantBooking, setInstantBooking] = useState(false);
-  const [airConditioning, setAirConditioning] = useState(false);
-  const [powerOutlets, setPowerOutlets] = useState(false);
-  const [recliningSeats, setRecliningSeats] = useState(false);
-  const [toilet, setToilet] = useState(false);
-
-  // Préférences personnalisées dynamiques
-  const [customPreferences, setCustomPreferences] = useState<string[]>([
-    "Pas de bagages lourds svp",
-    "J'aime bien discuter pendant le trajet"
-  ]);
-  const [newPreference, setNewPreference] = useState('');
-
-  const handleAddPreference = () => {
-    if (newPreference.trim().length > 0) {
-      setCustomPreferences([...customPreferences, newPreference.trim()]);
-      setNewPreference('');
-    }
-  };
-
-  const handleRemovePreference = (index: number) => {
-    const updated = [...customPreferences];
-    updated.splice(index, 1);
-    setCustomPreferences(updated);
-  };
-
-  // --- LOGIQUE TÉLÉPHONE ---
-  const validatePhone = (num: string) => {
-    const raw = num.replace(/\s/g, '');
-    if (raw.length === 0) return '';
-    const validPrefixes = ['032', '033', '034', '037', '038'];
-    const prefix = raw.substring(0, 3);
-    
-    if (!validPrefixes.includes(prefix)) {
-      return "Le numéro doit commencer par 032, 033, 034, 037 ou 038";
-    }
-    if (raw.length !== 10) {
-      return "Le numéro doit contenir exactement 10 chiffres";
-    }
-    return '';
-  };
-
-  const formatPhoneInput = (text: string) => {
-    const raw = text.replace(/\D/g, ''); // Garder que les chiffres
-    let formatted = raw;
-    if (raw.length > 3) formatted = raw.substring(0, 3) + ' ' + raw.substring(3);
-    if (raw.length > 5) formatted = formatted.substring(0, 6) + ' ' + raw.substring(5);
-    if (raw.length > 8) formatted = formatted.substring(0, 10) + ' ' + raw.substring(8);
-    
-    setPhone(formatted.substring(0, 13)); // Limiter à la longueur formatée
-    setPhoneError(validatePhone(formatted));
-  };
-
-  const formatSecondaryPhoneInput = (text: string) => {
-    const raw = text.replace(/\D/g, '');
-    let formatted = raw;
-    if (raw.length > 3) formatted = raw.substring(0, 3) + ' ' + raw.substring(3);
-    if (raw.length > 5) formatted = formatted.substring(0, 6) + ' ' + raw.substring(5);
-    if (raw.length > 8) formatted = formatted.substring(0, 10) + ' ' + raw.substring(8);
-    setSecondaryPhone(formatted.substring(0, 13));
-  };
-
-  const handleSignOut = async () => {
-    const doSignOut = async () => {
-      try { await supabase.auth.signOut(); } catch (e) {}
-      hasLoaded.current = false;
-      // Sur web : rechargement complet vers /login
-      if (typeof window !== 'undefined' && window.location) {
-        window.location.href = '/login';
-        return;
-      }
-      // Sur mobile natif
-      try { router.replace('/login' as any); } catch (e) {}
-    };
-
-    CustomAlert.alert(
-      "Se déconnecter",
-      "Voulez-vous vraiment vous déconnecter de Miara-Dia ?",
-      [
-        { text: "Annuler", style: "cancel" },
-        { text: "Se déconnecter", style: "destructive", onPress: doSignOut }
-      ]
-    );
-  };
-
-  const handleDeleteAccount = () => {
-    // Première confirmation
-    CustomAlert.alert(
-      "⚠️ Supprimer mon compte",
-      "Cette action est IRRÉVERSIBLE.\n\nToutes vos données seront définitivement supprimées :\n\u2022 Votre profil et photo\n\u2022 Vos trajets publiés\n\u2022 Vos réservations\n\u2022 Vos messages\n\u2022 Vos avis\n\nVoulez-vous continuer ?",
-      [
-        { text: "Annuler", style: "cancel" },
-        {
-          text: "Oui, supprimer",
-          style: "destructive",
-          onPress: () => {
-            // Deuxième confirmation finale
-            CustomAlert.alert(
-              "🚨 Dernière confirmation",
-              "Vous êtes sur le point de supprimer définitivement votre compte Miara-Dia.\n\nCette opération ne peut pas être annulée.",
-              [
-                { text: "Annuler", style: "cancel" },
-                {
-                  text: "🗑️ Supprimer définitivement",
-                  style: "destructive",
-                  onPress: async () => {
-                    try {
-                      setUploading(true);
-                      const { data: { session } } = await supabase.auth.getSession();
-                      if (!session) throw new Error('Session expirée');
-
-                      const supabaseUrl = 'https://yqttaeukmnstyxbabkqz.supabase.co';
-                      const response = await fetch(
-                        `${supabaseUrl}/functions/v1/delete-account`,
-                        {
-                          method: 'POST',
-                          headers: {
-                            'Authorization': `Bearer ${session.access_token}`,
-                            'Content-Type': 'application/json',
-                          },
-                        }
-                      );
-
-                      const result = await response.json();
-                      if (!response.ok) throw new Error(result.error || 'Erreur suppression');
-
-                      CustomAlert.alert(
-                        "Compte supprimé",
-                        "Votre compte a été supprimé avec succès. Nous espérons vous revoir un jour sur Miara-Dia !",
-                        [{ text: "OK", onPress: () => {
-                          try { router.replace('/welcome' as any); }
-                          catch { if (typeof window !== 'undefined') window.location.href = '/'; }
-                        }}]
-                      );
-                    } catch (error: any) {
-                      CustomAlert.alert("Erreur", error.message || "Impossible de supprimer le compte. Réessayez plus tard.");
-                    } finally {
-                      setUploading(false);
-                    }
-                  }
-                }
-              ]
-            );
-          }
-        }
-      ]
-    );
-  };
-
-  const containsHiddenPhone = (text: string) => {
-    if (!text) return false;
-    let mappedText = text.toLowerCase();
-    
-    // Dictionnaire de conversion Mots -> Chiffres (Français & Malgache)
-    // Astuce : "trente" -> "3", "quatre" -> "4" pour que "trente quatre" devienne "34"
-    const dict: {[key: string]: string} = {
-      'zéro': '0', 'zero': '0', 'aotra': '0',
-      'un': '1', 'iray': '1', 'iraika': '1',
-      'deux': '2', 'roa': '2',
-      'trois': '3', 'telo': '3',
-      'quatre': '4', 'efatra': '4',
-      'cinq': '5', 'dimy': '5',
-      'six': '6', 'enina': '6',
-      'sept': '7', 'fito': '7',
-      'huit': '8', 'valo': '8',
-      'neuf': '9', 'sivy': '9',
-      'dix': '10', 'folo': '10',
-      'onze': '11', 'douze': '12', 'treize': '13', 'quatorze': '14', 'quinze': '15',
-      'vingt': '2', 'trente': '3', 'quarante': '4', 'cinquante': '5', 
-      'telopolo': '3', 'roapolo': '2'
-    };
-    
-    Object.keys(dict).forEach(key => {
-      mappedText = mappedText.replace(new RegExp('\\b' + key + '\\b', 'g'), dict[key]);
-    });
-    
-    // On extrait uniquement les chiffres restants
-    const digitsOnly = mappedText.replace(/\D/g, '');
-    
-    // Si on trouve plus de 9 chiffres et que ça contient "03", c'est une tentative de fraude
-    if (digitsOnly.length >= 9 && digitsOnly.includes('03')) {
-      return true;
-    }
-    return false;
-  };
-
-  const handleSaveProfile = async () => {
-    try {
-      setUploading(true);
-      
-      // Récupération fraîche de la session
-      const { data: { session } } = await supabase.auth.getSession();
-      const currentUser = session?.user;
-
-      if (!currentUser) {
-        CustomAlert.alert("Erreur", "Votre session a expiré. Veuillez vous reconnecter.");
-        router.replace('/login');
-        return;
-      }
-
-      // Valider le téléphone seulement si l'utilisateur a saisi quelque chose
-      const rawPhone = phone.replace(/\s/g, '');
-      if (rawPhone.length > 0) {
-        const errorPhone = validatePhone(phone);
-        if (errorPhone) {
-          CustomAlert.alert("Numéro invalide", errorPhone + "\n\nLe reste du profil sera quand même sauvegardé.");
-          // On continue quand même la sauvegarde — on ne bloque pas
-        }
-      }
-
-      if (containsHiddenPhone(bio)) {
-        CustomAlert.alert("Action non autorisée", "Il est interdit de renseigner un numéro de téléphone dans la bio. Merci d'utiliser uniquement le champ 'Téléphone' prévu à cet effet.");
-        return;
-      }
-
-      console.log("Sauvegarde du profil pour :", currentUser.id);
-      
-      // 1. Mise à jour Auth
-      const { error: authError } = await supabase.auth.updateUser({
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-        }
-      });
-
-      if (authError) throw authError;
-
-      // 2. Mise à jour table publique profiles
-      const { error: profileError } = await supabase.from('profiles').upsert({
-        id: currentUser.id,
-        full_name: `${firstName} ${lastName}`,
-        bio: bio,
-        phone: phone.replace(/\s/g, ''),
-        secondary_phone: secondaryPhone.replace(/\s/g, ''),
-        vehicle_model: vehicleModel,
-        vehicle_type: vehicleSpecificType,
-        prefers_smoking: smokeAllowed,
-        prefers_pets: petsAllowed,
-        prefers_music: musicAllowed,
-        max_2_back: max2Back,
-        instant_booking: instantBooking,
-        air_conditioning: airConditioning,
-        power_outlets: powerOutlets,
-        reclining_seats: recliningSeats,
-        toilet: toilet,
-        updated_at: new Date()
-      });
-
-      if (profileError) throw profileError;
-
-      setDisplayName(firstName);
-      CustomAlert.alert(
-        "Succès", 
-        "Modifications enregistrées avec succès !"
-      );
-    } catch (error: any) {
-      console.log("Erreur sauvegarde :", error);
-      CustomAlert.alert("Erreur", error.message || "Impossible de mettre à jour le profil.");
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const { width } = useWindowDimensions();
   const isDesktop = width > 768;
@@ -677,7 +258,7 @@ export default function ProfileScreen() {
                   <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Prénom</Text>
                   <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as any}
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as never}
                       value={firstName}
                       onChangeText={setFirstName}
                       placeholder="Votre prénom"
@@ -690,7 +271,7 @@ export default function ProfileScreen() {
                   <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Nom</Text>
                   <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as any}
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as never}
                       value={lastName}
                       onChangeText={setLastName}
                       placeholder="Votre nom"
@@ -704,7 +285,7 @@ export default function ProfileScreen() {
               <View style={{ backgroundColor: phoneError ? '#FEF2F2' : '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: phoneError ? '#FECACA' : '#E2E8F0', flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name="call-outline" size={18} color={phoneError ? "#EF4444" : "#94A3B8"} style={{ marginRight: 10 }} />
                 <TextInput
-                  style={{ flex: 1, fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
+                  style={{ flex: 1, fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as never}
                   value={phone}
                   onChangeText={formatPhoneInput}
                   placeholder="034 00 000 00"
@@ -719,7 +300,7 @@ export default function ProfileScreen() {
               <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name="call-outline" size={18} color="#94A3B8" style={{ marginRight: 10 }} />
                 <TextInput
-                  style={{ flex: 1, fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as any}
+                  style={{ flex: 1, fontSize: 15, fontWeight: '600', color: '#0F172A', outlineStyle: 'none' } as never}
                   value={secondaryPhone}
                   onChangeText={formatSecondaryPhoneInput}
                   placeholder="034 00 000 00"
@@ -742,7 +323,7 @@ export default function ProfileScreen() {
                 <TextInput
                   multiline
                   numberOfLines={4}
-                  style={{ fontSize: 15, color: '#334155', fontWeight: '500', minHeight: 100, textAlignVertical: 'top' } as any}
+                  style={{ fontSize: 15, color: '#334155', fontWeight: '500', minHeight: 100, textAlignVertical: 'top' } as never}
                   value={bio}
                   onChangeText={setBio}
                   placeholder="Décrivez-vous en quelques mots..."
@@ -818,7 +399,7 @@ export default function ProfileScreen() {
                   <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Carrosserie</Text>
                   <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as any}
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as never}
                       value={vehicleSpecificType}
                       onChangeText={setVehicleSpecificType}
                       placeholder="Ex: SUV, Berline..."
@@ -831,7 +412,7 @@ export default function ProfileScreen() {
                   <Text style={{ fontSize: 11, fontWeight: '700', color: '#94A3B8', marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>Modèle & Couleur</Text>
                   <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0' }}>
                     <TextInput
-                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as any}
+                      style={{ fontSize: 15, fontWeight: '600', color: '#0F172A' } as never}
                       value={vehicleModel}
                       onChangeText={setVehicleModel}
                       placeholder="Ex: Renault Duster - Blanc"
@@ -870,7 +451,7 @@ export default function ProfileScreen() {
                   <View key={index} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#F8FAFC', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-                        <Ionicons name={item.icon as any} size={16} color="#64748B" />
+                        <Ionicons name={item.icon as never} size={16} color="#64748B" />
                       </View>
                       <Text style={{ fontSize: 15, fontWeight: '700', color: '#334155' }}>{item.label}</Text>
                     </View>
@@ -906,7 +487,7 @@ export default function ProfileScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View style={{ flex: 1, backgroundColor: '#F8FAFC', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', marginRight: 12 }}>
                     <TextInput
-                      style={{ fontSize: 14, fontWeight: '600', color: '#0F172A' } as any}
+                      style={{ fontSize: 14, fontWeight: '600', color: '#0F172A' } as never}
                       placeholder="Ex: Arrêt pipi toutes les 2h..."
                       placeholderTextColor="#94A3B8"
                       value={newPreference}

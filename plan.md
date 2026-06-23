@@ -32,6 +32,13 @@ graph TD
 *   **Cartographie :** Leaflet (intégré via React Native Webview) + tuiles gratuites vectorielles *CartoDB Voyager*.
 *   **Calculs Locaux :** Dictionnaire de routage malgache pré-calculé (`lib/distancesMadagascar.ts`).
 
+### Charte de Code (Règles d'Or)
+1. **Custom Hooks :** Toute logique de base de données (Supabase) ou d'état complexe est extraite dans des hooks (ex: `useChat.ts`, `useMyRides.ts`).
+2. **Modularité :** Les composants (pages) ne doivent pas dépasser 150-200 lignes. Ils doivent être découpés en sous-composants (ex: `RideCard.tsx`, `PaymentModal.tsx`).
+3. **Styles :** Privilégier Tailwind via NativeWind, éviter les gros objets `const styles = {}` en ligne.
+4. **Typage :** TypeScript strict avec interfaces (`src/types/`). **Le type `any` est formellement interdit.**
+5. **Boy Scout Rule :** Avant d'ajouter une nouveauté dans un fichier surchargé, celui-ci doit d'abord être refactorisé.
+
 ---
 
 ## 🗄️ 2. Schéma de Données & Sécurité (Supabase)

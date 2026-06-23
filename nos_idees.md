@@ -37,7 +37,8 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Dashboard Administrateur Exhaustif Premium (S22) 📊 :** Kiosque Glassmorphism, animations compteurs, calendrier interactif, statistiques.
 - [x] **Rafraîchissement Instantané Mobile (S25) ⚡ :** `useFocusEffect` pour synchronisation immédiate sans rechargement au changement d'onglet.
 
-### ⚡ Optimisations de Performance & Infrastructure
+### ⚡ Optimisations de Performance, Infrastructure & Architecture
+- [x] **Clean Architecture & Typage Strict (Règles des 5) (S31) 🧹 :** Fichiers géants (`publish.tsx`, `index.tsx`, `sms-gateway.tsx`, `admin/index.tsx`) découpés en sous-composants modulaires (< 200 lignes). Logique métier extraite dans des Custom Hooks (`usePublishLogic`, `useSearchLogic`, etc.). Code débarrassé des `any` résiduels.
 - [x] **Fix Boucles de Rendu & Memoïsation (S27) :** Timer carousel fixe, `RideCard` sous `React.memo`, callbacks memoïsés.
 - [x] **Suppression des Blocages (S27) :** `/publish` instantané sans spinner (auth asynchrone), Timeout sur API distance.
 - [x] **Code Splitting & Lazy Loading (S28) 📦 :** Allègement extrême du premier chargement sur 3G. `CustomAlert`, `DesktopHeader`, API Notifications, et les `DateTimePickerModal` sont chargés à la demande.
@@ -112,7 +113,7 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 ### 📱 Expérience Utilisateur (UX)
 - [ ] **Micro-animations (Lottie)** : Célébrations visuelles au succès du paiement.
 
-### 🏗️ Technique & Admin
+### 🏗️ Technique, Architecture & Admin
 - [ ] **Optimisation Realtime Global (Context)** : Centraliser les WebSockets Supabase.
 - [ ] **Appels In-App (VoIP)** : Bouton d'appel internet direct via l'app pour économiser du crédit appel.
 - [ ] **Dashboard Admin Mobile** : Une App simplifiée pour le Kiosque sur téléphone.

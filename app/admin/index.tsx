@@ -1,76 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { CustomAlert } from '../../utils/alert';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, useWindowDimensions, Platform, Image } from 'react-native';
-import { supabase } from '../../lib/supabase';
+import React from 'react';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, useWindowDimensions, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { formatPrice } from '../../lib/formatPrice';
 import { LinearGradient } from 'expo-linear-gradient';
-
-const AnimatedPrice = ({ value }: { value: number }) => {
-  const [displayValue, setDisplayValue] = useState(value);
-  
-  useEffect(() => {
-    if (displayValue === value) return;
-    let start = displayValue;
-    const end = value;
-    const duration = 1000; // ms
-    const startTime = Date.now();
-    let animationFrame: number;
-    
-    const animate = () => {
-      const now = Date.now();
-      const progress = Math.min((now - startTime) / duration, 1);
-      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      const current = Math.floor(start + (end - start) * easeProgress);
-      setDisplayValue(current);
-      
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      } else {
-        setDisplayValue(end);
-      }
-    };
-    
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [value]);
-
-  return <>{formatPrice(displayValue)}</>;
-};
-
-const AnimatedSimpleNumber = ({ value }: { value: number }) => {
-  const [displayValue, setDisplayValue] = useState(value);
-  
-  useEffect(() => {
-    if (displayValue === value) return;
-    let start = displayValue;
-    const end = value;
-    const duration = 1000;
-    const startTime = Date.now();
-    let animationFrame: number;
-    
-    const animate = () => {
-      const now = Date.now();
-      const progress = Math.min((now - startTime) / duration, 1);
-      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      const current = Math.floor(start + (end - start) * easeProgress);
-      setDisplayValue(current);
-      
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      } else {
-        setDisplayValue(end);
-      }
-    };
-    
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [value]);
-
-  return <>{displayValue}</>;
-};
+import { AnimatedPrice, AnimatedSimpleNumber } from '../../components/admin/AnimatedNumbers';
+import { useAdminDashboardLogic } from '../../hooks/useAdminDashboardLogic';
 
 const DAILY_MOCK_DATA: Record<number, { total: number, mvola: number, airtel: number, orange: number, voyages: number }> = {};
 
@@ -80,80 +16,11 @@ export default function AdminDashboard() {
   const isDesktop = width > 1024;
   const isTablet = width > 768 && width <= 1024;
 
-  const [bookings, setBookings] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [stats, setStats] = useState({ drivers: 1, clients: 7, online: 1 });
-  const [storageUsage, setStorageUsage] = useState(9835000); // ~9.38 Mo
-  
-  const [selectedDate, setSelectedDate] = useState<number | null>(8);
-  const [hoveredDate, setHoveredDate] = useState<number | null>(null);
-
-  useEffect(() => {
-    checkAdmin();
-    fetchAdminData();
-  }, []);
-
-  const checkAdmin = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      router.replace('/login');
-      return;
-    }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile?.is_admin) {
-      CustomAlert.alert("Accès refusé", "Vous n'avez pas les droits d'administrateur.");
-      router.replace('/(tabs)/profile');
-    } else {
-      setIsAdmin(true);
-    }
-  };
-
-  const fetchAdminData = async () => {
-    try {
-      setLoading(true);
-      
-      const { data: pending } = await supabase
-        .from('bookings')
-        .select('*, rides (departure, arrival, date), passenger:profiles!passenger_id(full_name)')
-        .eq('payment_status', 'pending')
-        .order('created_at', { ascending: false });
-
-      if (pending) setBookings(pending);
-
-      const { data: profiles } = await supabase.from('profiles').select('vehicle_type');
-      if (profiles) {
-        let driversCount = 0;
-        let clientsCount = 0;
-        profiles.forEach(p => {
-          if (p.vehicle_type) driversCount++;
-          else clientsCount++;
-        });
-        setStats({ drivers: Math.max(1, driversCount), clients: Math.max(7, clientsCount), online: 1 });
-      }
-    } catch (error: any) {
-      console.error('Error fetching admin data:', error.message);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchAdminData();
-  };
-
-  const generateDemoData = async () => {
-    // Action désactivée
-  };
+  const {
+    bookings, loading, refreshing, isAdmin, stats, storageUsage,
+    selectedDate, setSelectedDate, hoveredDate, setHoveredDate,
+    onRefresh
+  } = useAdminDashboardLogic();
 
   if (!isAdmin && !loading) return null;
 

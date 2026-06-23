@@ -108,7 +108,7 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
             <Text style={styles.manualInstruction}>
               1. Rendez-vous dans un point de vente.{"\n"}
               2. Envoyez <Text style={{fontWeight:'800'}}>{amount.toLocaleString('fr-FR')} Ar</Text> au :{"\n"}
-              <Text style={styles.phoneNumber}>034 82 372 67</Text>{"\n"}
+              <Text style={styles.phoneNumber}>038 17 909 87</Text>{"\n"}
               3. Saisissez la référence du transfert ci-dessous :
             </Text>
           </View>
@@ -135,9 +135,11 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
       );
     }
 
-    let adminNumber = '034 82 372 67';
+    let adminNumber = '038 17 909 87';
     if (selectedMethod?.id === 'Orange Money') {
-      adminNumber = '037 38 946 19';
+      adminNumber = '037 97 941 15';
+    } else if (selectedMethod?.id === 'Airtel Money') {
+      adminNumber = 'En cours...';
     }
 
     return (
