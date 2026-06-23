@@ -264,7 +264,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAwareScrollView
       style={{ flex: 1, backgroundColor: 'white' }}
-      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 28, paddingTop: 56, paddingBottom: 64, justifyContent: 'center' }}
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 28, paddingTop: 100, paddingBottom: 64 }}
       showsVerticalScrollIndicator={false}
       enableOnAndroid={true}
       keyboardShouldPersistTaps="handled"
