@@ -103,6 +103,9 @@ export default function LoginScreen() {
             onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
+            autoComplete="email"
+            textContentType="emailAddress"
+            importantForAutofill="yes"
             onFocus={() => setEmailFocused(true)}
             onBlur={() => setEmailFocused(false)}
           />
@@ -124,6 +127,9 @@ export default function LoginScreen() {
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
             autoCapitalize="none"
+            autoComplete="password"
+            textContentType="password"
+            importantForAutofill="yes"
             onFocus={() => setPassFocused(true)}
             onBlur={() => setPassFocused(false)}
           />
