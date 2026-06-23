@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { User } from '@supabase/supabase-js';
+import { Platform } from 'react-native';
 
 export function useProfileLogic(router: any) {
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -223,8 +224,8 @@ export function useProfileLogic(router: any) {
     const doSignOut = async () => {
       try { await supabase.auth.signOut(); } catch (e) {}
       hasLoaded.current = false;
-      if (typeof window !== 'undefined' && window.location) {
-        window.location.href = '/login';
+      if (Platform.OS === 'web') {
+        if (typeof window !== 'undefined') window.location.href = '/login';
         return;
       }
       try { router.replace('/login'); } catch (e) {}
@@ -283,8 +284,11 @@ export function useProfileLogic(router: any) {
                         "Compte supprimé",
                         "Votre compte a été supprimé avec succès. Nous espérons vous revoir un jour sur Miara-Dia !",
                         [{ text: "OK", onPress: () => {
-                          try { router.replace('/welcome'); }
-                          catch { if (typeof window !== 'undefined') window.location.href = '/'; }
+                          if (Platform.OS === 'web') {
+                            if (typeof window !== 'undefined') window.location.href = '/';
+                          } else {
+                            try { router.replace('/welcome'); } catch (e) {}
+                          }
                         }}]
                       );
                     } catch (error: unknown) {
