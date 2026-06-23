@@ -1,0 +1,10 @@
+{
+  "name": "expo-sms-gateway",
+  "version": "1.0.0",
+  "description": "A local Expo module for SMS Gateway",
+  "main": "src/ExpoSmsGatewayModule.ts",
+  "dependencies": {},
+  "peerDependencies": {
+    "expo": "*"
+  }
+}
