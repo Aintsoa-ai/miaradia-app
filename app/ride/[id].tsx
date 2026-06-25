@@ -694,6 +694,10 @@ export default function RideDetailsScreen() {
                       <Text style={{ color: '#B45309', fontSize: 11, fontWeight: '700', textAlign: 'center', lineHeight: 16, marginTop: 4 }}>
                         L'écran se débloquera automatiquement dès réception de votre transfert.
                       </Text>
+                      <View style={{ height: 1, backgroundColor: '#FDE68A', marginVertical: 4 }} />
+                      <Text style={{ color: '#92400E', fontSize: 10, fontStyle: 'italic', textAlign: 'center', lineHeight: 14 }}>
+                        Merci pour votre soutien ! 🙏 Cette contribution représente 10% du prix du trajet et nous permet d'entretenir la plateforme et de continuer à vous offrir ce service.
+                      </Text>
                     </View>
                   ) : (
                     <View style={{ gap: 16 }}>
