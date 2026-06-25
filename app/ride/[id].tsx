@@ -692,7 +692,7 @@ export default function RideDetailsScreen() {
                       <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'flex-start', borderWidth: 1, borderColor: '#E2E8F0' }}>
                         <Ionicons name="shield-checkmark-outline" size={16} color="#2563EB" style={{ marginRight: 8, marginTop: 2 }} />
                         <Text style={{ color: '#475569', fontSize: 11, fontWeight: '700', lineHeight: 16, flex: 1 }}>
-                          Contact protégé. Des frais de réservation de <Text style={{ color: '#0F172A', fontWeight: '900' }}>{formatPrice(fee)} Ar</Text> (10%) sont requis pour déverrouiller le trajet.
+                          Contact protégé. Des frais de réservation de <Text style={{ color: '#0F172A', fontWeight: '900' }}>{formatPrice(fee)} Ar</Text> (10%) sont requis pour déverrouiller le trajet. Ces 10% de frais par rapport au tarif initial servent à l'entretien de l'application.
                         </Text>
                       </View>
 

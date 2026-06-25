@@ -156,10 +156,10 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
         <Text style={styles.manualTitle}>Instructions de Paiement</Text>
         <View style={styles.instructionCard}>
           <Text style={styles.manualInstruction}>
-            1. Transférez exactement <Text style={{fontWeight:'800'}}>{amount.toLocaleString('fr-FR')} Ar</Text> (en totalité avec les frais à votre charge) au numéro :{"\n"}
+            1. Saisissez <Text style={{fontWeight:'800'}}>VOTRE</Text> numéro de téléphone ci-dessous et validez.{"\n\n"}
+            2. <Text style={{fontWeight:'800'}}>ENSUITE</Text>, transférez exactement <Text style={{fontWeight:'800'}}>{amount.toLocaleString('fr-FR')} Ar</Text> (en totalité avec les frais à votre charge) au numéro :{"\n"}
             <Text style={styles.phoneNumber}>{adminNumber}</Text>{"\n"}
-            <Text style={{fontSize: 12, color: '#6B7280'}}>Nom : Aintsoa Mihajatiana</Text>{"\n\n"}
-            2. Saisissez <Text style={{fontWeight:'800'}}>VOTRE</Text> numéro de téléphone ci-dessous et validez.
+            <Text style={{fontSize: 12, color: '#6B7280'}}>Nom : Aintsoa Mihajatiana</Text>
           </Text>
         </View>
 
@@ -212,6 +212,7 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
           <View style={styles.amountContainer}>
             <Text style={styles.amountLabel}>Total à régler</Text>
             <Text style={styles.amountValue}>{amount.toLocaleString('fr-FR')} Ar</Text>
+            <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 6, textAlign: 'center', fontWeight: '500' }}>Ce montant représente les 10% de frais de réservation destinés à l'entretien de l'application.</Text>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>

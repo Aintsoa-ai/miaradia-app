@@ -42,13 +42,12 @@ function parseMobileMoneySMS(smsBody: string): {
   }
 
   // === Orange Money ===
-  // "Vous avez recu un transfert de 1000Ar venant du 0373894619 Nouveau Solde: 2000Ar. Trans Id: PP260625.1444.D59762."
-  const orangeMatch = cleanBody.match(/([\d][\d\s]*[\d])\s*(?:Ar|Ariary).*?(\d{10}).*?(?:Id|Ref)\s*:?\s*([A-Z0-9\.]+)/i);
+  const orangeMatch = cleanBody.match(/([\d][\d\s]*[\d])\s*[Aa]riary.*?(\d{10}).*?(?:ID|Ref)\s*:?\s*([A-Z0-9]+)/i);
   if (orangeMatch) {
     return {
       amount: parseFloat(orangeMatch[1].replace(/\s+/g, '')),
       sender: orangeMatch[2],
-      reference: orangeMatch[3].replace(/\.$/, ''),
+      reference: orangeMatch[3],
     };
   }
 
@@ -158,28 +157,21 @@ export async function autoStartSmsListener(): Promise<void> {
   if (!ExpoSmsGatewayModule || !ExpoSmsGatewayModule.startListening) return;
   if (isListenerActive) return; // Déjà actif
 
-  // 1. On ne démarre automatiquement QUE pour l'administrateur
-  // pour ne pas demander l'accès aux SMS des simples voyageurs.
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user?.email !== 'aintsoacifr24@gmail.com') {
-    return;
-  }
+  // Vérifier la préférence sauvegardée
+  const pref = await AsyncStorage.getItem('sms_listening_pref');
+  if (pref !== 'true') return;
 
+  // Vérifier la permission Android au niveau système
   try {
-    // 2. Vérifier et DEMANDER la permission automatiquement
-    const permissionsToRequest = [PermissionsAndroid.PERMISSIONS.RECEIVE_SMS];
-    if (Platform.OS === 'android' && Platform.Version >= 33) {
-      permissionsToRequest.push(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-    }
-
-    const granted = await PermissionsAndroid.requestMultiple(permissionsToRequest);
-    
-    if (granted[PermissionsAndroid.PERMISSIONS.RECEIVE_SMS] !== PermissionsAndroid.RESULTS.GRANTED) {
-      console.log('[SmsAutoStart] Permission RECEIVE_SMS refusée par l\'admin');
+    const granted = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.RECEIVE_SMS
+    );
+    if (!granted) {
+      console.log('[SmsAutoStart] Permission RECEIVE_SMS non accordée, listener non démarré');
       return;
     }
 
-    // 3. Démarrer l'écoute via le module natif
+    // Démarrer l'écoute via le module natif
     ExpoSmsGatewayModule.startListening(supabaseUrl, supabaseAnonKey);
     
     // Ecouter les événements

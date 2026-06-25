@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { User } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function useProfileLogic(router: any) {
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -46,31 +47,12 @@ export function useProfileLogic(router: any) {
     if (hasLoaded.current && !forceRefresh) return;
     try {
       setLoadingProfile(true);
-      const { data: authData, error } = await supabase.auth.getUser();
-      const authUser = authData?.user;
       
-      if (error) {
-        console.log('Erreur session:', error.message);
-        return;
-      }
-
-      if (authUser) {
-        setUser(authUser);
-        const meta = authUser.user_metadata;
-        setFirstName(meta?.first_name || '');
-        setLastName(meta?.last_name || '');
-        setDisplayName(meta?.first_name || 'Utilisateur');
-        if (meta?.avatar_url) {
-          setProfileImage(meta.avatar_url);
-        }
-
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-
-        if (profileData) {
+      // 1. CHARGEMENT INSTANTANÉ DEPUIS LE CACHE LOCAL (zéro latence)
+      try {
+        const cachedStr = await AsyncStorage.getItem('user_profile_cache');
+        if (cachedStr) {
+          const profileData = JSON.parse(cachedStr);
           setBio(profileData.bio || '');
           setPhone(profileData.phone || '');
           setSecondaryPhone(profileData.secondary_phone || '');
@@ -87,6 +69,66 @@ export function useProfileLogic(router: any) {
           setToilet(profileData.toilet || false);
           setIsAdmin(profileData.is_admin || false);
           setKycStatus(profileData.kyc_status || 'unverified');
+          if (profileData.first_name) {
+            setFirstName(profileData.first_name);
+            setDisplayName(profileData.first_name);
+          }
+          if (profileData.last_name) setLastName(profileData.last_name);
+          if (profileData.avatar_url) setProfileImage(profileData.avatar_url);
+        }
+      } catch (e) {}
+
+      // 2. REQUÊTE EN ARRIÈRE-PLAN (getSession est instantané)
+      const { data: { session }, error } = await supabase.auth.getSession();
+      const authUser = session?.user;
+      
+      if (error) {
+        console.log('Erreur session:', error.message);
+        return;
+      }
+
+      if (authUser) {
+        setUser(authUser);
+        const meta = authUser.user_metadata;
+        if (meta?.first_name) setFirstName(meta.first_name);
+        if (meta?.last_name) setLastName(meta.last_name);
+        if (meta?.first_name) setDisplayName(meta.first_name);
+        if (meta?.avatar_url) setProfileImage(meta.avatar_url);
+
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authUser.id)
+          .single();
+
+        if (profileData) {
+          // Mise à jour de l'état
+          setBio(profileData.bio || '');
+          setPhone(profileData.phone || '');
+          setSecondaryPhone(profileData.secondary_phone || '');
+          setVehicleModel(profileData.vehicle_model || '');
+          setVehicleSpecificType(profileData.vehicle_type || '');
+          setSmokeAllowed(profileData.prefers_smoking || false);
+          setPetsAllowed(profileData.prefers_pets || false);
+          setMusicAllowed(profileData.prefers_music || true);
+          setMax2Back(profileData.max_2_back || false);
+          setInstantBooking(profileData.instant_booking || false);
+          setAirConditioning(profileData.air_conditioning || false);
+          setPowerOutlets(profileData.power_outlets || false);
+          setRecliningSeats(profileData.reclining_seats || false);
+          setToilet(profileData.toilet || false);
+          setIsAdmin(profileData.is_admin || false);
+          setKycStatus(profileData.kyc_status || 'unverified');
+
+          // Sauvegarde dans le cache local pour la prochaine fois
+          try {
+            AsyncStorage.setItem('user_profile_cache', JSON.stringify({
+              ...profileData,
+              first_name: meta?.first_name,
+              last_name: meta?.last_name,
+              avatar_url: meta?.avatar_url
+            }));
+          } catch (e) {}
         }
         hasLoaded.current = true;
       }
@@ -222,7 +264,10 @@ export function useProfileLogic(router: any) {
 
   const handleSignOut = async () => {
     const doSignOut = async () => {
-      try { await supabase.auth.signOut(); } catch (e) {}
+      try { 
+        await supabase.auth.signOut(); 
+        await AsyncStorage.removeItem('user_profile_cache');
+      } catch (e) {}
       hasLoaded.current = false;
       if (Platform.OS === 'web') {
         if (typeof window !== 'undefined') window.location.href = '/login';

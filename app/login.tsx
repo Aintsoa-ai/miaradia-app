@@ -27,10 +27,32 @@ export default function LoginScreen() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       CustomAlert.alert('Erreur de connexion', "L'email ou le mot de passe est incorrect.");
     } else {
+      // PRÉCHARGEMENT DU PROFIL POUR UN AFFICHAGE 100% INSTANTANÉ
+      if (authData?.user) {
+        try {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authData.user.id)
+            .single();
+          
+          if (profileData) {
+            const meta = authData.user.user_metadata;
+            const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+            await AsyncStorage.setItem('user_profile_cache', JSON.stringify({
+              ...profileData,
+              first_name: meta?.first_name,
+              last_name: meta?.last_name,
+              avatar_url: meta?.avatar_url
+            }));
+          }
+        } catch (e) {} // Ignorer si erreur, le profil le chargera lui-même
+      }
+
       if (params.redirect) {
         const redirectPath = params.redirect as string;
         const { redirect, ...rest } = params;

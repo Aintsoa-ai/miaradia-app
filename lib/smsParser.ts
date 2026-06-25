@@ -48,12 +48,13 @@ export function parseMobileMoneySMS(smsBody: string): {
   }
 
   // === ORANGE MONEY ===
-  const orangeMatch = cleanBody.match(/([\d][\d\s]*[\d])\s*[Aa]riary.*?(\d{10}).*?(?:ID|Ref)\s*:?\s*([A-Z0-9]+)/i);
+  // "Vous avez recu un transfert de 1000Ar venant du 0373894619 Nouveau Solde: 2000Ar. Trans Id: PP260625.1444.D59762."
+  const orangeMatch = cleanBody.match(/([\d][\d\s]*[\d])\s*(?:Ar|Ariary).*?(\d{10}).*?(?:Id|Ref)\s*:?\s*([A-Z0-9\.]+)/i);
   if (orangeMatch) {
     return {
       amount: parseFloat(orangeMatch[1].replace(/\s+/g, '')),
       sender: orangeMatch[2],
-      reference: orangeMatch[3]
+      reference: orangeMatch[3].replace(/\.$/, '')
     };
   }
 

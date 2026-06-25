@@ -37,10 +37,14 @@ export default function Layout() {
         if (update.isAvailable) {
           await Updates.fetchUpdateAsync();
           import("../utils/alert").then(({ CustomAlert }) => {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR');
+            const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            
             CustomAlert.alert(
               "Mise à jour disponible 🚀",
-              "Une nouvelle version de l'application vient d'être téléchargée. L'application va redémarrer pour l'appliquer.",
-              [{ text: "Redémarrer", onPress: () => Updates.reloadAsync() }]
+              `Une nouvelle version de l'application a été téléchargée le ${dateStr} à ${timeStr}.\n\nL'application va redémarrer pour l'appliquer.`,
+              [{ text: "Redémarrer l'application", onPress: () => Updates.reloadAsync() }]
             );
           });
         }

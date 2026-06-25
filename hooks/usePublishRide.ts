@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { CustomAlert } from '../utils/alert';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 export interface PublishRidePayload {
   departure: string;
@@ -37,17 +38,23 @@ export function usePublishRide() {
   const [isUploading, setIsUploading] = useState(false);
 
   const uploadRideImage = async (uri: string, userId: string) => {
-    const response = await fetch(uri);
+    // Optimisation : compression ultra-rapide avant upload
+    const manipResult = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: 800 } }],
+      { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
+    );
+
+    const response = await fetch(manipResult.uri);
     const blob = await response.blob();
     const arrayBuffer = await new Response(blob).arrayBuffer();
     
-    const fileExt = uri.split('.').pop()?.toLowerCase() || 'png';
-    const filePath = `ride_${userId}_${Date.now()}.${fileExt}`;
+    const filePath = `ride_${userId}_${Date.now()}.jpg`;
 
     const { error: uploadError } = await supabase.storage
       .from('avatars')
       .upload(filePath, arrayBuffer, {
-        contentType: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`
+        contentType: 'image/jpeg'
       });
 
     if (uploadError) throw uploadError;
@@ -82,8 +89,11 @@ export function usePublishRide() {
 
     try {
       setIsUploading(true);
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error("Vous devez être connecté pour publier un trajet.");
+      
+      // Optimisation : getSession() est instantané (cache local) vs getUser() (requête réseau)
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+      if (!user) throw new Error("Vous devez être connecté pour publier un trajet.");
 
       let uploadedImageUrl = null;
       if (rideImage) {
@@ -148,8 +158,8 @@ export function usePublishRide() {
         `Votre trajet en ${currentCategory} a été publié avec succès !`,
         [{ text: "OK", onPress: onSuccess }]
       );
-    } catch (error: unknown) {
-      const errMessage = error instanceof Error ? error.message : "Impossible de publier le trajet.";
+    } catch (error: any) {
+      const errMessage = error?.message || error?.details || "Impossible de publier le trajet.";
       CustomAlert.alert("Erreur", errMessage);
     } finally {
       setIsUploading(false);
