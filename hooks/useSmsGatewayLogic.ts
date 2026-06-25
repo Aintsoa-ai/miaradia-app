@@ -72,6 +72,12 @@ export function useSmsGatewayLogic() {
     try {
       const { reference, amount, sender: extractedSender } = parseMobileMoneySMS(smsBody);
 
+      if (sender && sender !== 'SIMULATE' && (sender.includes('+') || /^[0-9]+$/.test(sender.replace(/\s/g, '')))) {
+        CustomAlert.alert('🚨 Fraude Détectée', "Ce SMS ne vient pas d'un opérateur officiel.");
+        setProcessing(false);
+        return;
+      }
+
       const logEntry: any = {
         sms_body: smsBody,
         extracted_reference: reference,

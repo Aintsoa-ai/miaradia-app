@@ -86,6 +86,14 @@ async function handleIncomingSms(smsBody: string, rawSender?: string) {
     const { reference, amount, sender } = parseMobileMoneySMS(smsBody);
     const extractedSender = sender || rawSender || null;
 
+    // BOUCLIER DE SÉCURITÉ ANTI-FRAUDE (SPOOFING)
+    // Si l'expéditeur contient un "+" ou commence par "03", c'est un humain qui essaie de frauder.
+    // Un vrai SMS opérateur vient de "MVola", "OrangeMoney", ou "Airtel" (pas de format numéro classique).
+    if (rawSender && (rawSender.includes('+') || /^[0-9]+$/.test(rawSender.replace(/\s/g, '')))) {
+      console.log('[SmsAutoStart] 🚨 SMS frauduleux bloqué. Expéditeur suspect :', rawSender);
+      return; // On ignore complètement ce SMS
+    }
+
     // Log du SMS dans Supabase
     const logEntry: any = {
       sms_body: smsBody,
