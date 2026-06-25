@@ -681,10 +681,18 @@ export default function RideDetailsScreen() {
                     <View style={{ backgroundColor: '#FFFBEB', borderWidth: 1, borderColor: '#FDE68A', borderRadius: 16, padding: 16, gap: 8 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <Ionicons name="time" size={16} color="#D97706" />
-                        <Text style={{ color: '#B45309', fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>Vérification en cours</Text>
+                        <Text style={{ color: '#B45309', fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 6 }}>Action Requise</Text>
                       </View>
-                      <Text style={{ color: '#B45309', fontSize: 11, fontWeight: '700', textAlign: 'center', lineHeight: 16 }}>
-                        Le dépôt de votre frais de réservation est en cours de validation par notre équipe. Le numéro sera visible dès validation.
+                      <Text style={{ color: '#B45309', fontSize: 13, fontWeight: '800', textAlign: 'center', marginTop: 4 }}>
+                        Pour finaliser, veuillez transférer exactement {formatPrice(fee)} Ar.
+                      </Text>
+                      <View style={{ backgroundColor: '#FEF3C7', padding: 12, borderRadius: 12, marginTop: 4 }}>
+                        <Text style={{ color: '#92400E', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>👉 MVola : <Text style={{fontWeight:'900'}}>038 17 909 87</Text></Text>
+                        <Text style={{ color: '#92400E', fontSize: 12, fontWeight: '700' }}>👉 Orange Money : <Text style={{fontWeight:'900'}}>037 97 941 15</Text></Text>
+                        <Text style={{ color: '#92400E', fontSize: 11, fontStyle: 'italic', marginTop: 6 }}>(Nom : Aintsoa Mihajatiana)</Text>
+                      </View>
+                      <Text style={{ color: '#B45309', fontSize: 11, fontWeight: '700', textAlign: 'center', lineHeight: 16, marginTop: 4 }}>
+                        L'écran se débloquera automatiquement dès réception de votre transfert.
                       </Text>
                     </View>
                   ) : (

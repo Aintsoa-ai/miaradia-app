@@ -157,9 +157,7 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
         <View style={styles.instructionCard}>
           <Text style={styles.manualInstruction}>
             1. Saisissez <Text style={{fontWeight:'800'}}>VOTRE</Text> numéro de téléphone ci-dessous et validez.{"\n\n"}
-            2. <Text style={{fontWeight:'800'}}>ENSUITE</Text>, transférez exactement <Text style={{fontWeight:'800'}}>{amount.toLocaleString('fr-FR')} Ar</Text> (en totalité avec les frais à votre charge) au numéro :{"\n"}
-            <Text style={styles.phoneNumber}>{adminNumber}</Text>{"\n"}
-            <Text style={{fontSize: 12, color: '#6B7280'}}>Nom : Aintsoa Mihajatiana</Text>
+            2. À l'étape suivante, vous verrez le numéro vers lequel transférer les <Text style={{fontWeight:'800'}}>{amount.toLocaleString('fr-FR')} Ar</Text>.
           </Text>
         </View>
 
