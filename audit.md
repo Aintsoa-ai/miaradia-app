@@ -2,6 +2,25 @@
 
 ## 📅 Historique des Audits & Résolutions
 
+### Session 32 (25 Juin 2026) : UX Mobile Money, Passerelle SMS & Sécurité Anti-Fraude 🛡️
+
+> **Contexte :** Résoudre les bugs de non-validation des paiements Orange Money, améliorer l'UX du paiement pour éviter les erreurs d'ordre, et combler une faille de sécurité majeure (Spoofing).
+
+#### Fonctionnalités Ajoutées / Corrigées
+*   **Correction Analyseur SMS (Regex) Orange Money :**
+    *   Mise à jour des expressions régulières dans `smsAutoStart.ts` et `smsParser.ts` pour supporter le nouveau format d'Orange Money (utilisation de "Ar" au lieu de "Ariary" et gestion des ID de transaction avec points ex: `PP260625.1444.D59762`).
+*   **Bouclier Sécurité Anti-Usurpation (Spoofing) 🛡️ :**
+    *   Implémentation d'un contrôle strict du `Sender ID` (l'expéditeur). L'application rejette silencieusement tout SMS de paiement dont l'expéditeur contient des chiffres (ex: `034...` ou `+261...`), garantissant que seuls les SMS officiels "MVola", "OrangeMoney", ou "Airtel" sont acceptés, bloquant ainsi les SMS frauduleux envoyés par des particuliers.
+*   **Refonte UX du Parcours de Paiement :**
+    *   Séparation du processus en 2 étapes claires pour forcer la mise en attente *avant* l'envoi d'argent.
+    *   Étape 1 : Le Modal de paiement demande uniquement le numéro de téléphone.
+    *   Étape 2 : L'écran de la réservation bascule en "Action Requise" affichant les montants, les numéros de dépôt, et un message de courtoisie expliquant l'utilité des frais de 10% pour l'entretien de la plateforme.
+*   **Optimisation Instant Profile :**
+    *   Préchargement des données (`AsyncStorage`) au `login` pour un affichage 100% instantané du profil sans délai.
+
+---
+
+
 ### Session 31 (23 Juin 2026) : Audit Strict "Clean Architecture" 🏗️
 
 > **Contexte :** Vérification du respect des 5 règles d'or (Custom Hooks, Composants modulaires < 200 lignes, Styles propres, Typage strict sans `any`, Boy Scout Rule).

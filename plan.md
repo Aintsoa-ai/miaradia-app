@@ -113,6 +113,7 @@ miaradia-app/
 *   **Intégration API MVola Officielle *(PROCHAINE ÉTAPE)* :** Obtenir un compte business Telma pour une validation encore plus fiable que la solution SMS Gateway.
 *   **Optimisations Performance Mobile (S27) ⚡ :** Correction du bug de re-création infinie du timer carousel (refs au lieu de dépendances React), memoïsation de `RideCard` avec `React.memo`, suppression du spinner bloquant sur `/publish` (auth en arrière-plan), délai différé de 3s pour `usePlatformStats`, timeout `AbortController` 5s sur les APIs distance (Nominatim + OSRM), suppression de tous les `console.log` de production, et configuration de headers de cache Vercel agressifs (JS/CSS immutable 1 an, PNG 7 jours).
 *   **Sécurité & Trust Factor (S30) 🛡️ :** Déploiement d'une politique de transparence extrême avec Tracker GPS Virtuel envoyant les coordonnées via Google Maps (`expo-location`) sur WhatsApp, obligation d'afficher la plaque d'immatriculation, et intégration d'un bouton S.O.S "117". Verrouillage total de la base de données via des index SQL Uniques (1 téléphone = 1 compte, 1 CIN = 1 KYC) empêchant techniquement la création de faux profils. Refonte UI/UX Profil et Dashboard Kiosque.
+*   **Anti-Fraude SMS & UX Paiement (S32) 🛡️💳 :** Création d'un bouclier anti-spoofing bloquant les SMS frauduleux (Sender ID contenant des chiffres). Refonte de l'UX de paiement en 2 étapes pour garantir que la réservation est "en attente" avant le transfert de fonds. Mise à jour des Regex Orange Money.
 ### Phase 3 : Fiabilité & Mode Offline
 *   **Cache Local SQLite/AsyncStorage :** Mettre en cache local les détails du billet réservé et le contact du chauffeur pour y avoir accès sur la route nationale en zone d'ombre (sans réseau).
 *   **Vérification CIN (KYC) *(RÉALISÉ - S24)* :** Formulaire de téléversement et processus d'approbation d'identité avec interface d'administration ultra-premium pour certifier officiellement les conducteurs.
@@ -135,4 +136,4 @@ miaradia-app/
 | **Supabase** | Backend + DB + Auth + Edge Functions | https://yqttaeukmnstyxbabkqz.supabase.co |
 | **SMS Gateway** | App Android sur téléphone admin | Gratuit |
 
-*Dernière mise à jour : **13 Juin 2026** — Session 30 : Sécurité Physique (Tracker GPS), Base de données verrouillée.*
+*Dernière mise à jour : **25 Juin 2026** — Session 32 : UX Mobile Money, Anti-Fraude SMS.*

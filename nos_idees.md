@@ -26,6 +26,9 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 - [x] **Alerte Embouteillages & Temps Supplémentaire (S28) 🚦 :** Reconnaissance automatique des goulots d'étranglement selon l'heure (ex: Anosizato, By-pass, Tsarasaotra) avec alerte visuelle pour le chauffeur et ajustement dynamique de l'heure d'arrivée. Alerte météo/saison des pluies intégrée.
 
 ### Monétisation & Prix
+- [x] **Bouclier Anti-Usurpation SMS (S32) 🛡️ :** Rejet des faux SMS envoyés depuis des numéros réguliers (Spoofing).
+- [x] **Refonte UX Paiement Séquentiel (S32) :** Séparation Saisie Numéro et Transfert, avec ajout d'une note de courtoisie pour justifier les 10% (transparence).
+- [x] **Correctifs Regex Orange Money (S32) :** Support des points dans l'ID de transaction et de l'unité "Ar".
 - [x] **Validation Automatique SMS Mobile Money *(RÉALISÉ - S14-S19)* :** Détection automatique SMS MVola/Orange/Airtel via webhook. Matching des références, déverrouillage du contact.
 - [x] **Message & Notification Post-Validation *(RÉALISÉ - S28)* :** Dès la validation du paiement, un message In-App est généré ET le chauffeur reçoit instantanément une notification Push.
 - [x] **Tarification Intelligente & Prédictive *(RÉALISÉ - S28)* :** Lors de la publication d'un trajet, l'application analyse les historiques réels de la route sélectionnée dans la DB pour pré-remplir un prix moyen, ou utilise une estimation de 150 Ar/km si la route est nouvelle.
@@ -122,4 +125,4 @@ Ce document recense les idées d'amélioration et les futures fonctionnalités p
 
 ---
 
-*Dernière mise à jour : 13 Juin 2026 - Session 30 : Sécurité Physique et Informatique (Trust Factor, Tracker GPS, Unicité Base de données, UI Profil).*
+*Dernière mise à jour : 25 Juin 2026 - Session 32 : UX Mobile Money, Anti-Fraude SMS.*

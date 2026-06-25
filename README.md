@@ -94,7 +94,7 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Gestion des Annonces :** Sur la page de détail de *son propre trajet*, le chauffeur dispose d'un panneau pour ajuster les places en temps réel (boutons `+` et `-`) ou supprimer totalement l'annonce.
 - **Historique & Trajets Expirés :** Les trajets terminés/passés dans l'onglet "Je conduis" sont automatiquement détectés, grisés (opacité `0.7`), marqués d'un badge `"Trajet terminé"` et triés en bas de liste. L'historique du chauffeur est préservé tout en libérant l'espace supérieur pour les trajets actifs.
 
-### 8. Système de Paiement Mobile Money *(STABLE - SESSION 19)*
+### 8. Système de Paiement Mobile Money *(AMÉLIORÉ - SESSION 32)*
 - **Gating de Contact :** Le numéro du conducteur est masqué jusqu'au paiement.
 - **Multi-Opérateurs & UI Premium :** Modale de sélection élégante pour MVola, Orange Money, Airtel Money.
 - **Frais dynamiques :** 10% du prix du trajet (min 1 000, max 5 000 Ar).
@@ -102,6 +102,8 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 - **Crédits de Bienvenue (Freemium) 🎁 :** Distribution automatique de 5 trajets gratuits (`free_unlocks`) à tous les nouveaux inscrits, permettant de débloquer des contacts de chauffeurs sans paiement pour construire la confiance.
 - **Auto-Rafraîchissement Realtime :** Les statuts de réservation se mettent à jour instantanément à la seconde près côté passager (sans rechargement de page) grâce à `supabase_realtime`.
 - **Notifications Push Expo *(AMÉLIORÉ - S21)* :** Envoi d'une notification push silencieuse et immédiate sur le téléphone du passager dès que le webhook valide son paiement Mobile Money en arrière-plan. Correction complète du `projectId` EAS officiel et liaison d'un écouteur global de tap redirigeant instantanément le passager vers le détail de son voyage (`/ride/[id]`).
+- **Bouclier Anti-Usurpation (Spoofing) 🛡️ *(NOUVEAU - S32)* :** Rejet automatique des faux SMS de paiement envoyés depuis des numéros de téléphone standards. Vérification stricte du Sender ID opérateur.
+- **UX Paiement Séquentiel *(NOUVEAU - S32)* :** Parcours repensé (Validation Numéro → Instructions) avec affichage persistant des numéros de transfert et note de courtoisie.
 - **Table `sms_logs` :** Audit complet de tous les SMS Mobile Money reçus.
 - **Sécurisation Blindée :** Le numéro du chauffeur reste strictement verrouillé tant que la passerelle SMS n'a pas confirmé le paiement en base de données, empêchant tout contournement manuel.
 - **Chat de Confirmation Automatique :** Immédiatement après la validation du paiement, le système insère de manière asynchrone un message automatique dans le chat de la réservation.
@@ -233,4 +235,4 @@ Application de covoiturage moderne dédiée aux routes nationales de Madagascar.
 
 ---
 
-*Dernière mise à jour : **13 Juin 2026** — Session 30 : Sécurité Physique (Trust Factor, Tracker GPS), Unicité SQL, UI Profil et Admin.*
+*Dernière mise à jour : **25 Juin 2026** — Session 32 : UX Mobile Money, Anti-Fraude SMS.*
