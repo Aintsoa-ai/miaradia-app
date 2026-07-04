@@ -140,6 +140,13 @@ export function useProfileLogic(router: any) {
     }
   }, []);
 
+  const fetchProfileDeferred = useCallback((forceRefresh = false) => {
+    // Rendement immédiat de la main au moteur UI
+    setTimeout(() => {
+      fetchProfile(forceRefresh);
+    }, 150); // 150ms est suffisant pour que la navigation soit complètement fluide
+  }, [fetchProfile]);
+
   const uploadImage = async (uri: string) => {
     if (!user) {
       CustomAlert.alert('Erreur', 'Vous devez être connecté pour changer votre photo.');
@@ -459,7 +466,7 @@ export function useProfileLogic(router: any) {
     musicAllowed, setMusicAllowed, max2Back, setMax2Back, instantBooking, setInstantBooking,
     airConditioning, setAirConditioning, powerOutlets, setPowerOutlets, recliningSeats, setRecliningSeats,
     toilet, setToilet, customPreferences, newPreference, setNewPreference,
-    fetchProfile, pickImage, handleAddPreference, handleRemovePreference,
+    fetchProfile: fetchProfileDeferred, pickImage, handleAddPreference, handleRemovePreference,
     formatPhoneInput, formatSecondaryPhoneInput, handleSignOut, handleDeleteAccount, handleSaveProfile
   };
 }
