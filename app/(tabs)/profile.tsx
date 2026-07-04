@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { CustomAlert } from '../../utils/alert';
 
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch, Alert, Image, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch, Alert, Image, ActivityIndicator, useWindowDimensions, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
+const ScrollContainer = Platform.OS === 'web' ? ScrollView : KeyboardAwareScrollView as any;
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -41,7 +43,7 @@ export default function ProfileScreen() {
     <View style={{ flex: 1, backgroundColor: '#F1F5F9' }}>
       <StatusBar style="light" />
       
-      <KeyboardAwareScrollView 
+      <ScrollContainer 
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 60, alignItems: isDesktop ? 'center' : 'stretch' }} 
         showsVerticalScrollIndicator={false}
         enableOnAndroid={true}
@@ -511,7 +513,7 @@ export default function ProfileScreen() {
         <View style={{ paddingBottom: 40 }} />
 
           </View>
-        </KeyboardAwareScrollView>
+        </ScrollContainer>
     </View>
   );
 }
