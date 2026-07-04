@@ -156,7 +156,7 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
         <Text style={styles.manualTitle}>Instructions de Paiement</Text>
         <View style={styles.instructionCard}>
           <Text style={styles.manualInstruction}>
-            1. Saisissez <Text style={{fontWeight:'800'}}>VOTRE</Text> numéro de téléphone ci-dessous et validez.{"\n\n"}
+            1. Saisissez ci-dessous le numéro <Text style={{fontWeight:'900', color: '#B91C1C'}}>avec lequel vous allez envoyer l'argent</Text>. C'est ce numéro qui nous permettra d'identifier votre paiement et de débloquer le chauffeur.{"\n\n"}
             2. À l'étape suivante, vous verrez le numéro vers lequel transférer les <Text style={{fontWeight:'800'}}>{amount.toLocaleString('fr-FR')} Ar</Text>.
           </Text>
         </View>
@@ -165,7 +165,7 @@ export default function PaymentModal({ isVisible, onClose, onSelectMethod, amoun
           <Ionicons name="call-outline" size={20} color="#9CA3AF" />
           <TextInput
             style={styles.input}
-            placeholder="Votre numéro (ex: 034 XX XXX XX)"
+            placeholder="Le numéro qui envoie l'argent..."
             value={phoneNumber}
             onChangeText={setPhoneNumber}
             keyboardType="phone-pad"
